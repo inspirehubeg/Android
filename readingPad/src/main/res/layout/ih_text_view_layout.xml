@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?><!--<ih.tools.readingpad.feature_book_parsing.presentation.text_view.IHTextView xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:id="@+id/ihTextView"-->
+<!--    android:gravity="center_vertical"-->
+<!-- />-->
+
+<ih.tools.readingpad.feature_book_parsing.presentation.text_view.IHTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ihTextView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:linksClickable="true"
+    android:minHeight="?android:attr/listPreferredItemHeightSmall"
+    android:paddingBottom="20dp"
+    android:paddingTop="30dp"
+    android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+    android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+    android:textAppearance="?android:attr/textAppearanceListItemSmall"
+    android:textIsSelectable="true" />
+
+
+

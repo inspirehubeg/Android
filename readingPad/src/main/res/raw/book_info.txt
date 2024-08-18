@@ -1,0 +1,12 @@
+{
+   "name":"Book",
+   "description":"description",
+   "author":{
+      "name":"Ali",
+      "id":"123"
+   },
+   "pagesNumber":30,
+   "bookSize":5,
+   "id":"328478",
+   "chaptersNumber":5
+}

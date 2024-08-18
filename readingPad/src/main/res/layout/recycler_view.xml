@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/frame_layout"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ih.tools.readingpad.feature_book_parsing.presentation.recycler_view.IHRecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/recycler_view"/>
+
+
+
+<!--        <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--            android:id="@+id/fab"-->
+<!--            android:layout_width="50dp"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:layout_gravity="bottom|start"-->
+<!--            android:importantForAccessibility="no"-->
+<!--            android:src="@android:drawable/arrow_down_float"-->
+<!--            />-->
+
+<!--        <TextView android:layout_height="wrap_content"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:text="OK"-->
+<!--            android:textSize="18sp"-->
+<!--            android:textColor="#fff"-->
+<!--            android:layout_gravity="bottom|start"-->
+<!--            />-->
+
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

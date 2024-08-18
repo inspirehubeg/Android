@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_highlight"
+        android:title="Highlight"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_bookmark"
+        android:title="Bookmark"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_remove_bookmark"
+        android:title="Remove Bookmark"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_remove_highlight"
+        android:title="Remove highlight"
+        app:showAsAction="ifRoom" />
+</menu>

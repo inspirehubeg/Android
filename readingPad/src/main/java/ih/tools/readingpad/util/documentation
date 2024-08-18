@@ -1,0 +1,5 @@
+Mapping attributes to the app theme App developers can map your library's attributes to their app's theme colors
+by defining a custom theme overlay in their styles.xml file.
+This overlay should target your library's style and override the attributes with their desired color values.
+Here's an example of how an app developer can create a theme overlay to map
+your primaryColor attribute to their app's primary color:

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AlexSchool</string>
+    <string name="settings">الضبط</string>
+    <string name="book_content">محتوي الكتاب</string>
+    <string name="system_default">مطابق للنظام</string>
+    <string name="english">الانجليزية</string>
+    <string name="arabic">العربية</string>
+    <string name="settings_icon">ايقونة الضبط</string>
+    <string name="back_button">العودة للخلف</string>
+    <string name="save">حفظ</string>
+</resources>
