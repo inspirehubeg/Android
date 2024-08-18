@@ -1,6 +1,7 @@
 package ih.tools.readingpad.feature_book_parsing.presentation.reading_pad_screen
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -111,7 +112,8 @@ fun ReadingPadScreen(
                         .fillMaxSize()
                         .padding(values) //this allows the top bar to be pinned without hiding any content beneath it
                 } else {
-                   Modifier.fillMaxSize()
+                    Modifier
+                        .fillMaxSize()
                         .systemBarsPadding() // this allows the bars to appear above the page to give the full screen behavior
                 }
             ) {
@@ -152,7 +154,27 @@ fun ReadingPadScreen(
                 PageSelector(viewModel, listState)
             }
         }
+        BackHandler {
+            if (showFontSlider) {
+                viewModel._showFontSlider.value = (false)
+            } else if (showThemeSelector) {
+                viewModel._showThemeSelector.value = false
+            } else if (showBookmarkListDialog) {
+                viewModel._showBookmarkListDialog.value = false
+            } else if (showPageNumberDialog) {
+                viewModel._showPageNumberDialog.value = false
+            } else if (showAddBookmarkDialog) {
+                viewModel._showAddBookmarkDialog.value = false
+            } else if (showEditBookmarkDialog) {
+                viewModel._showEditBookmarkDialog.value = false
+            } else {
+                // Let the default back navigation handle this case
+                navController.navigateUp()
+            }
+        }
     }
+
+
 }
 
 

@@ -1,5 +1,6 @@
 package alexschool.bookreader.data
 
+import alexschool.bookreader.R
 import android.content.Context
 
 class AlexSchoolPrefManager (private val context: Context) {
@@ -14,7 +15,7 @@ class AlexSchoolPrefManager (private val context: Context) {
     }
 
     fun getLanguage(): String {
-        return sharedPreferences.getString(LANGUAGE_KEY, "System default") ?: "System default"
+        return sharedPreferences.getString(LANGUAGE_KEY, context.getString(R.string.system_default)) ?: context.getString(R.string.system_default)
     }
 
     companion object {

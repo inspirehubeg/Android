@@ -1,20 +1,23 @@
 package alexschool.bookreader.ui.settings
 
-import android.app.Activity
-import android.content.res.Configuration
+import alexschool.bookreader.R
+import android.content.Context
 import android.util.Log
-import java.util.Locale
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 
-fun updateAppLocale(activity: Activity, language: String) {
+fun updateAppLocale(context: Context, language: String) {
+
+    //val locale = LocaleListCompat.forLanguageTags(language)
+
+    // extra logic you might want to execute
+
     Log.d("MainActivity", "updateAppLocale: $language")
     val locale = when (language) {
-        "System default" -> Locale.getDefault()
-        "English" -> Locale("en")
-        "Arabic" -> Locale("ar")
-        else -> Locale.getDefault()
+        context.getString(R.string.english) -> LocaleListCompat.forLanguageTags("en")
+        context.getString(R.string.arabic) -> LocaleListCompat.forLanguageTags("ar")
+        else -> LocaleListCompat.getDefault()
     }
-    Locale.setDefault(locale)
-    val config = Configuration(activity.resources.configuration)
-    config.setLocale(locale)
-    activity.createConfigurationContext(config)
+    AppCompatDelegate.setApplicationLocales(locale)
+    //Locale.setDefault(locale)
 }

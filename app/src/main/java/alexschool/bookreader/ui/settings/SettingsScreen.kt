@@ -75,7 +75,7 @@ fun SettingsScreen(
     val prefManager = AlexSchoolPrefManager(context)
     var expanded by remember { mutableStateOf(false) }
     var selectedLanguage by remember { mutableStateOf(prefManager.getLanguage()) }
-    val languages = listOf(stringResource(R.string.system_default),
+    val languages = listOf(
         stringResource(R.string.english), stringResource(R.string.arabic)
     )
 
@@ -95,8 +95,7 @@ fun SettingsScreen(
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.navigateUp()
-                        //navController.popBackStack()
-                        //viewModel.onEvent(BookContentEvent.BackButtonClick)
+
                     })
                     {
                         Icon(
@@ -146,11 +145,8 @@ fun SettingsScreen(
             Button(
                 onClick = {
                     prefManager.setLanguage(selectedLanguage)
-                    val activity = context as? Activity
-                    activity?.let {
-                        updateAppLocale(it, selectedLanguage)
-                        it.recreate()
-                    }
+                    updateAppLocale(context ,selectedLanguage)
+
                     //navController.navigate(Screens.HomeScreen.route)
                    // navController.popBackStack()
                 }) {

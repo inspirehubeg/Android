@@ -13,7 +13,7 @@ import androidx.navigation.navArgument
 import ih.tools.readingpad.feature_book_parsing.presentation.reading_pad_screen.ReadingPadScreen
 
 @Composable
-fun Navigation() {
+fun Navigation(viewModel: AlexSchoolViewModel) {
     val navController = rememberNavController()
 
     NavHost(
@@ -23,6 +23,7 @@ fun Navigation() {
         composable(
             route = Screens.HomeScreen.route
         ) {
+            viewModel.setCurrentScreen("HomeScreen")
             HomeScreen(navController = navController)
         }
         composable(
@@ -36,6 +37,7 @@ fun Navigation() {
                 }
             )
         ) {
+            viewModel.setCurrentScreen("ReadingPadScreen")
             ReadingPadScreen(navController = navController)
         }
 //        composable(
@@ -51,6 +53,7 @@ fun Navigation() {
         composable(
             route = Screens.SettingsScreen.route
         ) {
+            viewModel.setCurrentScreen("SettingsScreen")
             SettingsScreen(navController)
         }
     }
