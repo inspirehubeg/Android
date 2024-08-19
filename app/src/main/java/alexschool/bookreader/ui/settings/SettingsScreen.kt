@@ -2,8 +2,6 @@ package alexschool.bookreader.ui.settings
 
 import alexschool.bookreader.R
 import alexschool.bookreader.data.AlexSchoolPrefManager
-import alexschool.bookreader.ui.Screens
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
@@ -51,7 +48,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.util.showToast
@@ -95,7 +91,6 @@ fun SettingsScreen(
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.navigateUp()
-
                     })
                     {
                         Icon(
@@ -109,49 +104,66 @@ fun SettingsScreen(
     ) { values ->
         Column (
             Modifier
-                .fillMaxSize()
                 .padding(values)
+                .fillMaxSize()
         ) {
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = {
-                    expanded = !expanded
-                }) {
-                TextField(
-                    value = selectedLanguage,
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
-                    modifier = Modifier.menuAnchor()
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    languages.forEach { selectionOption ->
-                        DropdownMenuItem(
-                            text = { Text(selectionOption) },
-                            onClick = {
-                                selectedLanguage = selectionOption
-                                expanded = false
-                            }
-                        )
-                    }
-                }
+            Row (
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp)
+            ){
+                Text(text = stringResource(R.string.choose_app_language))
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    prefManager.setLanguage(selectedLanguage)
-                    updateAppLocale(context ,selectedLanguage)
+            Row (
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp)) {
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = {
+                        expanded = !expanded
+                    }
+                ) {
+                    TextField(
+                        value = selectedLanguage,
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        },
+                        modifier = Modifier.menuAnchor()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        languages.forEach { selectionOption ->
+                            DropdownMenuItem(
+                                text = { Text(selectionOption) },
+                                onClick = {
+                                    selectedLanguage = selectionOption
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Button(
+                    onClick = {
+                        prefManager.setLanguage(selectedLanguage)
+                        updateAppLocale(context ,selectedLanguage)
 
-                    //navController.navigate(Screens.HomeScreen.route)
-                   // navController.popBackStack()
-                }) {
-                Text(stringResource(R.string.save))
+                        //navController.navigate(Screens.HomeScreen.route)
+                        // navController.popBackStack()
+                    }) {
+                    Text(stringResource(R.string.apply))
+                }
             }
+
+
+
         }
 //        LazyColumn(
 //            Modifier

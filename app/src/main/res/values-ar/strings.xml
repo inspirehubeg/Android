@@ -9,4 +9,6 @@
     <string name="settings_icon">ايقونة الضبط</string>
     <string name="back_button">العودة للخلف</string>
     <string name="save">حفظ</string>
+    <string name="apply">تفعيل</string>
+    <string name="choose_app_language">اختار لغة التطبيق</string>
 </resources>

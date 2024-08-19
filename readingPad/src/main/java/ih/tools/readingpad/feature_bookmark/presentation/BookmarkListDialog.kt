@@ -68,7 +68,8 @@ fun BookmarkListDialog(
                     shape = RoundedCornerShape(8.dp)
                 )
                 .align(Alignment.Center)
-                .clickable(onClick = {})
+                .clickable(onClick = {}),
+            contentAlignment = Alignment.TopCenter
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -97,14 +98,16 @@ fun BookmarkListDialog(
                         BookmarkListItem(
                             bookmark = bookmark,
                             viewModel = viewModel,
-                            modifier = Modifier.clickable {
-                                viewModel.scrollToIndexLazy(
-                                    targetPageIndex = bookmark.pageNumber - 1,
-                                    lazyListState = listState,
-                                    targetIndex = bookmark.start
-                                )
-                                onDismiss()
-                            })
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    viewModel.scrollToIndexLazy(
+                                        targetPageIndex = bookmark.pageNumber - 1,
+                                        lazyListState = listState,
+                                        targetIndex = bookmark.start
+                                    )
+                                    onDismiss()
+                                })
                     }
                 }
             }
@@ -149,13 +152,13 @@ fun BookmarkListItem(
         )
     )
     {
-        Row (
+        Row(
             modifier = modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
-        ){
-            Column (
+        ) {
+            Column(
                 modifier = Modifier.weight(5f)
-            ){
+            ) {
                 Row(
                     modifier = modifier
                         .fillMaxWidth()
@@ -203,8 +206,8 @@ fun BookmarkListItem(
                     //containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     //contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 )
-            ){
-               Icon(Icons.Filled.Delete, contentDescription = "Delete Bookmark")
+            ) {
+                Icon(Icons.Filled.Delete, contentDescription = "Delete Bookmark")
             }
         }
 
