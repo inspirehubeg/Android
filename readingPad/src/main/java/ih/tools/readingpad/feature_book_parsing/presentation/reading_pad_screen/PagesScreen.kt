@@ -2,20 +2,12 @@ package ih.tools.readingpad.feature_book_parsing.presentation.reading_pad_screen
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -73,26 +65,27 @@ fun PagesScreen(
 
 
     }
-   // if (verticalScroll) {
-        LazyColumn(
-            state = listState
-        ) {
-            itemsIndexed(itemPages) { index, page ->
-                // Only display the current page
-                Log.d("PagesScreen", "page index = $index")
-                XMLViewLazyItem(
-                    page = page,
-                    viewModel = bookContentViewModel,
-                    modifier = Modifier
-                )
-                Spacer( //indicates the pages divider
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.outline)
-                        .height(3.dp)
-                )
-            }
+    // if (verticalScroll) {
+    LazyColumn(
+        state = listState
+    ) {
+        itemsIndexed(itemPages) { index, page ->
+            // Only display the current page
+            Log.d("PagesScreen", "page index = $index")
+            XMLViewLazyItem(
+                page = page,
+                viewModel = bookContentViewModel,
+                modifier = Modifier
+            )
+            Spacer( //indicates the pages divider
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.outline)
+                    .height(3.dp)
+            )
         }
+    }
+}
 //    } else {
 //        LazyRow(
 //            state = listState,
@@ -128,7 +121,7 @@ fun PagesScreen(
 //            }
 //        }
 //    }
-}
+
 
 
 

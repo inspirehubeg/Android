@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="page_number">صفحة: %1$s</string>
+    <string name="chapter_number">فصل: %1$s</string>
+    <string name="book_bookmarks">علامات الكتاب</string>
+    <string name="font_size">حجم الخط</string>
+    <string name="adjust_font_size">تغيير حجم الخط</string>
+    <string name="bookmarks">علامات</string>
+    <string name="settings">الضبط</string>
+    <string name="themes">المظهر</string>
+    <string name="choose_a_theme">"اختار مظهر "</string>
+    <string name="search_placeholder">بحث...</string>
+    <string name="clear">محو</string>
+    <string name="navigate_back">العودة للخلف</string>
+    <string name="search">بحث</string>
+    <string name="theme_item_string">أبجد</string>
+    <string name="bookmark_placeholder">مثال: جديد</string>
+    <string name="bookmark_dialog_name">"الاسم: "</string>
+    <string name="cancel">الغاء</string>
+    <string name="done">تم</string>
+    <string name="delete">مسح</string>
+    <string name="default_new_bookmark_name">جديد</string>
+</resources>

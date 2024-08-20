@@ -69,10 +69,11 @@ fun BookmarkListDialog(
                 )
                 .align(Alignment.Center)
                 .clickable(onClick = {}),
-            contentAlignment = Alignment.TopCenter
+            contentAlignment = Alignment.TopEnd
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
+
             ) {
                 Box(
                     modifier = Modifier

@@ -12,6 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -20,12 +23,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.feature_book_parsing.presentation.components.CustomFontDialog
-import ih.tools.readingpad.feature_bookmark.presentation.BookmarkListDialog
+import ih.tools.readingpad.feature_book_parsing.presentation.components.FullScreenImage
 import ih.tools.readingpad.feature_book_parsing.presentation.components.PageSelector
 import ih.tools.readingpad.feature_book_parsing.presentation.components.ReadingPadBottomBar
 import ih.tools.readingpad.feature_book_parsing.presentation.components.ReadingPadTopBar
 import ih.tools.readingpad.feature_book_parsing.presentation.components.ThemeSelectorMenu
 import ih.tools.readingpad.feature_bookmark.presentation.AddBookmarkDialog
+import ih.tools.readingpad.feature_bookmark.presentation.BookmarkListDialog
 import ih.tools.readingpad.feature_bookmark.presentation.EditBookmarkDialog
 import ih.tools.readingpad.ui.theme.ReadingPadTheme
 import kotlinx.coroutines.launch
@@ -52,7 +56,11 @@ fun ReadingPadScreen(
         val showEditBookmarkDialog by viewModel.showEditBookmarkDialog.collectAsState()
         val currentBookmarkSpan by viewModel.bookmarkClickEvent.collectAsState()
 
+        val imageClicked by viewModel.imageClicked.collectAsState()
+        var showFullScreenImage by remember { mutableStateOf(false) }
+
         val listState = rememberLazyListState() //monitors the state of the lazyColumn to use in navigation
+
 
         // to calculate the height and width of the screen
         val configuration = LocalConfiguration.current
@@ -153,6 +161,18 @@ fun ReadingPadScreen(
             if (showPageNumberDialog) {
                 PageSelector(viewModel, listState)
             }
+
+            if (imageClicked != null) {
+                showFullScreenImage = true
+            }
+
+            if (showFullScreenImage) {
+                FullScreenImage(imageData = imageClicked!!) {
+                    //onClose do the following
+                    showFullScreenImage = false
+                    viewModel.onImageClick(null) // Reset the clicked image state
+                }
+            }
         }
         BackHandler {
             if (showFontSlider) {
@@ -167,14 +187,16 @@ fun ReadingPadScreen(
                 viewModel._showAddBookmarkDialog.value = false
             } else if (showEditBookmarkDialog) {
                 viewModel._showEditBookmarkDialog.value = false
-            } else {
+            }else if (showFullScreenImage) {
+                showFullScreenImage = false
+                viewModel.onImageClick(null)
+            }
+            else {
                 // Let the default back navigation handle this case
                 navController.navigateUp()
             }
         }
     }
-
-
 }
 
 

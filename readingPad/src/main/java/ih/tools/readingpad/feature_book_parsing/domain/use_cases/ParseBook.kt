@@ -21,7 +21,7 @@ class ParseBook {
         context: Context,
         book: Book,
         recyclerView: RecyclerView,
-        bookContentViewModel: BookContentViewModel
+        viewModel: BookContentViewModel
     ): SpannableStringBuilder {
         val encoding = metadata.encoding
         val TAG_START = encoding.tags.tagStart
@@ -71,13 +71,13 @@ class ParseBook {
 
                     // if the parsed tag is an internal link
                     is ParsedElement.InternalLinkSource -> {
-                        pageSpannableStringBuilder = ParseInternalLink().invoke(pageSpannableStringBuilder, parsedTag, metadata, book = book , recyclerView, bookContentViewModel)
+                        pageSpannableStringBuilder = ParseInternalLink().invoke(pageSpannableStringBuilder, parsedTag, metadata, book = book , recyclerView, viewModel)
                     }
 
                     // if the parsed tag is an image
                     is ParsedElement.Image -> {
                         Log.d("ParseBook", "Image element is ${parsedTag.content}")
-                        pageSpannableStringBuilder = ParseImage().invoke(parsedTag, pageSpannableStringBuilder, context)
+                        pageSpannableStringBuilder = ParseImage().invoke(parsedTag, pageSpannableStringBuilder, context, viewModel = viewModel )
                     }
 
                 }

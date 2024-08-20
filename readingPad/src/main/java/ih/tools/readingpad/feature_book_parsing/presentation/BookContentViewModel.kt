@@ -47,6 +47,9 @@ class BookContentViewModel @Inject constructor(
     private val context: Context
 ) : ViewModel() {
 
+    private val _imageClicked = MutableStateFlow<ByteArray?>(null)
+    val imageClicked: StateFlow<ByteArray?> = _imageClicked.asStateFlow()
+
     val _verticalScroll = MutableStateFlow(preferencesManager.isVerticalScroll())
     val verticalScroll = _verticalScroll.asStateFlow()
 
@@ -175,6 +178,10 @@ class BookContentViewModel @Inject constructor(
                 "spannable content = ${state.value.spannableContent.length}"
             )
         }
+    }
+
+    fun onImageClick(imageData: ByteArray?) {
+        _imageClicked.value = imageData
     }
 
     fun setPinnedTopBar(isPinned: Boolean) {

@@ -21,7 +21,7 @@ class ParsePageLazy {
         context: Context,
         book: Book,
         lazyListState: LazyListState,
-        bookContentViewModel: BookContentViewModel
+        viewModel: BookContentViewModel
     ): SpannableStringBuilder {
         val encoding = metadata.encoding
         val TAG_START = encoding.tags.tagStart
@@ -71,14 +71,14 @@ class ParsePageLazy {
                             metadata,
                             book = book,
                             lazyListState,
-                            bookContentViewModel
+                            viewModel
                         )
                     }
 
                     is ParsedElement.Image -> {
                         Log.d("ParseBook", "Image element is ${parsedTag.content}")
                         pageSpannableStringBuilder =
-                            ParseImage().invoke(parsedTag, pageSpannableStringBuilder, context)
+                            ParseImage().invoke(parsedTag, pageSpannableStringBuilder, context, viewModel = viewModel)
                     }
 
                 }
