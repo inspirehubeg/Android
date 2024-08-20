@@ -30,31 +30,15 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 
 @Composable
 fun FullScreenImage(
     imageData: ByteArray,
     onClose: () -> Unit,
 ) {
-    var scale by remember { mutableStateOf(1f) }
-    var offset by remember { mutableStateOf(Offset.Zero) }
-
-    val imageBitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size).asImageBitmap()
-    val imageWidth = imageBitmap.width
-    val imageHeight = imageBitmap.height
-    val density = LocalDensity.current
-    val screenWidthDp = LocalConfiguration.current.screenWidthDp.dp
-    val screenHeightDp = LocalConfiguration.current.screenHeightDp.dp
-
-    val screenWidth = with(density) { screenWidthDp.toPx() }
-    val screenHeight = with(density) { screenHeightDp.toPx() }
-
     Box(
 
         modifier = Modifier
@@ -167,7 +151,7 @@ fun PhotoImage(image: ByteArray, modifier: Modifier = Modifier) {
                 zoom = (zoom * zoomChange).coerceIn(1f, 5f)
             }
             Image(
-                bitmap = BitmapFactory.decodeByteArray(image, 0, image.size).asImageBitmap(),
+                bitmap = imageBitmap,
                 //  painter = painterResource(id = R.drawable.andre),
                 contentDescription = "Full screen image",
                 modifier = modifier

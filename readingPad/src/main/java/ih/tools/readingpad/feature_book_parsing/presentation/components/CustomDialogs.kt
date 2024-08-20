@@ -60,7 +60,7 @@ fun CustomFontDialog(
             Slider(
                 value = fontSize,
                 onValueChange = { newSize -> viewModel.saveFontSize(newSize) },
-                valueRange = 12f..42f,
+                valueRange = 12f..32f,
                 steps = 24
             )
         }

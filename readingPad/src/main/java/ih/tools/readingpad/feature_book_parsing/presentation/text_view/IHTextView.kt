@@ -20,16 +20,17 @@ import androidx.core.text.toSpannable
 import androidx.recyclerview.widget.RecyclerView
 import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
-import ih.tools.readingpad.feature_highlight.domain.model.Highlight
-import ih.tools.readingpad.util.IHBackgroundSpan
 import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkClickableSpan
 import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkImageSpan
+import ih.tools.readingpad.feature_highlight.domain.model.Highlight
+import ih.tools.readingpad.util.IHBackgroundSpan
 import ih.tools.readingpad.util.IHSpan
 import ih.tools.readingpad.util.copyTextWithSignature
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.sqrt
 import kotlin.properties.Delegates
 
 
@@ -268,7 +269,8 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
 //
 //        }
 //    }
-
+    private var scale = 1f
+    private var initialPointerDistance = 0f
     private var pressStart: Int = 0
     override fun onTouch(view: View?, event: MotionEvent?): Boolean {
         if (event != null) {
@@ -277,9 +279,40 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
             // to allow the highlight and bookmark functions in that exact text view
             viewModel._textView.value = this
 
-            when (event.action) {
+            when (event.action and MotionEvent.ACTION_MASK) {
                 MotionEvent.ACTION_DOWN -> {
                     pressStart = this.getOffsetForPosition(event.x, event.y)
+                    // Handle pinch start
+//                    if (event.pointerCount == 2) {
+//                        initialPointerDistance = distance(event)
+//                    }
+                }
+                MotionEvent.ACTION_POINTER_UP -> {
+                    // Reset initialPointerDistance when a finger is lifted
+                    initialPointerDistance = 0f
+                    }
+
+                MotionEvent.ACTION_MOVE -> {
+                    // Handle pinch gesture
+                    if (event.pointerCount == 2) {
+                        if (initialPointerDistance == 0f) {
+                            Log.d("twoFingers", "initialPointerDistance is 0")
+                            initialPointerDistance = distance(event) // Initialize only on first move
+                        }
+                        val currentDistance = distance(event)
+                        val newScale = scale * (currentDistance / initialPointerDistance)
+                        if (newScale != scale) {
+                            scale = newScale
+                            val minScale = 12f / fontSize // Minimum scale for font size 12
+                            val maxScale = 32f / fontSize // Maximum scale for font size 32
+                            scale = scale.coerceIn(minScale, maxScale) // Adjust zoom limits
+
+                            val newFontSize = fontSize * scale
+                            textSize = newFontSize // Update text size
+                            viewModel.saveFontSize(newFontSize) // Save the updated font size
+                            initialPointerDistance = currentDistance
+                        }
+                    }
                 }
 
                 MotionEvent.ACTION_UP -> {
@@ -309,7 +342,14 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
         }
         return false
     }
-
+    //calculate the distance between two fingers
+    private fun distance(event: MotionEvent): Float {
+        val x1 = event.getX(0)
+        val y1 = event.getY(0)
+        val x2 = event.getX(1)
+        val y2 = event.getY(1)
+        return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+    }
 
     inner class CustomMenu : ActionMode.Callback {
         override fun onCreateActionMode(
