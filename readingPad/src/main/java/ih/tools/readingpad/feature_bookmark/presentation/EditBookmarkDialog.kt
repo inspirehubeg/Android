@@ -37,8 +37,8 @@ fun EditBookmarkDialog(
     val context = LocalContext.current
 
     val onDismiss = {
-        viewModel._showEditBookmarkDialog.value = false
-        viewModel._bookmarkClickEvent.value = null
+        viewModel.setShowEditBookmarkDialog(false)
+        viewModel.setBookmarkClickEvent(null)
     }
 
     AlertDialog(
@@ -102,7 +102,7 @@ fun EditBookmarkDialog(
                                     context.getString(R.string.default_new_bookmark_name)
                                 }
                             )
-                            viewModel._bookmarkClickEvent.value = null
+                            viewModel.setBookmarkClickEvent(null)
                         }
                         onDismiss()
                     }

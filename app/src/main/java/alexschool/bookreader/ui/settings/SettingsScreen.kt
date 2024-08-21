@@ -118,12 +118,13 @@ fun SettingsScreen(
             Row (
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp)) {
+                    .padding(horizontal = 16.dp)) {
                 ExposedDropdownMenuBox(
                     expanded = expanded,
                     onExpandedChange = {
                         expanded = !expanded
-                    }
+                    },
+                    modifier = Modifier.weight(3f)
                 ) {
                     TextField(
                         value = selectedLanguage,
@@ -151,6 +152,7 @@ fun SettingsScreen(
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Button(
+                    modifier = Modifier.weight(1f),
                     onClick = {
                         prefManager.setLanguage(selectedLanguage)
                         updateAppLocale(context ,selectedLanguage)
@@ -196,7 +198,7 @@ fun FontSizeSetting(
         Slider(
             value = fontSize,
             onValueChange = { newFontSize ->
-                viewModel.saveFontSize(newFontSize)
+                viewModel.sstFontSize(newFontSize)
             },
             valueRange = 12f..42f,
             steps = 24
@@ -234,7 +236,7 @@ fun FontColorSetting(
                     color = color,
                     isSelected = fontColor == color.toArgb(),
                     onClick = {
-                        viewModel.saveFontColor(color.toArgb())
+                        viewModel.setFontColor(color.toArgb())
 
                     }
                 )
@@ -298,7 +300,7 @@ fun BackgroundColorSetting(
                     color = color,
                     isSelected = backgroundColor == color.toArgb(),
                     onClick = {
-                        viewModel.saveBackgroundColor(color.toArgb())
+                        viewModel.setBackgroundColor(color.toArgb())
                     }
                 )
             }
@@ -366,7 +368,7 @@ fun FontWeightSetting(
         // Save button
         Button(
             onClick = {
-                viewModel.saveFontWeight(selectedFontWeight.weight)
+                viewModel.setFontWeight(selectedFontWeight.weight)
                 showToast(context = context, "Font weight saved")
             },
             modifier = Modifier.fillMaxWidth()

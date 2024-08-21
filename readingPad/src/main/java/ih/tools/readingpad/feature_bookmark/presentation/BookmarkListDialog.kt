@@ -46,7 +46,7 @@ fun BookmarkListDialog(
 ) {
     val bookmarks = viewModel.state.value.bookBookmarks
     val onDismiss = {
-        viewModel._showBookmarkListDialog.value = false
+        viewModel.setShowBookmarkListDialog(false)
     }
     //an outer box that fills the entire screen but transparent to allow the custom placement of the inner box
     Box(

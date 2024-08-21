@@ -34,8 +34,8 @@ class IHBookmarkClickableSpan(
 
     override fun onClick(widget: View) {
         // on click should open a note containing the name saved
-        viewModel._bookmarkClickEvent.value = this
-        viewModel._editBookmark.value = true
+        viewModel.setBookmarkClickEvent(this)
+        viewModel.setEditBookmark(true)
 
         Log.d("new", "onBookmarkClick is called id = $id, name = $bookmarkName")
     }

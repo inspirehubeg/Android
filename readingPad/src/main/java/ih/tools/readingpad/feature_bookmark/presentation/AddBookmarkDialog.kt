@@ -35,8 +35,8 @@ fun AddBookmarkDialog(
     var bookmarkName by remember { mutableStateOf("") }
     val context = LocalContext.current
     val onDismiss = {
-        viewModel._showAddBookmarkDialog.value = false
-        viewModel._bookmarkClickEvent.value = null
+        viewModel.setShowAddBookmarkDialog(false)
+        viewModel.setBookmarkClickEvent(null)
     }
     AlertDialog(
         containerColor = MaterialTheme.colorScheme.primaryContainer,

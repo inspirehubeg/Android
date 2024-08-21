@@ -7,9 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ih.tools.readingpad.R
-import ih.tools.readingpad.feature_book_parsing.presentation.text_view.IHTextView
 import ih.tools.readingpad.feature_book_parsing.domain.model.SpannedPage
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.feature_book_parsing.presentation.text_view.IHTextView
 
 class RecyclerViewAdapter(
     private val viewModel: BookContentViewModel,
@@ -48,7 +48,7 @@ class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         Log.d("IHTextView", "bind is called")
         textView.setText(page.content, viewModel, currentPageNumber = page.pageNumber)
         Log.d("BookContentViewModel", "page number in bind = ${page.pageNumber}")
-        viewModel._textView.value = textView
+        viewModel.setTextView(textView)
 
 //        viewModel.viewModelScope.launch {
 //            val highlightsDeferred = async {

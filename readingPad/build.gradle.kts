@@ -77,4 +77,6 @@ dependencies {
     }
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation (libs.androidx.room.ktx)
+    //Coil for image handling
+    implementation("io.coil-kt:coil-compose:2.4.0")
 }

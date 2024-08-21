@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import book_generation.feature.book_creation.security.Decryption
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_fetching.domain.use_cases.fetchBook
 import ih.tools.readingpad.feature_book_fetching.domain.use_cases.getBookInfo
 import ih.tools.readingpad.feature_book_fetching.domain.use_cases.getMetadata
@@ -43,70 +44,66 @@ class BookContentViewModel @Inject constructor(
     private val highlightUseCases: HighlightUseCases,
     private val bookmarkUseCases: BookmarkUseCases,
     private val preferencesManager: PreferencesManager,
-    //private val bookmarkListener: BookmarkSpanListener,
     private val context: Context
 ) : ViewModel() {
 
     private val _imageClicked = MutableStateFlow<ByteArray?>(null)
     val imageClicked: StateFlow<ByteArray?> = _imageClicked.asStateFlow()
 
-    val _verticalScroll = MutableStateFlow(preferencesManager.isVerticalScroll())
+    private val _verticalScroll = MutableStateFlow(preferencesManager.isVerticalScroll())
     val verticalScroll = _verticalScroll.asStateFlow()
 
-    val _showBookmarkListDialog = MutableStateFlow(false)
+    private val _showBookmarkListDialog = MutableStateFlow(false)
     val showBookmarkListDialog = _showBookmarkListDialog.asStateFlow()
 
-    val _showPageNumberDialog = MutableStateFlow(false)
+    private val _showPageNumberDialog = MutableStateFlow(false)
     val showPageNumberDialog = _showPageNumberDialog.asStateFlow()
 
-    val _showAddBookmarkDialog = MutableStateFlow(false)
+    private val _showAddBookmarkDialog = MutableStateFlow(false)
     val showAddBookmarkDialog = _showAddBookmarkDialog.asStateFlow()
 
 
-    val _showEditBookmarkDialog = MutableStateFlow(false)
+    private val _showEditBookmarkDialog = MutableStateFlow(false)
     val showEditBookmarkDialog = _showEditBookmarkDialog.asStateFlow()
 
-    val _showThemeSelector = MutableStateFlow(false)
+    private val _showThemeSelector = MutableStateFlow(false)
     val showThemeSelector: StateFlow<Boolean> = _showThemeSelector.asStateFlow()
 
-    val _showFontSlider = MutableStateFlow(false)
+    private val _showFontSlider = MutableStateFlow(false)
     val showFontSlider: StateFlow<Boolean> = _showFontSlider.asStateFlow()
 
     // this part is temporary, it fetches the book from Raw but it should be replaced by fetching the book by id in the init{}
     private val metadata = getMetadata(context)
-    val bookInfo = getBookInfo(context)
+    private val bookInfo = getBookInfo(context)
     val book = fetchBook(bookInfo)
-    val offsets = metadata.tokenOffsets
-    var tokenName: String = ""
+    private val offsets = metadata.tokenOffsets
+    private var tokenName: String = ""
 
     // clickable bookmark span listener
-    val _bookmarkClickEvent = MutableStateFlow<IHBookmarkClickableSpan?>(null)
+    private val _bookmarkClickEvent = MutableStateFlow<IHBookmarkClickableSpan?>(null)
     val bookmarkClickEvent: StateFlow<IHBookmarkClickableSpan?> = _bookmarkClickEvent.asStateFlow()
 
-    val _editBookmark = MutableStateFlow<Boolean>(false)
+
+    private val _editBookmark = MutableStateFlow(false)
     val editBookmark: StateFlow<Boolean> = _editBookmark.asStateFlow()
 
-    val _bookmarkTitle = MutableStateFlow("")
-    val bookmarkTitle: StateFlow<String> = _bookmarkTitle
-
-    val _bookmarkEnd = MutableStateFlow(0)
+    private val _bookmarkEnd = MutableStateFlow(0)
     val bookmarkEnd: StateFlow<Int> = _bookmarkEnd
 
-    val _bookmarkStart = MutableStateFlow(0)
+    private val _bookmarkStart = MutableStateFlow(0)
     val bookmarkStart: StateFlow<Int> = _bookmarkStart
 
-    val _bookmarkPageNumber = MutableStateFlow(0)
-    val bookmarkPageNumber: StateFlow<Int> = _bookmarkPageNumber
+    private val _bookmarkPageNumber = MutableStateFlow(0)
+    private val bookmarkPageNumber: StateFlow<Int> = _bookmarkPageNumber
 
-    val _textView = MutableStateFlow<IHTextView?>(null)
+    private val _textView = MutableStateFlow<IHTextView?>(null)
     val textView: StateFlow<IHTextView?> = _textView
 
-    val _showTopBar = MutableStateFlow(true)
+    private val _showTopBar = MutableStateFlow(true)
     val showTopBar: StateFlow<Boolean> = _showTopBar.asStateFlow()
 
-    //val listener = bookmarkListener
-    var getAllHighlightsJob: Job? = null
-    var getAllBookmarksJob: Job? = null
+    private var getAllHighlightsJob: Job? = null
+    private var getAllBookmarksJob: Job? = null
 
     private val _fontSize = MutableStateFlow(preferencesManager.getFontSize())
     val fontSize: StateFlow<Float> = _fontSize
@@ -120,7 +117,7 @@ class BookContentViewModel @Inject constructor(
     private val _pinnedTopBar = MutableStateFlow(preferencesManager.isPinnedTopBar())
     val pinnedTopBar = _pinnedTopBar
 
-    val _pageNumber = mutableStateOf<Int>(1)
+    private val _pageNumber = mutableIntStateOf(1)
     val pageNumber: State<Int> = _pageNumber
 
     private val _fontWeight = MutableStateFlow(preferencesManager.getFontWeight())
@@ -129,20 +126,10 @@ class BookContentViewModel @Inject constructor(
     private val _backgroundColor = MutableStateFlow(preferencesManager.getBackgroundColor())
     val backgroundColor = _backgroundColor
 
-    val _linkNavigationPage = MutableStateFlow<Boolean>(false)
+    private val _linkNavigationPage = MutableStateFlow(false)
     val linkNavigationPage: StateFlow<Boolean> = _linkNavigationPage
 
     val bookmarkSpans = mutableMapOf<Long, IHBookmarkClickableSpan>()
-
-
-    private val _pageHighlights = MutableStateFlow<List<Highlight>>(emptyList())
-    val pageHighlights: StateFlow<List<Highlight>> = _pageHighlights
-
-    private val _currentPageIndex = mutableIntStateOf(0)
-    val currentPageIndex: State<Int> = _currentPageIndex
-
-    private val _targetIndex = mutableStateOf<Int?>(null)
-    val targetIndex: State<Int?> = _targetIndex
 
     private val _state = mutableStateOf(BookDetailsState())
     val state: State<BookDetailsState> = _state
@@ -180,44 +167,6 @@ class BookContentViewModel @Inject constructor(
         }
     }
 
-    fun onImageClick(imageData: ByteArray?) {
-        _imageClicked.value = imageData
-    }
-
-    fun setPinnedTopBar(isPinned: Boolean) {
-        preferencesManager.setPinnedTopBar(isPinned)
-        _pinnedTopBar.value = isPinned
-    }
-    fun setVerticalScroll(isVertical: Boolean) {
-        preferencesManager.setVerticalScroll(isVertical)
-        _verticalScroll.value = isVertical
-    }
-    fun setDarkTheme(isDark: Boolean, textColor: Int, backgroundColor: Int) {
-        preferencesManager.setDarkTheme(isDark)
-        _darkTheme.value = isDark
-        saveFontColor(textColor)
-        saveBackgroundColor(backgroundColor)
-    }
-
-    fun saveFontSize(fontSize: Float) {
-        preferencesManager.setFontSize(fontSize)
-        _fontSize.value = fontSize
-    }
-
-    fun saveFontColor(color: Int) {
-        preferencesManager.setFontColor(color)
-        _fontColor.value = color
-    }
-
-    fun saveFontWeight(fontWeight: Int) {
-        preferencesManager.setFontWeight(fontWeight)
-        _fontWeight.value = fontWeight
-    }
-
-    fun saveBackgroundColor(backgroundColor: Int) {
-        preferencesManager.setBackgroundColor(backgroundColor)
-        _backgroundColor.value = backgroundColor
-    }
 
     fun addHighlight(pageNumber: Int, start: Int, end: Int, textView: IHTextView) {
         val originalStart = textView.getDatabaseIndex(start)
@@ -307,7 +256,6 @@ class BookContentViewModel @Inject constructor(
                     "IHTextView",
                     "pageNumber = $pageNumber getHighlightsForBook is successful $highlights"
                 )
-                _pageHighlights.value = _state.value.bookHighlights
                 textView.drawAllHighlights(state.value.bookHighlights)
 
             }.launchIn(viewModelScope)
@@ -363,7 +311,6 @@ class BookContentViewModel @Inject constructor(
                 )
 
                 Log.d("BookContentViewModel", "getHighlightsForBook is successful $highlights")
-                _pageHighlights.value = _state.value.bookHighlights
             }.launchIn(viewModelScope)
             Log.d("BookContentViewModel", "HighlightsForBook is spanned")
         } catch (e: Exception) {
@@ -388,7 +335,6 @@ class BookContentViewModel @Inject constructor(
             Log.e("BookContentViewModel", "Error getting Book bookmarks: ${e.message}")
         }
     }
-
 
     fun scrollToIndexLazy(targetPageIndex: Int, lazyListState: LazyListState, targetIndex: Int) {
 
@@ -420,17 +366,121 @@ class BookContentViewModel @Inject constructor(
     }
 
     fun navigateToPage(targetPageIndex: Int, lazyListState: LazyListState) {
-        if (targetPageIndex in 0 until lazyListState.layoutInfo.totalItemsCount){
+        if (targetPageIndex in 0 until lazyListState.layoutInfo.totalItemsCount) {
             viewModelScope.launch {
                 lazyListState.scrollToItem(targetPageIndex)
                 _showTopBar.value = false
             }
-        }
-        else {
+        } else {
             _showTopBar.value = false
-            showToast(context, "Page not found")
+            showToast(context, context.getString(R.string.page_not_found))
         }
 
+    }
+
+
+    //setters functions
+    fun setShowBookmarkListDialog(show: Boolean) {
+        _showBookmarkListDialog.value = show
+    }
+
+    fun setShowPageNumberDialog(show: Boolean) {
+        _showPageNumberDialog.value = show
+    }
+
+    fun setShowAddBookmarkDialog(show: Boolean) {
+        _showAddBookmarkDialog.value = show
+    }
+
+    fun setShowEditBookmarkDialog(show: Boolean) {
+        _showEditBookmarkDialog.value = show
+    }
+
+    fun setShowThemeSelector(show: Boolean) {
+        _showThemeSelector.value = show
+    }
+
+    fun setShowFontSlider(show: Boolean) {
+        _showFontSlider.value = show
+    }
+
+    fun setBookmarkClickEvent(span: IHBookmarkClickableSpan?) {
+        _bookmarkClickEvent.value = span
+    }
+
+    fun setEditBookmark(edit: Boolean) {
+        _editBookmark.value = edit
+    }
+
+    fun setBookmarkEnd(end: Int) {
+        _bookmarkEnd.value = end
+    }
+
+    fun setBookmarkStart(start: Int) {
+        _bookmarkStart.value = start
+    }
+
+    fun setBookmarkPageNumber(pageNumber: Int) {
+        _bookmarkPageNumber.value = pageNumber
+    }
+
+    fun setTextView(textView: IHTextView) {
+        _textView.value = textView
+    }
+
+    fun setTopBarVisibility(isVisible: Boolean) {
+        _showTopBar.value = isVisible
+    }
+
+    fun setPageNumber(number: Int) {
+        _pageNumber.intValue = number
+    }
+
+    fun setLinkNavigationPage(value: Boolean) {
+        _linkNavigationPage.value = value
+    }
+
+
+    fun sstFontSize(fontSize: Float) {
+        preferencesManager.setFontSize(fontSize)
+        _fontSize.value = fontSize
+    }
+
+    fun setFontColor(color: Int) {
+        preferencesManager.setFontColor(color)
+        _fontColor.value = color
+    }
+
+    fun setFontWeight(fontWeight: Int) {
+        preferencesManager.setFontWeight(fontWeight)
+        _fontWeight.value = fontWeight
+    }
+
+    fun setBackgroundColor(backgroundColor: Int) {
+        preferencesManager.setBackgroundColor(backgroundColor)
+        _backgroundColor.value = backgroundColor
+    }
+
+
+    fun onImageClick(imageData: ByteArray?) {
+        _imageClicked.value = imageData
+    }
+
+    fun setPinnedTopBar(isPinned: Boolean) {
+        preferencesManager.setPinnedTopBar(isPinned)
+        _pinnedTopBar.value = isPinned
+    }
+
+    fun setVerticalScroll(isVertical: Boolean) {
+        preferencesManager.setVerticalScroll(isVertical)
+        _verticalScroll.value = isVertical
+    }
+
+    fun setDarkTheme(isDark: Boolean, textColor: Int, backgroundColor: Int) {
+        preferencesManager.setDarkTheme(isDark)
+        _darkTheme.value = isDark
+        setFontColor(textColor)
+        setBackgroundColor(backgroundColor)
     }
 }
 

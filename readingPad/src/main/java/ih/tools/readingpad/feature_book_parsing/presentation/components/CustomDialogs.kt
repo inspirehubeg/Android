@@ -44,7 +44,7 @@ fun CustomFontDialog(
             .fillMaxSize()
             .padding(bottom = 50.dp)
             .clickable(onClick = {
-                viewModel._showFontSlider.value = false
+                viewModel.setShowFontSlider(false)
             })
     ) {
         Box(
@@ -59,7 +59,7 @@ fun CustomFontDialog(
         ) {
             Slider(
                 value = fontSize,
-                onValueChange = { newSize -> viewModel.saveFontSize(newSize) },
+                onValueChange = { newSize -> viewModel.sstFontSize(newSize) },
                 valueRange = 12f..32f,
                 steps = 24
             )
@@ -79,7 +79,7 @@ fun PageSelector(viewModel: BookContentViewModel , listState: LazyListState) {
             .fillMaxSize()
             .padding(bottom = 50.dp)
             .clickable(onClick = {
-                viewModel._showPageNumberDialog.value = false
+                viewModel.setShowPageNumberDialog(false)
             })
     ) {
         Box(
@@ -122,7 +122,7 @@ fun PageSelector(viewModel: BookContentViewModel , listState: LazyListState) {
                     modifier = Modifier.weight(1f),
                     onClick = {
                         viewModel.navigateToPage(number.toInt() - 1, listState)
-                        viewModel._showPageNumberDialog.value = false
+                        viewModel.setShowPageNumberDialog(false)
                     }
                 ) {
                     Text("Go")

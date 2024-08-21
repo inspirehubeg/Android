@@ -74,15 +74,15 @@ fun ReadingPadScreen(
         LaunchedEffect(key1 = viewModel, key2 = listState) {
             launch {
                 viewModel.bookmarkClickEvent.collect { span ->
-                    viewModel._bookmarkClickEvent.value = span
+                    viewModel.setBookmarkClickEvent(span)
                     Log.d("BookContentScreen", "currentSpan = $currentBookmarkSpan")
                     if (span != null) {
                         //check if it's a new bookmark or an existing one to determine which dialog to open
                         if (viewModel.editBookmark.value) {
-                            viewModel._showEditBookmarkDialog.value = true
-                            viewModel._editBookmark.value = false
+                            viewModel.setShowEditBookmarkDialog(true)
+                            viewModel.setEditBookmark(false)
                         } else {
-                            viewModel._showAddBookmarkDialog.value = true
+                            viewModel.setShowAddBookmarkDialog(true)
                         }
                     }
                 }
@@ -90,7 +90,7 @@ fun ReadingPadScreen(
             launch {
                 snapshotFlow { listState.isScrollInProgress }.collect { isScrolling ->
                     if (isScrolling) {
-                        viewModel._showTopBar.value = false
+                        viewModel.setTopBarVisibility(false)
                     }
                 }
             }
@@ -176,17 +176,17 @@ fun ReadingPadScreen(
         }
         BackHandler {
             if (showFontSlider) {
-                viewModel._showFontSlider.value = (false)
+                viewModel.setShowFontSlider(false)
             } else if (showThemeSelector) {
-                viewModel._showThemeSelector.value = false
+                viewModel.setShowThemeSelector(false)
             } else if (showBookmarkListDialog) {
-                viewModel._showBookmarkListDialog.value = false
+                viewModel.setShowBookmarkListDialog(false)
             } else if (showPageNumberDialog) {
-                viewModel._showPageNumberDialog.value = false
+                viewModel.setShowPageNumberDialog(false)
             } else if (showAddBookmarkDialog) {
-                viewModel._showAddBookmarkDialog.value = false
+                viewModel.setShowAddBookmarkDialog(false)
             } else if (showEditBookmarkDialog) {
-                viewModel._showEditBookmarkDialog.value = false
+                viewModel.setShowEditBookmarkDialog(false)
             }else if (showFullScreenImage) {
                 showFullScreenImage = false
                 viewModel.onImageClick(null)

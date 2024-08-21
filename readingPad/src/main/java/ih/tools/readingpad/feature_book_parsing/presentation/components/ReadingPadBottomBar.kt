@@ -61,10 +61,10 @@ fun ReadingPadBottomBar(
             },
             showDialog = showBookmarkListDialog,
             onClick = {
-                viewModel._showBookmarkListDialog.value = !showBookmarkListDialog
-                viewModel._showThemeSelector.value = false
-                viewModel._showFontSlider.value = false
-                viewModel._showPageNumberDialog.value = false
+                viewModel.setShowBookmarkListDialog(!showBookmarkListDialog)
+                viewModel.setShowThemeSelector(false)
+                viewModel.setShowFontSlider(false)
+                viewModel.setShowPageNumberDialog(false)
             }
         ),
 
@@ -90,10 +90,10 @@ fun ReadingPadBottomBar(
             },
             showDialog = false,
             onClick = {
-                viewModel._showPageNumberDialog.value = ! showPageNumberDialog
-                viewModel._showBookmarkListDialog.value = false
-                viewModel._showThemeSelector.value = false
-                viewModel._showFontSlider.value = false
+                viewModel.setShowPageNumberDialog(!showPageNumberDialog)
+                viewModel.setShowBookmarkListDialog(false)
+                viewModel.setShowThemeSelector(false)
+                viewModel.setShowFontSlider(false)
             }
         ),
         NavigationItem(
@@ -103,10 +103,10 @@ fun ReadingPadBottomBar(
             },
             showDialog = showFontSlider,
             onClick = {
-                viewModel._showFontSlider.value = !showFontSlider
-                viewModel._showThemeSelector.value = false
-                viewModel._showBookmarkListDialog.value = false
-                viewModel._showPageNumberDialog.value = false
+                viewModel.setShowFontSlider(!showFontSlider)
+                viewModel.setShowThemeSelector(false)
+                viewModel.setShowBookmarkListDialog(false)
+                viewModel.setShowPageNumberDialog(false)
             }
         ),
         NavigationItem(
@@ -116,10 +116,10 @@ fun ReadingPadBottomBar(
             },
             showDialog = showThemeSelector,
             onClick = {
-                viewModel._showThemeSelector.value = !showThemeSelector
-                viewModel._showFontSlider.value = false
-                viewModel._showBookmarkListDialog.value = false
-                viewModel._showPageNumberDialog.value = false
+                viewModel.setShowThemeSelector(!showThemeSelector)
+                viewModel.setShowFontSlider(false)
+                viewModel.setShowBookmarkListDialog(false)
+                viewModel.setShowPageNumberDialog(false)
             }
         )
 

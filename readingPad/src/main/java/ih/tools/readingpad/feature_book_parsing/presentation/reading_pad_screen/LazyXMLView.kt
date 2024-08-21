@@ -45,7 +45,7 @@ fun XMLViewLazyItem(
             textView.setText(spannableString.value, viewModel, page.pageNumber)
             //pass the first text view to the viewModel after creation for the navigation of the links in the first page
             if (page.pageNumber == 1) {
-                viewModel._textView.value = textView
+                viewModel.setTextView(textView)
             }
             Log.d("PagesScreen", "page number = ${textView.pageNumber}")
             return@AndroidView view
@@ -55,8 +55,8 @@ fun XMLViewLazyItem(
             val textView = view.findViewById<IHTextView>(R.id.ihTextView)
             //if the textView is the target page of a link:
             if (viewModel.linkNavigationPage.value) {
-                viewModel._textView.value = textView
-                viewModel._linkNavigationPage.value = false
+                viewModel.setTextView(textView)
+                viewModel.setLinkNavigationPage(false)
             }
             //this fun updates the text styles of the text view whenever any of these values change
             updateTextViewStyle(textView, fontSize, fontColor, fontWeight)

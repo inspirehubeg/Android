@@ -20,4 +20,5 @@
     <string name="done">Done</string>
     <string name="delete">Delete</string>
     <string name="default_new_bookmark_name">New</string>
+    <string name="page_not_found">Page not found</string>
 </resources>

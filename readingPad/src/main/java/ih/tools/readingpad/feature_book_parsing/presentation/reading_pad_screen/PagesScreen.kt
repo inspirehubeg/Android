@@ -36,7 +36,7 @@ fun PagesScreen(
     val verticalScroll by bookContentViewModel.verticalScroll.collectAsState()
 
     val firstVisibleItemIndex = remember { derivedStateOf { listState.firstVisibleItemIndex } }
-    bookContentViewModel._pageNumber.value = firstVisibleItemIndex.value + 1
+    bookContentViewModel.setPageNumber(firstVisibleItemIndex.value + 1)
 
     // val pages = mutableListOf<Page>()
     val itemPages = remember { mutableStateListOf<SpannedPage>() }

@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ih.tools.readingpad.R
@@ -37,7 +36,7 @@ fun ThemeSelectorMenu(
     viewModel: BookContentViewModel,
 ) {
     val isDarkTheme = viewModel.darkTheme.collectAsState().value
-    val onDismissRequest = { viewModel._showThemeSelector.value = false }
+    val onDismissRequest = { viewModel.setShowThemeSelector(false) }
     //outer transparent box that allows the custom positioning of the theme menu
     Box(
         modifier = Modifier

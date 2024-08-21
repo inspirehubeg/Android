@@ -277,7 +277,7 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
             Log.d("onTouch", "onTouch is called")
             //whenever a touch happens on the screen the current text view is sent to the viewModel
             // to allow the highlight and bookmark functions in that exact text view
-            viewModel._textView.value = this
+            viewModel.setTextView(this)
 
             when (event.action and MotionEvent.ACTION_MASK) {
                 MotionEvent.ACTION_DOWN -> {
@@ -309,7 +309,7 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
 
                             val newFontSize = fontSize * scale
                             textSize = newFontSize // Update text size
-                            viewModel.saveFontSize(newFontSize) // Save the updated font size
+                            viewModel.sstFontSize(newFontSize) // Save the updated font size
                             initialPointerDistance = currentDistance
                         }
                     }
@@ -324,7 +324,7 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
                     // Check for a quick tap with no text selection to make the bars appear or disappear
                     if (event.eventTime - event.downTime < 300 && !hasSelection()) {
                         Log.d("onTouch", "quick tap")
-                        viewModel._showTopBar.value = !viewModel.showTopBar.value
+                        viewModel.setTopBarVisibility(!viewModel.showTopBar.value)
                     } else {
                         // Handle span selection
                         Log.d("onTouch", "selection")
@@ -468,7 +468,7 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
                     if (bookmarkSpans.isNotEmpty()) {
                         bookmarkSpans.forEach { span ->
                             viewModel.removeBookmarkById(span.id.toLong())
-                            viewModel._textView.value = this@IHTextView
+                            viewModel.setTextView(this@IHTextView)
                             //removeSingleCustomSpan(span)
                         }
                     }
@@ -484,11 +484,11 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
                     if (start != end) {
                         val bookmarkSpan = IHBookmarkClickableSpan(viewModel = viewModel)
                         //opens the dialog in the ui so that the user can add a name then save the bookmark to db
-                        viewModel._textView.value = this@IHTextView
-                        viewModel._bookmarkClickEvent.value = bookmarkSpan
-                        viewModel._bookmarkStart.value = start
-                        viewModel._bookmarkEnd.value = end
-                        viewModel._bookmarkPageNumber.value = pageNumber
+                        viewModel.setTextView(this@IHTextView)
+                        viewModel.setBookmarkClickEvent(bookmarkSpan)
+                        viewModel.setBookmarkStart(start)
+                        viewModel.setBookmarkEnd(end)
+                        viewModel.setBookmarkPageNumber(pageNumber)
 
 
                         // viewModel.addBookmark(pageNumber = pageNumber, start, end, this@IHTextView)
