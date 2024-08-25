@@ -42,11 +42,12 @@ fun CustomFontDialog(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 50.dp)
+            .padding(bottom = 40.dp)
             .clickable(onClick = {
                 viewModel.setShowFontSlider(false)
             })
     ) {
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -68,10 +69,10 @@ fun CustomFontDialog(
 }
 
 @Composable
-fun PageSelector(viewModel: BookContentViewModel , listState: LazyListState) {
+fun PageSelector(viewModel: BookContentViewModel, listState: LazyListState) {
     val pageNumber by viewModel.pageNumber
-    var number: String  by remember { mutableStateOf("") }
-   // number = pageNumber.toString()
+    var number: String by remember { mutableStateOf("") }
+    // number = pageNumber.toString()
     var isError by remember { mutableStateOf(true) }
     Box(
         contentAlignment = Alignment.BottomCenter,
@@ -92,9 +93,11 @@ fun PageSelector(viewModel: BookContentViewModel , listState: LazyListState) {
                 )
                 .align(Alignment.BottomCenter)
         ) {
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
                 TextField(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.weight(2f),
@@ -106,13 +109,13 @@ fun PageSelector(viewModel: BookContentViewModel , listState: LazyListState) {
                     ),
                     isError = isError,
                     value = number,
-                    onValueChange = {newValue ->
+                    onValueChange = { newValue ->
                         number = newValue.filter { it.isDigit() }
                         if (number.isNotEmpty() &&
-                            number.toInt() in 1 .. listState.layoutInfo.totalItemsCount){
+                            number.toInt() in 1..listState.layoutInfo.totalItemsCount
+                        ) {
                             isError = false
-                        }
-                        else {
+                        } else {
                             isError = true
                         }
                     }

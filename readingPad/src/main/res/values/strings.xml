@@ -21,4 +21,8 @@
     <string name="delete">Delete</string>
     <string name="default_new_bookmark_name">New</string>
     <string name="page_not_found">Page not found</string>
+    <string name="image_not_available">Image not available</string>
+    <string name="full_screen_image">Full screen image</string>
+    <string name="error_loading_image">Error loading image</string>
+    <string name="add_custom_theme">Add Custom Theme</string>
 </resources>

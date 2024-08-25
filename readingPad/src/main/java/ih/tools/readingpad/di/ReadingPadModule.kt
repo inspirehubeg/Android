@@ -3,10 +3,6 @@ package ih.tools.readingpad.di
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
-import ih.tools.readingpad.feature_bookmark.domain.use_cases.AddBookmark
-import ih.tools.readingpad.feature_bookmark.domain.use_cases.BookmarkUseCases
-import ih.tools.readingpad.feature_bookmark.domain.use_cases.RemoveBookmarkById
-import ih.tools.readingpad.feature_bookmark.domain.use_cases.GetBookmarksForBook
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,17 +12,21 @@ import ih.tools.readingpad.feature_book_parsing.data.PreferencesManager
 import ih.tools.readingpad.feature_book_parsing.data.data_source.AppDatabase
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.BookParserUseCases
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseBook
-import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParsePageLazy
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseFont
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseImage
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseInternalLink
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseInternalLinkLazy
+import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParsePageLazy
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseRegularText
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseWebLink
 import ih.tools.readingpad.feature_bookmark.data.data_source.BookmarkDao
 import ih.tools.readingpad.feature_bookmark.data.repository.BookmarkRepositoryImpl
 import ih.tools.readingpad.feature_bookmark.domain.repository.BookmarkRepository
+import ih.tools.readingpad.feature_bookmark.domain.use_cases.AddBookmark
+import ih.tools.readingpad.feature_bookmark.domain.use_cases.BookmarkUseCases
 import ih.tools.readingpad.feature_bookmark.domain.use_cases.CheckBookmarkExists
+import ih.tools.readingpad.feature_bookmark.domain.use_cases.GetBookmarksForBook
+import ih.tools.readingpad.feature_bookmark.domain.use_cases.RemoveBookmarkById
 import ih.tools.readingpad.feature_bookmark.domain.use_cases.UpdateBookmarkTitle
 import ih.tools.readingpad.feature_highlight.data.data_source.HighlightDao
 import ih.tools.readingpad.feature_highlight.data.repository.HighlightRepositoryImpl
@@ -35,13 +35,20 @@ import ih.tools.readingpad.feature_highlight.domain.use_cases.AddHighlight
 import ih.tools.readingpad.feature_highlight.domain.use_cases.GetPageHighlights
 import ih.tools.readingpad.feature_highlight.domain.use_cases.HighlightUseCases
 import ih.tools.readingpad.feature_highlight.domain.use_cases.RemoveHighlightById
-
+import ih.tools.readingpad.feature_note_color.data.repository.ThemeColorRepositoryImpl
+import ih.tools.readingpad.feature_note_color.domain.repository.ThemeColorRepository
+import ih.tools.readingpad.feature_note_color.domain.use_case.AddThemeColorUseCase
+import ih.tools.readingpad.feature_note_color.domain.use_case.ColorExistsUseCase
+import ih.tools.readingpad.feature_note_color.domain.use_case.DeleteAllThemeColorsUseCase
+import ih.tools.readingpad.feature_note_color.domain.use_case.DeleteThemeColorUseCase
+import ih.tools.readingpad.feature_note_color.domain.use_case.GetThemeColorsUseCase
+import ih.tools.readingpad.feature_note_color.domain.use_case.ThemeColorUseCases
 import javax.inject.Singleton
 
 
 /**
 ReadingPad library module to handle dependency injection with dagger hilt
-*/
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object ReadingPadModule {
@@ -52,7 +59,7 @@ object ReadingPadModule {
     for example the regular @Provide functions
      */
 
-   /** provides database object to any class that needs it*/
+    /** provides database object to any class that needs it*/
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
@@ -90,7 +97,14 @@ object ReadingPadModule {
         return BookmarkRepositoryImpl(db.bookmarkDao)
     }
 
-   /** provides a context to any class that needs it */
+    /** provides theme color repository object to any class that needs it*/
+    @Provides
+    @Singleton
+    fun provideThemeColorRepository(db: AppDatabase): ThemeColorRepository {
+        return ThemeColorRepositoryImpl(db.themeColorDao)
+    }
+
+    /** provides a context to any class that needs it */
     @Provides
     @Singleton
     fun provideContext(application: Application): Context = application.applicationContext
@@ -123,7 +137,7 @@ object ReadingPadModule {
     /** provides book parser use cases object to any class that needs it*/
     @Provides
     @Singleton
-    fun provideBookParserUseCases(): BookParserUseCases{
+    fun provideBookParserUseCases(): BookParserUseCases {
         return BookParserUseCases(
             parseImage = ParseImage(),
             parseFont = ParseFont(),
@@ -134,7 +148,18 @@ object ReadingPadModule {
             parsePageLazy = ParsePageLazy(),
             parseInternalLinkLazy = ParseInternalLinkLazy(),
         )
+    }
 
+    @Provides
+    @Singleton
+    fun provideThemeColorUseCases(repository: ThemeColorRepository): ThemeColorUseCases {
+        return ThemeColorUseCases(
+            addThemeColorUseCase = AddThemeColorUseCase(repository),
+            deleteThemeColorUseCase = DeleteThemeColorUseCase(repository),
+            deleteAllThemeColorsUseCase = DeleteAllThemeColorsUseCase(repository),
+            getThemeColorsUseCase = GetThemeColorsUseCase(repository),
+            colorExistsUseCase = ColorExistsUseCase(repository)
+        )
     }
 
     /** provides preferences manager object to any class that needs it*/

@@ -24,6 +24,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -40,11 +42,12 @@ import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
 @Composable
 fun BookmarkListDialog(
     viewModel: BookContentViewModel,
-    dialogHeight: Dp,
+    backgroundHeight: Dp,
     dialogWidth: Dp,
     listState: LazyListState,
 ) {
     val bookmarks = viewModel.state.value.bookBookmarks
+    val fontSize by viewModel.fontSize.collectAsState()
     val onDismiss = {
         viewModel.setShowBookmarkListDialog(false)
     }
@@ -52,28 +55,28 @@ fun BookmarkListDialog(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 50.dp)
             .clickable(onClick = {
                 onDismiss()
             })
+        , contentAlignment = Alignment.Center
     ) {
         // the actual dialog box placed in the desired location of the screen, in this case at the center
         Box(
             modifier = Modifier
-                .height(dialogHeight)
+                //.height(dialogHeight)
                 .width(dialogWidth)
-                .padding(16.dp)
+                .padding(vertical = 50.dp)
                 .background(
                     MaterialTheme.colorScheme.tertiary,
                     shape = RoundedCornerShape(8.dp)
                 )
                 .align(Alignment.Center)
                 .clickable(onClick = {}),
-            contentAlignment = Alignment.TopEnd
+            contentAlignment = Alignment.Center
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
-
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
                     modifier = Modifier
@@ -93,22 +96,27 @@ fun BookmarkListDialog(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
-                //LazyColumn to allow the list to grow dynamically and to allow scrolling
-                LazyColumn {
-                    items(bookmarks) { bookmark ->
-                        BookmarkListItem(
-                            bookmark = bookmark,
-                            viewModel = viewModel,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    viewModel.scrollToIndexLazy(
-                                        targetPageIndex = bookmark.pageNumber - 1,
-                                        lazyListState = listState,
-                                        targetIndex = bookmark.start
-                                    )
-                                    onDismiss()
-                                })
+                if (bookmarks.isEmpty()) {
+                    Text(text = "No bookmarks Saved yet", fontSize = fontSize.sp)
+                } else {
+                    //LazyColumn to allow the list to grow dynamically and to allow scrolling
+                    LazyColumn {
+                        items(bookmarks) { bookmark ->
+                            BookmarkListItem(
+                                bookmark = bookmark,
+                                viewModel = viewModel,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        viewModel.scrollToIndexLazy(
+                                            targetPageIndex = bookmark.pageNumber - 1,
+                                            lazyListState = listState,
+                                            targetIndex = bookmark.start
+                                        )
+                                        onDismiss()
+                                    }
+                            )
+                        }
                     }
                 }
             }

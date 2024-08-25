@@ -8,6 +8,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import book_generation.feature.book_creation.security.Decryption
@@ -26,6 +27,9 @@ import ih.tools.readingpad.feature_bookmark.domain.use_cases.BookmarkUseCases
 import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkClickableSpan
 import ih.tools.readingpad.feature_highlight.domain.model.Highlight
 import ih.tools.readingpad.feature_highlight.domain.use_cases.HighlightUseCases
+import ih.tools.readingpad.feature_note_color.domain.model.ThemeColor
+import ih.tools.readingpad.feature_note_color.domain.model.ThemeColorType
+import ih.tools.readingpad.feature_note_color.domain.use_case.ThemeColorUseCases
 import ih.tools.readingpad.util.showToast
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -44,14 +48,30 @@ class BookContentViewModel @Inject constructor(
     private val highlightUseCases: HighlightUseCases,
     private val bookmarkUseCases: BookmarkUseCases,
     private val preferencesManager: PreferencesManager,
+    private val themeColorUseCases: ThemeColorUseCases,
     private val context: Context
 ) : ViewModel() {
+
+
+    private val _savedFontColors = MutableLiveData<List<ThemeColor>>()
+    val savedFontColors = _savedFontColors
+
+    private val _savedBackgroundColors = MutableLiveData<List<ThemeColor>>()
+    val savedBackgroundColors = _savedBackgroundColors
+
+
 
     private val _imageClicked = MutableStateFlow<ByteArray?>(null)
     val imageClicked: StateFlow<ByteArray?> = _imageClicked.asStateFlow()
 
     private val _verticalScroll = MutableStateFlow(preferencesManager.isVerticalScroll())
     val verticalScroll = _verticalScroll.asStateFlow()
+
+    private val _showCustomThemePage = MutableStateFlow(false)
+    val showCustomThemePage = _showCustomThemePage.asStateFlow()
+    fun setShowCustomThemePage(open: Boolean) {
+        _showCustomThemePage.value = open
+    }
 
     private val _showBookmarkListDialog = MutableStateFlow(false)
     val showBookmarkListDialog = _showBookmarkListDialog.asStateFlow()
@@ -126,6 +146,12 @@ class BookContentViewModel @Inject constructor(
     private val _backgroundColor = MutableStateFlow(preferencesManager.getBackgroundColor())
     val backgroundColor = _backgroundColor
 
+    private val _currentThemeFontColor = MutableLiveData<Int>(fontColor.value)
+    val currentThemeFontColor = _currentThemeFontColor
+
+    private val _currentThemeBackgroundColor = MutableLiveData<Int>(backgroundColor.value)
+    val currentThemeBackgroundColor= _currentThemeBackgroundColor
+
     private val _linkNavigationPage = MutableStateFlow(false)
     val linkNavigationPage: StateFlow<Boolean> = _linkNavigationPage
 
@@ -165,6 +191,7 @@ class BookContentViewModel @Inject constructor(
                 "spannable content = ${state.value.spannableContent.length}"
             )
         }
+        getSavedColors()
     }
 
 
@@ -297,6 +324,54 @@ class BookContentViewModel @Inject constructor(
         }
     }
 
+    private fun getSavedColors() {
+        viewModelScope.launch {
+            _savedFontColors.value =
+                themeColorUseCases.getThemeColorsUseCase(type = ThemeColorType.FONT)
+
+            _savedBackgroundColors.value =
+                themeColorUseCases.getThemeColorsUseCase(type = ThemeColorType.BACKGROUND)
+        }
+    }
+
+    // Function to add a color
+    fun addThemeColor(argb: Int, type: ThemeColorType) {
+        viewModelScope.launch {
+            // Check if the color already exists in the database
+            val colorCount = themeColorUseCases.colorExistsUseCase(argb)
+            if (colorCount == 0) {
+                // If the color doesn't exist, insert it
+                themeColorUseCases.addThemeColorUseCase(argb, type)
+                getSavedColors() // Refresh the colors
+            }
+        }
+    }
+
+    // Functions to delete all colors
+    fun deleteAllThemeFontColors() {
+        viewModelScope.launch {
+            themeColorUseCases.deleteAllThemeColorsUseCase(ThemeColorType.FONT)
+            getSavedColors() // Refresh the colors
+        }
+    }
+
+    fun deleteAllThemeBackgroundColors() {
+        viewModelScope.launch {
+            themeColorUseCases.deleteAllThemeColorsUseCase(ThemeColorType.BACKGROUND)
+            getSavedColors() // Refresh the colors
+        }
+    }
+
+
+    // Function to delete a specific color
+    fun deleteThemeColor(themeColor: ThemeColor) {
+        viewModelScope.launch {
+            themeColorUseCases.deleteThemeColorUseCase(themeColor)
+            getSavedColors() // Refresh the colors
+        }
+    }
+
+
     private suspend fun getHighlightsForBook(pageNumber: Int) {
         getAllHighlightsJob?.cancel()
         try {
@@ -380,6 +455,14 @@ class BookContentViewModel @Inject constructor(
 
 
     //setters functions
+
+    fun setCurrentThemeFontColor(colorInt: Int){
+        _currentThemeFontColor.value = colorInt
+    }
+
+    fun setCurrentThemeBackgroundColor(colorInt: Int){
+        _currentThemeBackgroundColor.value = colorInt
+    }
     fun setShowBookmarkListDialog(show: Boolean) {
         _showBookmarkListDialog.value = show
     }
@@ -480,6 +563,11 @@ class BookContentViewModel @Inject constructor(
         preferencesManager.setDarkTheme(isDark)
         _darkTheme.value = isDark
         setFontColor(textColor)
+        setBackgroundColor(backgroundColor)
+    }
+
+    fun saveTheme(fontColor: Int, backgroundColor: Int) {
+        setFontColor(fontColor)
         setBackgroundColor(backgroundColor)
     }
 }

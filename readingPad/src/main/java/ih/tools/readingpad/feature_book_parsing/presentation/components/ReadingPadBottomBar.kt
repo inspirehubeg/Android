@@ -38,7 +38,6 @@ fun ReadingPadBottomBar(
     val showBookmarkListDialog by viewModel.showBookmarkListDialog.collectAsState()
     val showPageNumberDialog by viewModel.showPageNumberDialog.collectAsState()
     val pageNumber by viewModel.pageNumber
-    val verticalScroll by viewModel.verticalScroll.collectAsState()
 
     // the list of bottom bar items, they are displayed in the same order
     val itemList: List<NavigationItem> = listOf(
@@ -51,6 +50,7 @@ fun ReadingPadBottomBar(
             showDialog = false,
             onClick = {
                 //viewModel.setVerticalScroll(!verticalScroll)
+               // viewModel.setShowCustomThemePage(true)
             }
         ),
 
@@ -65,6 +65,7 @@ fun ReadingPadBottomBar(
                 viewModel.setShowThemeSelector(false)
                 viewModel.setShowFontSlider(false)
                 viewModel.setShowPageNumberDialog(false)
+                viewModel.setShowCustomThemePage(false)
             }
         ),
 
@@ -94,6 +95,8 @@ fun ReadingPadBottomBar(
                 viewModel.setShowBookmarkListDialog(false)
                 viewModel.setShowThemeSelector(false)
                 viewModel.setShowFontSlider(false)
+                viewModel.setShowCustomThemePage(false)
+
             }
         ),
         NavigationItem(
@@ -107,6 +110,8 @@ fun ReadingPadBottomBar(
                 viewModel.setShowThemeSelector(false)
                 viewModel.setShowBookmarkListDialog(false)
                 viewModel.setShowPageNumberDialog(false)
+                viewModel.setShowCustomThemePage(false)
+
             }
         ),
         NavigationItem(
@@ -120,6 +125,8 @@ fun ReadingPadBottomBar(
                 viewModel.setShowFontSlider(false)
                 viewModel.setShowBookmarkListDialog(false)
                 viewModel.setShowPageNumberDialog(false)
+                viewModel.setShowCustomThemePage(false)
+
             }
         )
 

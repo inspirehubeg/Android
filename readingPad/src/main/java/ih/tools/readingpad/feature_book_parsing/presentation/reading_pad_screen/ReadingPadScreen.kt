@@ -17,12 +17,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.feature_book_parsing.presentation.components.CustomFontDialog
+import ih.tools.readingpad.feature_book_parsing.presentation.components.CustomThemeScreen
 import ih.tools.readingpad.feature_book_parsing.presentation.components.FullScreenImage
 import ih.tools.readingpad.feature_book_parsing.presentation.components.PageSelector
 import ih.tools.readingpad.feature_book_parsing.presentation.components.ReadingPadBottomBar
@@ -59,14 +61,19 @@ fun ReadingPadScreen(
         val imageClicked by viewModel.imageClicked.collectAsState()
         var showFullScreenImage by remember { mutableStateOf(false) }
 
-        val listState = rememberLazyListState() //monitors the state of the lazyColumn to use in navigation
+        val openCustomTheme by viewModel.showCustomThemePage.collectAsState()
+        val backgroundColor by viewModel.backgroundColor.collectAsState()
+        val fontColor by viewModel.fontColor.collectAsState()
+
+        val listState =
+            rememberLazyListState() //monitors the state of the lazyColumn to use in navigation
 
 
         // to calculate the height and width of the screen
         val configuration = LocalConfiguration.current
         val screenHeight = configuration.screenHeightDp
         val screenWidth = configuration.screenWidthDp
-        val dialogHeight = screenHeight * 0.7f
+        val bookmarkDialogHeight = screenHeight * 0.6f
         val dialogWidth = screenWidth * 0.9f
 
 
@@ -97,7 +104,7 @@ fun ReadingPadScreen(
         }
 
         Scaffold(
-            containerColor = ReadingPadTheme.colorScheme.surface,
+            containerColor = Color( backgroundColor),
             topBar = {
                 //the showTopBar changes with the single tap on screen to show or hide the bars
                 // and emulates full screen effect
@@ -115,7 +122,7 @@ fun ReadingPadScreen(
             // passing the values to the lazyColumn or to the Box doesn't allow the topBar to be above the page
             // which is not the intended behavior so don't give this modifier to the lazyColumn
             Box(
-                modifier = if (pinnedTopBar){
+                modifier = if (pinnedTopBar) {
                     Modifier
                         .fillMaxSize()
                         .padding(values) //this allows the top bar to be pinned without hiding any content beneath it
@@ -155,7 +162,7 @@ fun ReadingPadScreen(
             }
 
             if (showBookmarkListDialog) {
-                BookmarkListDialog(viewModel, dialogHeight.dp, dialogWidth.dp, listState)
+                BookmarkListDialog(viewModel, backgroundHeight = bookmarkDialogHeight.dp, dialogWidth.dp, listState)
             }
 
             if (showPageNumberDialog) {
@@ -173,6 +180,13 @@ fun ReadingPadScreen(
                     viewModel.onImageClick(null) // Reset the clicked image state
                 }
             }
+            if (openCustomTheme) {
+               // ColorPicker(onColorChange = {}, modifier = Modifier)
+                CustomThemeScreen(
+                    viewModel = viewModel,
+                    dialogWidth = dialogWidth.dp
+                )
+            }
         }
         BackHandler {
             if (showFontSlider) {
@@ -187,11 +201,12 @@ fun ReadingPadScreen(
                 viewModel.setShowAddBookmarkDialog(false)
             } else if (showEditBookmarkDialog) {
                 viewModel.setShowEditBookmarkDialog(false)
-            }else if (showFullScreenImage) {
+            } else if (showFullScreenImage) {
                 showFullScreenImage = false
                 viewModel.onImageClick(null)
-            }
-            else {
+            } else if (openCustomTheme) {
+                viewModel.setShowCustomThemePage(false)
+            } else {
                 // Let the default back navigation handle this case
                 navController.navigateUp()
             }

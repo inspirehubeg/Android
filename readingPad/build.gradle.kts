@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.runtime.android)
     implementation(libs.engage.core)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.junit)
@@ -79,4 +80,8 @@ dependencies {
     implementation (libs.androidx.room.ktx)
     //Coil for image handling
     implementation("io.coil-kt:coil-compose:2.4.0")
+
+    //colorPicker
+
+    implementation(libs.compose.colorpicker)
 }

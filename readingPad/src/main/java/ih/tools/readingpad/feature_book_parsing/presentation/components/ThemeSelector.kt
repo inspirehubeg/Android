@@ -10,8 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -76,6 +80,26 @@ fun ThemeSelectorMenu(
                         onDismissRequest()
                     }
                 )
+                Spacer(modifier = Modifier.width(16.dp))
+                Card (
+                    elevation = CardDefaults.cardElevation(8.dp),
+                ){
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .size(65.dp)
+                            .background(color = MaterialTheme.colorScheme.surface)
+                    ) {
+                        IconButton(onClick = {
+                            viewModel.setShowThemeSelector(false)
+                            viewModel.setShowCustomThemePage(true)
+                        }) {
+                           Icon (
+                               Icons.Default.Add , contentDescription = stringResource(R.string.add_custom_theme)
+                           )
+                        }
+                    }
+                }
             }
         }
     }

@@ -152,7 +152,7 @@ fun SettingsScreen(
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Button(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1.5f),
                     onClick = {
                         prefManager.setLanguage(selectedLanguage)
                         updateAppLocale(context ,selectedLanguage)
