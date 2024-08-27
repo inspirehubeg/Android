@@ -24,4 +24,19 @@ val LightGray = Color(0xFFCCCCCC)
 val LightBackground = Color(0xFFFAF9F6)
 val DarkBackground = Color(0xFF1C1B1F)
 
-val test = Color(0xFFFA0000)
+val DarkBrown = Color(0xFF795548)
+val LightBeige2 = Color(0xFFF7F3E3)
+
+val Peach = Color(0xFFEDD1B0)
+val Orange = Color(0xFFEDDD6E)
+val Yellow = Color(0xFFF8FD89)
+val Purple = Color(0xFFB987DC)
+val LightRed = Color(0xFFE0A6AA)
+val Turquoise = Color(0xFFA5F7E1)
+val BlueGrey = Color(0xFFDBE1F1)
+val Grey = Color(0xFFD8D3D6)
+val Blue = Color(0xFF96adfc)
+val Green = Color(0xFFa8f29a)
+
+
+

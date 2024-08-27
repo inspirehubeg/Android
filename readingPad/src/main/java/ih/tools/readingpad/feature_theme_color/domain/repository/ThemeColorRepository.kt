@@ -1,7 +1,7 @@
-package ih.tools.readingpad.feature_note_color.domain.repository
+package ih.tools.readingpad.feature_theme_color.domain.repository
 
-import ih.tools.readingpad.feature_note_color.domain.model.ThemeColor
-import ih.tools.readingpad.feature_note_color.domain.model.ThemeColorType
+import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColor
+import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColorType
 
 interface ThemeColorRepository {
     suspend fun getAll(type: ThemeColorType): List<ThemeColor>

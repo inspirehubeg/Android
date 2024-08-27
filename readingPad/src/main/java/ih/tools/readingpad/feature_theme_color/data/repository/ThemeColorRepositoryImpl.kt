@@ -1,9 +1,9 @@
-package ih.tools.readingpad.feature_note_color.data.repository
+package ih.tools.readingpad.feature_theme_color.data.repository
 
-import ih.tools.readingpad.feature_note_color.data.data_source.ThemeColorDao
-import ih.tools.readingpad.feature_note_color.domain.model.ThemeColor
-import ih.tools.readingpad.feature_note_color.domain.model.ThemeColorType
-import ih.tools.readingpad.feature_note_color.domain.repository.ThemeColorRepository
+import ih.tools.readingpad.feature_theme_color.data.data_source.ThemeColorDao
+import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColor
+import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColorType
+import ih.tools.readingpad.feature_theme_color.domain.repository.ThemeColorRepository
 
 class ThemeColorRepositoryImpl(private val dao: ThemeColorDao) : ThemeColorRepository {
     override suspend fun getAll(type: ThemeColorType): List<ThemeColor> {

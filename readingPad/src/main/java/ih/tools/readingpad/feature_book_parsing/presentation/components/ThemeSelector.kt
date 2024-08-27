@@ -33,13 +33,25 @@ import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewMode
 import ih.tools.readingpad.ui.theme.DarkBackground
 import ih.tools.readingpad.ui.theme.DarkGray
 import ih.tools.readingpad.ui.theme.LightBackground
+import ih.tools.readingpad.ui.theme.LightBeige2
+import ih.tools.readingpad.ui.theme.LightBrown
 import ih.tools.readingpad.ui.theme.LightGray
 
 @Composable
 fun ThemeSelectorMenu(
     viewModel: BookContentViewModel,
 ) {
-    val isDarkTheme = viewModel.darkTheme.collectAsState().value
+
+    val backgroundColor = viewModel.backgroundColor.collectAsState().value
+    val textColor = viewModel.fontColor.collectAsState().value
+    val isLightTheme =
+        (backgroundColor == LightBackground.toArgb()) && (textColor == DarkGray.toArgb())
+    val isSepiaTheme =
+        (backgroundColor == LightBeige2.toArgb()) && (textColor == LightBrown.toArgb())
+    val isDarkTheme =
+        (backgroundColor == DarkBackground.toArgb()) && (textColor == LightGray.toArgb())
+    val isCustomTheme = !isDarkTheme && !isLightTheme && !isSepiaTheme
+
     val onDismissRequest = { viewModel.setShowThemeSelector(false) }
     //outer transparent box that allows the custom positioning of the theme menu
     Box(
@@ -54,18 +66,22 @@ fun ThemeSelectorMenu(
                 .background(MaterialTheme.colorScheme.secondaryContainer)
                 .align(Alignment.BottomEnd)
         ) {
-            Row (
+            Row(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.secondaryContainer)
                     .padding(8.dp)
-            ){
+            ) {
                 //dark mode
                 ThemeSelectorItem(
                     backgroundColor = DarkBackground.toArgb(),
                     textColor = LightGray.toArgb(),
                     isSelected = isDarkTheme,
                     onClick = {
-                        viewModel.setDarkTheme(true, LightGray.toArgb(), backgroundColor = DarkBackground.toArgb())
+                        viewModel.setDarkTheme(
+                            true,
+                            LightGray.toArgb(),
+                            backgroundColor = DarkBackground.toArgb()
+                        )
                         onDismissRequest()
                     }
                 )
@@ -74,16 +90,37 @@ fun ThemeSelectorMenu(
                 ThemeSelectorItem(
                     backgroundColor = LightBackground.toArgb(),
                     textColor = DarkGray.toArgb(),
-                    isSelected = !isDarkTheme,
+                    isSelected = isLightTheme,
                     onClick = {
-                        viewModel.setDarkTheme(false, DarkGray.toArgb(), backgroundColor = LightBackground.toArgb())
+                        viewModel.setDarkTheme(
+                            false,
+                            DarkGray.toArgb(),
+                            backgroundColor = LightBackground.toArgb()
+                        )
                         onDismissRequest()
                     }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                Card (
+                //Sepia mode
+                ThemeSelectorItem(
+                    backgroundColor = LightBeige2.toArgb(),
+                    textColor = LightBrown.toArgb(),
+                    isSelected = isSepiaTheme,
+                    onClick = {
+                        viewModel.setDarkTheme(
+                            false,
+                            LightBrown.toArgb(),
+                            backgroundColor = LightBeige2.toArgb()
+                        )
+                        onDismissRequest()
+                    }
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+
+                //add custom theme
+                Card(
                     elevation = CardDefaults.cardElevation(8.dp),
-                ){
+                ) {
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
@@ -94,9 +131,10 @@ fun ThemeSelectorMenu(
                             viewModel.setShowThemeSelector(false)
                             viewModel.setShowCustomThemePage(true)
                         }) {
-                           Icon (
-                               Icons.Default.Add , contentDescription = stringResource(R.string.add_custom_theme)
-                           )
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = stringResource(R.string.add_custom_theme)
+                            )
                         }
                     }
                 }
@@ -113,9 +151,9 @@ fun ThemeSelectorItem(
     isSelected: Boolean = false,
     onClick: () -> Unit = {}
 ) {
-    Card (
+    Card(
         elevation = CardDefaults.cardElevation(8.dp),
-    ){
+    ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -127,7 +165,11 @@ fun ThemeSelectorItem(
                 .background(color = Color(backgroundColor))
                 .clickable { onClick() }
         ) {
-            Text(text = stringResource(R.string.theme_item_string), color = Color(textColor), fontSize = 35.sp)
+            Text(
+                text = stringResource(R.string.theme_item_string),
+                color = Color(textColor),
+                fontSize = 35.sp
+            )
         }
     }
 

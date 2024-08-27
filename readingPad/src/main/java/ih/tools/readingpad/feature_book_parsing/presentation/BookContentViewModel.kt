@@ -27,9 +27,9 @@ import ih.tools.readingpad.feature_bookmark.domain.use_cases.BookmarkUseCases
 import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkClickableSpan
 import ih.tools.readingpad.feature_highlight.domain.model.Highlight
 import ih.tools.readingpad.feature_highlight.domain.use_cases.HighlightUseCases
-import ih.tools.readingpad.feature_note_color.domain.model.ThemeColor
-import ih.tools.readingpad.feature_note_color.domain.model.ThemeColorType
-import ih.tools.readingpad.feature_note_color.domain.use_case.ThemeColorUseCases
+import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColor
+import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColorType
+import ih.tools.readingpad.feature_theme_color.domain.use_case.ThemeColorUseCases
 import ih.tools.readingpad.util.showToast
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -414,7 +414,19 @@ class BookContentViewModel @Inject constructor(
     fun scrollToIndexLazy(targetPageIndex: Int, lazyListState: LazyListState, targetIndex: Int) {
 
         viewModelScope.launch {
+
             if (targetPageIndex != lazyListState.firstVisibleItemIndex) {
+                _linkNavigationPage.value = true
+                Log.d(
+                    "BookContentViewModel",
+                    "linkNavigationPage = ${linkNavigationPage.value}"
+                )
+                Log.d(
+                    "BookContentViewModel",
+                    "is current page = ${textView.value?.pageNumber}"
+                )
+
+            }
                 // Scroll to the target page if it's not already visible
                 lazyListState.scrollToItem(targetPageIndex)
 
@@ -422,20 +434,22 @@ class BookContentViewModel @Inject constructor(
                     .filter { !it } // Wait until scrolling is finished
                     .first() // Take only the first emission
                     .let {
-                        _linkNavigationPage.value = true
-                        delay(200)
+                         delay(200)
                         if (!linkNavigationPage.value) {
                             val targetLine = textView.value?.getYCoordinateForIndex(targetIndex)
+                            Log.d("BookContentViewModel", "not current page & targetLine = $targetLine")
                             lazyListState.scrollBy(targetLine!!.toFloat())
                             _showTopBar.value = false
                         }
                     }
-            } else {
-                // Target page is already visible, scroll directly to the index
-                val targetLine = textView.value?.getYCoordinateForIndex(targetIndex)
-                lazyListState.scrollBy(targetLine!!.toFloat())
-                _showTopBar.value = false
-            }
+           // }
+//            else {
+//                // Target page is already visible, scroll directly to the index
+//                val targetLine = textView.value?.getYCoordinateForIndex(targetIndex)
+//                Log.d("BookContentViewModel", "is current page & targetLine = $targetLine")
+//                lazyListState.scrollBy(-100f)
+//                _showTopBar.value = false
+//            }
 
         }
     }
@@ -524,7 +538,7 @@ class BookContentViewModel @Inject constructor(
     }
 
 
-    fun sstFontSize(fontSize: Float) {
+    fun setFontSize(fontSize: Float) {
         preferencesManager.setFontSize(fontSize)
         _fontSize.value = fontSize
     }

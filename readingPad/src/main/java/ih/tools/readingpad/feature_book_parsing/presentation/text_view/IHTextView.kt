@@ -309,7 +309,7 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
 
                             val newFontSize = fontSize * scale
                             textSize = newFontSize // Update text size
-                            viewModel.sstFontSize(newFontSize) // Save the updated font size
+                            viewModel.setFontSize(newFontSize) // Save the updated font size
                             initialPointerDistance = currentDistance
                         }
                     }

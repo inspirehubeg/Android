@@ -47,8 +47,8 @@ import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
-import ih.tools.readingpad.feature_note_color.domain.model.ThemeColor
-import ih.tools.readingpad.feature_note_color.domain.model.ThemeColorType
+import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColor
+import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColorType
 
 @Composable
 fun ColorPicker(

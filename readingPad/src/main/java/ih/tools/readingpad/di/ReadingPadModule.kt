@@ -35,14 +35,14 @@ import ih.tools.readingpad.feature_highlight.domain.use_cases.AddHighlight
 import ih.tools.readingpad.feature_highlight.domain.use_cases.GetPageHighlights
 import ih.tools.readingpad.feature_highlight.domain.use_cases.HighlightUseCases
 import ih.tools.readingpad.feature_highlight.domain.use_cases.RemoveHighlightById
-import ih.tools.readingpad.feature_note_color.data.repository.ThemeColorRepositoryImpl
-import ih.tools.readingpad.feature_note_color.domain.repository.ThemeColorRepository
-import ih.tools.readingpad.feature_note_color.domain.use_case.AddThemeColorUseCase
-import ih.tools.readingpad.feature_note_color.domain.use_case.ColorExistsUseCase
-import ih.tools.readingpad.feature_note_color.domain.use_case.DeleteAllThemeColorsUseCase
-import ih.tools.readingpad.feature_note_color.domain.use_case.DeleteThemeColorUseCase
-import ih.tools.readingpad.feature_note_color.domain.use_case.GetThemeColorsUseCase
-import ih.tools.readingpad.feature_note_color.domain.use_case.ThemeColorUseCases
+import ih.tools.readingpad.feature_theme_color.data.repository.ThemeColorRepositoryImpl
+import ih.tools.readingpad.feature_theme_color.domain.repository.ThemeColorRepository
+import ih.tools.readingpad.feature_theme_color.domain.use_case.AddThemeColorUseCase
+import ih.tools.readingpad.feature_theme_color.domain.use_case.ColorExistsUseCase
+import ih.tools.readingpad.feature_theme_color.domain.use_case.DeleteAllThemeColorsUseCase
+import ih.tools.readingpad.feature_theme_color.domain.use_case.DeleteThemeColorUseCase
+import ih.tools.readingpad.feature_theme_color.domain.use_case.GetThemeColorsUseCase
+import ih.tools.readingpad.feature_theme_color.domain.use_case.ThemeColorUseCases
 import javax.inject.Singleton
 
 

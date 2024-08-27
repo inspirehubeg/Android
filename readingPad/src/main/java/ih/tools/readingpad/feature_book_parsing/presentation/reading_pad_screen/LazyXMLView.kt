@@ -55,11 +55,17 @@ fun XMLViewLazyItem(
             val textView = view.findViewById<IHTextView>(R.id.ihTextView)
             //if the textView is the target page of a link:
             if (viewModel.linkNavigationPage.value) {
+                Log.d("bookContentViewModel", "page number = ${textView.pageNumber}")
                 viewModel.setTextView(textView)
                 viewModel.setLinkNavigationPage(false)
             }
             //this fun updates the text styles of the text view whenever any of these values change
-            updateTextViewStyle(textView, fontSize, fontColor, fontWeight)
+            updateTextViewStyle(
+                textView,
+                fontSize,
+                fontColor,
+                //DarkBrown.toArgb(),
+                 fontWeight)
         }
     )
 }

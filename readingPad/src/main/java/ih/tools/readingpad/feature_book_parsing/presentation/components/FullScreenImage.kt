@@ -11,11 +11,16 @@ import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,6 +33,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import ih.tools.readingpad.R
 
 @Composable
@@ -35,18 +41,24 @@ fun FullScreenImage(
     imageData: ByteArray,
     onClose: () -> Unit,
 ) {
+    var rotation by remember { mutableFloatStateOf(0f) }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        Scrim(onClose = onClose)
-        PhotoImage(imageData)
+        Scrim(
+            onRotateLeft = { rotation -= 90f },
+            onRotateRight = { rotation += 90f },
+            onClose = onClose
+        )
+        PhotoImage(imageData, rotation = rotation)
     }
 }
 
 @Composable
-fun PhotoImage(image: ByteArray, modifier: Modifier = Modifier) {
-    var zoom by remember { mutableStateOf(1f) }
+fun PhotoImage(image: ByteArray, modifier: Modifier = Modifier, rotation: Float) {
+    var zoom by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
 
     if (image.isEmpty()) {
@@ -59,58 +71,71 @@ fun PhotoImage(image: ByteArray, modifier: Modifier = Modifier) {
             val imageBitmap = bitmap.asImageBitmap()
             val imageWidth = imageBitmap.width.toFloat()
             val imageHeight = imageBitmap.height.toFloat()
+            val aspectRatio = if (rotation == 90f || rotation == -90f) {
+                imageHeight / imageWidth
+            }else imageWidth / imageHeight
+            Column {
+                BoxWithConstraints(
+                    modifier = Modifier
+                        .background(Color.Red)
+                        .aspectRatio(imageWidth/imageHeight)
+                ) {
+                    val zoomState =
+                        rememberTransformableState { zoomChange, panChange, _ ->
+                            zoom = (zoom * zoomChange).coerceIn(1f, 3f)
+                            val extraWidth = (zoom - 1) * constraints.maxWidth.toFloat()
+                            val extraHeight = ((zoom - 1) * constraints.maxHeight.toFloat())
+                            var pan = panChange
+                            if (rotation == 90f || rotation == -90f) {
+                                pan = Offset(0f, 0f)
+                            }
+                            Log.d(
+                                "PhotoImage",
+                                "extraWidth: $extraWidth, extraHeight: $extraHeight"
+                            )
 
-            BoxWithConstraints(
-                modifier = Modifier
-                    .background(Color.Red)
-                    .aspectRatio(imageWidth / imageHeight)
-            ) {
-                val zoomState =
-                    rememberTransformableState { zoomChange, panChange, _ ->
-                        zoom = (zoom * zoomChange).coerceIn(1f, 3f)
-                        val extraWidth = (zoom - 1) * constraints.maxWidth.toFloat()
-                        val extraHeight = ((zoom - 1) * constraints.maxHeight.toFloat())
-                        Log.d("PhotoImage", "extraWidth: $extraWidth, extraHeight: $extraHeight")
-
-                        val maxX = extraWidth / 2
-                        val maxY = extraHeight / 2
-                        offset = Offset(
-                            x = (offset.x + zoom * panChange.x).coerceIn(-maxX, maxX),
-                            y = (offset.y + zoom * panChange.y).coerceIn(-maxY, maxY)
-                        )
-                    }
-
-                Image(
-                    bitmap = imageBitmap,
-                    //  painter = painterResource(id = R.drawable.andre),
-                    contentDescription = stringResource(R.string.full_screen_image),
-                    modifier = modifier
-                        .aspectRatio(imageWidth / imageHeight)
-                        .graphicsLayer {
-                            translationX = offset.x
-                            translationY = offset.y
-                            scaleX = zoom
-                            scaleY = zoom
-                        }
-                        .transformable(state = zoomState)
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onDoubleTap = { tapOffset ->
-                                    zoom = if (zoom > 1f) 1f else 2f
-                                    Log.d(
-                                        "PhotoImage",
-                                        "onDoubleTap: zoom =${zoom}, tapOffset = $tapOffset"
-                                    )
-
-                                    offset = calculateDoubleTapOffset(zoom, size, tapOffset)
-                                    Log.d(
-                                        "PhotoImage",
-                                        "onDoubleTap: offset = $offset, size = $size"
-                                    )
-                                }
+                            val maxX = extraWidth / 2
+                            val maxY = extraHeight / 2
+                            offset = Offset(
+                                x = (offset.x + zoom * pan.x).coerceIn(-maxX, maxX),
+                                y = (offset.y + zoom * pan.y).coerceIn(-maxY, maxY)
                             )
                         }
-                )
+
+                    Image(
+                        bitmap = imageBitmap,
+                        //  painter = painterResource(id = R.drawable.andre),
+                        contentDescription = stringResource(R.string.full_screen_image),
+                        modifier = modifier
+                            .aspectRatio(imageWidth/imageHeight)
+                            .graphicsLayer {
+                                translationX = offset.x
+                                translationY = offset.y
+                                scaleX = zoom
+                                scaleY = zoom
+                                rotationZ = rotation
+                                Log.d("PhotoImage", "rotation: $rotation")
+                            }
+                            .transformable(state = zoomState)
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onDoubleTap = { tapOffset ->
+                                        zoom = if (zoom > 1f) 1f else 2f
+                                        Log.d(
+                                            "PhotoImage",
+                                            "onDoubleTap: zoom =${zoom}, tapOffset = $tapOffset"
+                                        )
+
+                                        offset = calculateDoubleTapOffset(zoom, size, tapOffset)
+                                        Log.d(
+                                            "PhotoImage",
+                                            "onDoubleTap: offset = $offset, size = $size"
+                                        )
+                                    }
+                                )
+                            }
+                    )
+                }
             }
         }.onFailure { e ->
             // Display an error message or placeholder
@@ -122,16 +147,33 @@ fun PhotoImage(image: ByteArray, modifier: Modifier = Modifier) {
 
 
 @Composable
-fun Scrim(onClose: () -> Unit, modifier: Modifier = Modifier) {
+fun Scrim(
+    onRotateRight: () -> Unit, onRotateLeft: () -> Unit,
+    onClose: () -> Unit, modifier: Modifier = Modifier
+) {
     Box(
         modifier
             .fillMaxSize()
+            .padding(vertical = 40.dp)
             .focusable()
             .clickable {
                 onClose()
             }
             .background(Color.DarkGray.copy(alpha = 0.9f))
-    )
+    ) {
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+        ) {
+            Button(onClick = onRotateLeft) {
+                Text(text = "Rotate left")
+            }
+            Button(onClick = onRotateRight) {
+                Text(text = "Rotate right")
+
+            }
+        }
+    }
 }
 
 

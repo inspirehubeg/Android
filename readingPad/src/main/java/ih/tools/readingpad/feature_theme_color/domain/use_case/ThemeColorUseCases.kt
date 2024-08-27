@@ -1,4 +1,4 @@
-package ih.tools.readingpad.feature_note_color.domain.use_case
+package ih.tools.readingpad.feature_theme_color.domain.use_case
 
 data class ThemeColorUseCases(
     val addThemeColorUseCase: AddThemeColorUseCase,
