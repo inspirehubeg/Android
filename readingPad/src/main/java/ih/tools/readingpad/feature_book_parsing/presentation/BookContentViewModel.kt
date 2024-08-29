@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import book_generation.feature.book_creation.security.Decryption
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ih.tools.readingpad.R
+import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Page
 import ih.tools.readingpad.feature_book_fetching.domain.use_cases.fetchBook
 import ih.tools.readingpad.feature_book_fetching.domain.use_cases.getBookInfo
 import ih.tools.readingpad.feature_book_fetching.domain.use_cases.getMetadata
@@ -21,6 +22,8 @@ import ih.tools.readingpad.feature_book_fetching.domain.use_cases.getRawFileByNa
 import ih.tools.readingpad.feature_book_fetching.domain.use_cases.readFileFromRaw
 import ih.tools.readingpad.feature_book_parsing.data.PreferencesManager
 import ih.tools.readingpad.feature_book_parsing.domain.model.BookDetailsState
+import ih.tools.readingpad.feature_book_parsing.domain.model.SpannedPage
+import ih.tools.readingpad.feature_book_parsing.domain.use_cases.convertPagesToSpannedPagesLazy
 import ih.tools.readingpad.feature_book_parsing.presentation.text_view.IHTextView
 import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
 import ih.tools.readingpad.feature_bookmark.domain.use_cases.BookmarkUseCases
@@ -52,14 +55,11 @@ class BookContentViewModel @Inject constructor(
     private val context: Context
 ) : ViewModel() {
 
-
     private val _savedFontColors = MutableLiveData<List<ThemeColor>>()
     val savedFontColors = _savedFontColors
 
     private val _savedBackgroundColors = MutableLiveData<List<ThemeColor>>()
     val savedBackgroundColors = _savedBackgroundColors
-
-
 
     private val _imageClicked = MutableStateFlow<ByteArray?>(null)
     val imageClicked: StateFlow<ByteArray?> = _imageClicked.asStateFlow()
@@ -86,6 +86,12 @@ class BookContentViewModel @Inject constructor(
     private val _showEditBookmarkDialog = MutableStateFlow(false)
     val showEditBookmarkDialog = _showEditBookmarkDialog.asStateFlow()
 
+    private val _showFullScreenImage = MutableStateFlow(false)
+    val showFullScreenImage = _showFullScreenImage.asStateFlow()
+    fun setShowFullScreenImage(open: Boolean) {
+        _showFullScreenImage.value = open
+    }
+
     private val _showThemeSelector = MutableStateFlow(false)
     val showThemeSelector: StateFlow<Boolean> = _showThemeSelector.asStateFlow()
 
@@ -103,6 +109,11 @@ class BookContentViewModel @Inject constructor(
     private val _bookmarkClickEvent = MutableStateFlow<IHBookmarkClickableSpan?>(null)
     val bookmarkClickEvent: StateFlow<IHBookmarkClickableSpan?> = _bookmarkClickEvent.asStateFlow()
 
+    private val _imageRotation = MutableStateFlow(0f)
+    val imageRotation: StateFlow<Float> = _imageRotation.asStateFlow()
+    fun setImageRotation(rotation: Float) {
+        _imageRotation.value = rotation
+    }
 
     private val _editBookmark = MutableStateFlow(false)
     val editBookmark: StateFlow<Boolean> = _editBookmark.asStateFlow()
@@ -146,11 +157,11 @@ class BookContentViewModel @Inject constructor(
     private val _backgroundColor = MutableStateFlow(preferencesManager.getBackgroundColor())
     val backgroundColor = _backgroundColor
 
-    private val _currentThemeFontColor = MutableLiveData<Int>(fontColor.value)
+    private val _currentThemeFontColor = MutableLiveData(fontColor.value)
     val currentThemeFontColor = _currentThemeFontColor
 
-    private val _currentThemeBackgroundColor = MutableLiveData<Int>(backgroundColor.value)
-    val currentThemeBackgroundColor= _currentThemeBackgroundColor
+    private val _currentThemeBackgroundColor = MutableLiveData(backgroundColor.value)
+    val currentThemeBackgroundColor = _currentThemeBackgroundColor
 
     private val _linkNavigationPage = MutableStateFlow(false)
     val linkNavigationPage: StateFlow<Boolean> = _linkNavigationPage
@@ -159,6 +170,17 @@ class BookContentViewModel @Inject constructor(
 
     private val _state = mutableStateOf(BookDetailsState())
     val state: State<BookDetailsState> = _state
+
+    var lazyListState = LazyListState()
+    private val _currentPageIndex = MutableStateFlow(0)
+    val currentPageIndex: StateFlow<Int> = _currentPageIndex
+
+    private val _fontSizeChanged = MutableStateFlow(false)
+    val fontSizeChanged: StateFlow<Boolean> = _fontSizeChanged
+
+    fun setFontSizeChanged(value: Boolean) {
+        _fontSizeChanged.value = value
+    }
 
     init {
         // this part is temporary, it fetches the book from Raw but it should be replaced by fetching the book by id in the init{}
@@ -258,7 +280,7 @@ class BookContentViewModel @Inject constructor(
             for (i in state.value.bookBookmarks) {
                 Log.d("new", "bookmark = ${i.bookmarkTitle}")
             }
-            Log.d("rasm", "addBookmark is invoked page# = ${textView.pageNumber}")
+            Log.d("new", "addBookmark is invoked page# = ${textView.pageNumber}")
             textView.drawSingleBookmark(
                 newBookmarkId,
                 newBookmark.bookmarkTitle,
@@ -411,6 +433,12 @@ class BookContentViewModel @Inject constructor(
         }
     }
 
+    fun scrollToIndex(targetPageIndex: Int) {
+        viewModelScope.launch {
+            lazyListState.scrollToItem(targetPageIndex)
+        }
+    }
+
     fun scrollToIndexLazy(targetPageIndex: Int, lazyListState: LazyListState, targetIndex: Int) {
 
         viewModelScope.launch {
@@ -427,22 +455,22 @@ class BookContentViewModel @Inject constructor(
                 )
 
             }
-                // Scroll to the target page if it's not already visible
-                lazyListState.scrollToItem(targetPageIndex)
+            // Scroll to the target page if it's not already visible
+            lazyListState.scrollToItem(targetPageIndex)
 
-                snapshotFlow { lazyListState.isScrollInProgress }
-                    .filter { !it } // Wait until scrolling is finished
-                    .first() // Take only the first emission
-                    .let {
-                         delay(200)
-                        if (!linkNavigationPage.value) {
-                            val targetLine = textView.value?.getYCoordinateForIndex(targetIndex)
-                            Log.d("BookContentViewModel", "not current page & targetLine = $targetLine")
-                            lazyListState.scrollBy(targetLine!!.toFloat())
-                            _showTopBar.value = false
-                        }
+            snapshotFlow { lazyListState.isScrollInProgress }
+                .filter { !it } // Wait until scrolling is finished
+                .first() // Take only the first emission
+                .let {
+                    delay(200)
+                    if (!linkNavigationPage.value) {
+                        val targetLine = textView.value?.getYCoordinateForIndex(targetIndex)
+                        Log.d("BookContentViewModel", "not current page & targetLine = $targetLine")
+                        lazyListState.scrollBy(targetLine!!.toFloat())
+                        _showTopBar.value = false
                     }
-           // }
+                }
+            // }
 //            else {
 //                // Target page is already visible, scroll directly to the index
 //                val targetLine = textView.value?.getYCoordinateForIndex(targetIndex)
@@ -470,13 +498,14 @@ class BookContentViewModel @Inject constructor(
 
     //setters functions
 
-    fun setCurrentThemeFontColor(colorInt: Int){
+    fun setCurrentThemeFontColor(colorInt: Int) {
         _currentThemeFontColor.value = colorInt
     }
 
-    fun setCurrentThemeBackgroundColor(colorInt: Int){
+    fun setCurrentThemeBackgroundColor(colorInt: Int) {
         _currentThemeBackgroundColor.value = colorInt
     }
+
     fun setShowBookmarkListDialog(show: Boolean) {
         _showBookmarkListDialog.value = show
     }
@@ -539,8 +568,11 @@ class BookContentViewModel @Inject constructor(
 
 
     fun setFontSize(fontSize: Float) {
+        _currentPageIndex.value = lazyListState.firstVisibleItemIndex
+
         preferencesManager.setFontSize(fontSize)
         _fontSize.value = fontSize
+        _fontSizeChanged.value = true
     }
 
     fun setFontColor(color: Int) {
@@ -580,10 +612,71 @@ class BookContentViewModel @Inject constructor(
         setBackgroundColor(backgroundColor)
     }
 
-    fun saveTheme(fontColor: Int, backgroundColor: Int) {
-        setFontColor(fontColor)
-        setBackgroundColor(backgroundColor)
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    /**
+     * Cache to store converted pages for each chapter.
+     * Key: Chapter index
+     * Value: List of SpannedPage for the chapter
+     */
+    private val convertedPagesCache = mutableMapOf<Int, List<SpannedPage>>()
+
+    /**
+     * Retrieves the spanned pages for a chapter.
+     * If the pages are not cached, they are converted and stored in the cache.
+     * The next chapter's pages are also preloaded and cached.
+     *
+     * @param chapterIndex The index of the chapter.
+     * @param pages The list of pages for the chapter.
+     * @return The list of SpannedPage for the chapter.
+     */
+    suspend fun getSpannedPagesForChapter(chapterIndex: Int, pages: List<Page>): List<SpannedPage> {
+        _isLoading.value = true
+        val result = convertedPagesCache.getOrPut(chapterIndex) {
+            convertAndCachePages(chapterIndex, pages)
+        }
+        _isLoading.value = false
+        return result
     }
+
+    /**
+     * Converts the pages of a chapter and caches them.
+     * Also preloads and caches the pages of the next chapter if available.
+     *
+     * @param chapterIndex The index of the chapter.
+     * @param pages The list of pages for the chapter.
+     * @return The list of SpannedPage for the chapter.
+     */
+    private suspend fun convertAndCachePages(
+        chapterIndex: Int,
+        pages: List<Page>
+    ): List<SpannedPage> {
+        val spannedPages =
+            convertPagesToSpannedPagesLazy(pages, metadata, context, book, lazyListState, this)
+        convertedPagesCache[chapterIndex] = spannedPages
+
+        // Preload the next chapter if available
+        val nextChapterIndex = chapterIndex + 1
+        if (nextChapterIndex < book.chapters.size) {
+            val nextChapterPages = book.chapters[nextChapterIndex].pages
+            convertedPagesCache[nextChapterIndex] =
+                convertPagesToSpannedPagesLazy(
+                    nextChapterPages,
+                    metadata,
+                    context,
+                    book,
+                    lazyListState,
+                    this
+                )
+        }
+
+        return spannedPages
+    }
+    // handle edge cases like the last chapter not having a next chapter.
+    // You can further optimize this by adding a mechanism to remove cached chapters
+    // that are far away from the currently viewed chapter if memory usage becomes a concern
+
 }
 
 

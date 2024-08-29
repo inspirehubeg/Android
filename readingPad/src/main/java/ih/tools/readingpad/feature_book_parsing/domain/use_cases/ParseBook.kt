@@ -13,8 +13,22 @@ import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
 import ih.tools.readingpad.feature_book_parsing.domain.model.SpannedPage
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 
+/**
+ * Parses the content of a book, handling different elements like text, fonts, links, and images.
+ */
 class ParseBook {
 
+/**
+ * Parses the encoded content of a book page and converts it into a SpannableStringBuilder.
+ *
+ * @param pageEncodedString The encoded content of the page.
+ * @param metadata Metadata about the book, including encoding information.
+ * @param context The application context.
+ * @param book The book object.
+ * @param recyclerView The RecyclerView used to display the book content.
+ * @param viewModel The ViewModel associated with the book content.
+ * @return A SpannableStringBuilder containing the parsed content with formatting and interactive elements.
+ */
     suspend fun invoke(
         pageEncodedString: String,
         metadata: Metadata,
@@ -99,13 +113,21 @@ class ParseBook {
     }
 }
 
-/** this takes the parts that the regex split starting always with a tag start
- * then classify each part to the right element either an Image, internal link, web link or custom font
+/**
+ * Parses a tag from the book content and returns a ParsedElement representing the tag typeand its content.
+ *
+ * @param tagContent The content of the tag, including the tag identifier and the actual content.
+ * @param encoding The encoding information for the book, used to identify different tag types.
+ * @return A ParsedElement representing the parsed tag.
+ * @throws IllegalArgumentException If the tag content is invalid or the tag type is unknown.
  */
  fun parseTag(
     tagContent: String,
     encoding: Encoding,
 ): ParsedElement {
+    if (tagContent.length <= 1) {
+        throw IllegalArgumentException("Invalid tag content: $tagContent")
+    }
     val tagStart = tagContent.substring(0, 1)
     val content = tagContent.substring(1)
     val tags = encoding.tags
@@ -114,21 +136,22 @@ class ParseBook {
     return when (tagStart) {
         tags.webLink -> ParsedElement.WebLink(content)
         tags.internalLink -> {
-            val linkKey = content.substring(0, tags.linkKeyLength.toInt())
-            val linkContent = content.substring(tags.linkKeyLength.toInt())
-            //saveLinkSource(viewModel, start, end, linkKey)
+            if (content.length <= tags.linkKeyLength) {
+                throw IllegalArgumentException("Invalid internal link content: $content")
+            }
+            val linkKey = content.substring(0, tags.linkKeyLength)
+            val linkContent = content.substring(tags.linkKeyLength)
             ParsedElement.InternalLinkSource(linkContent, linkKey)
         }
 
         tags.image -> {
-            lateinit var imageData: String
-            lateinit var imageRatio: String
-            lateinit var imageAlign: String
-
             val sub = content.split(':')
-            imageData = sub[0] //image data byte array
-            imageRatio = sub[1] //image ratio
-            imageAlign = sub[2] //image alignment
+            if (sub.size != 3) {
+                throw IllegalArgumentException("Invalid image content: $content")
+            }
+           val imageData = sub[0] //image data byte array
+            val imageRatio = sub[1] //image ratio
+            val imageAlign = sub[2] //image alignment
 
             val localFile = LocalFile.instance()
             val decodedImage1 = localFile.decode(imageData)
@@ -139,16 +162,24 @@ class ParseBook {
             ParsedElement.Image(
                 content = decodedImage1,
                 alignment = imageAlign,
-                ratio = imageRatio.toInt()
+                ratio = imageRatio.toIntOrNull() ?: 0 // Handle potential NumberFormatException
             )
         }
-
-
         else -> ParsedElement.Font(content, tagStart)
     }
 }
 
-
+/**
+ * Converts a list of pages with plain text content to a list of pages with formatted, spanned content.
+ *
+ * @param pages The list of pages to convert.
+ * @param metadata Metadata about the book, including encoding information.
+ * @param context The application context.
+ * @param book The book object.
+ * @param recyclerView The RecyclerView used to display the book content.
+ * @param bookContentViewModel The ViewModel associated with the book content.
+ * @return A list of SpannedPage objects, where each page has its content formatted as a SpannableStringBuilder.
+ */
 suspend fun convertPagesToSpannedPages(
     pages: List<Page>,
     metadata: Metadata,
@@ -157,10 +188,11 @@ suspend fun convertPagesToSpannedPages(
     recyclerView: RecyclerView,
     bookContentViewModel: BookContentViewModel
 ): List<SpannedPage> {
+    val parseBook = ParseBook() // Create a single instance of ParseBook
     return pages.map { pageContent ->
         // Apply formatting to spannableContent here
         val decodedSpannedPage =
-            ParseBook().invoke(pageContent.body.text, metadata, context, book, recyclerView,bookContentViewModel)
+            parseBook.invoke(pageContent.body.text, metadata, context, book, recyclerView,bookContentViewModel)
         SpannedPage(decodedSpannedPage, pageContent.pageNumber)
     }
 }

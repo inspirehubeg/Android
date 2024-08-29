@@ -20,4 +20,9 @@
     <string name="done">تم</string>
     <string name="delete">مسح</string>
     <string name="default_new_bookmark_name">جديد</string>
+    <string name="page_not_found">صفحة غير موجودة</string>
+    <string name="image_not_available">صورة غير متاحة</string>
+    <string name="full_screen_image">صورة بحجم الشاشة</string>
+    <string name="error_loading_image">خطأ في تحميل الصورة</string>
+    <string name="add_custom_theme">اضف ثيم خاص</string>
 </resources>

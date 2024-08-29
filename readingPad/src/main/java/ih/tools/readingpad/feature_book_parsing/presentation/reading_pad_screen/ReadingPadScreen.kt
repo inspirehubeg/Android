@@ -6,15 +6,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +22,7 @@ import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewMode
 import ih.tools.readingpad.feature_book_parsing.presentation.components.CustomFontDialog
 import ih.tools.readingpad.feature_book_parsing.presentation.components.CustomThemeScreen
 import ih.tools.readingpad.feature_book_parsing.presentation.components.FullScreenImage
+import ih.tools.readingpad.feature_book_parsing.presentation.components.FullScreenImageTopBar
 import ih.tools.readingpad.feature_book_parsing.presentation.components.PageSelector
 import ih.tools.readingpad.feature_book_parsing.presentation.components.ReadingPadBottomBar
 import ih.tools.readingpad.feature_book_parsing.presentation.components.ReadingPadTopBar
@@ -40,8 +37,7 @@ import kotlinx.coroutines.launch
  *  the pages content and all the dialogs ars displayed*/
 @Composable
 fun ReadingPadScreen(
-    viewModel: BookContentViewModel = hiltViewModel(),
-    navController: NavController
+    viewModel: BookContentViewModel = hiltViewModel(), navController: NavController
 ) {
     val isDarkTheme = viewModel.darkTheme.collectAsState().value
 
@@ -59,14 +55,14 @@ fun ReadingPadScreen(
         val currentBookmarkSpan by viewModel.bookmarkClickEvent.collectAsState()
 
         val imageClicked by viewModel.imageClicked.collectAsState()
-        var showFullScreenImage by remember { mutableStateOf(false) }
+        val showFullScreenImage by viewModel.showFullScreenImage.collectAsState()
 
         val openCustomTheme by viewModel.showCustomThemePage.collectAsState()
         val backgroundColor by viewModel.backgroundColor.collectAsState()
         val fontColor by viewModel.fontColor.collectAsState()
 
         val listState =
-            rememberLazyListState() //monitors the state of the lazyColumn to use in navigation
+            viewModel.lazyListState //monitors the state of the lazyColumn to use in navigation
 
 
         // to calculate the height and width of the screen
@@ -103,20 +99,20 @@ fun ReadingPadScreen(
             }
         }
 
-        Scaffold(
-            containerColor = Color( backgroundColor),
-            topBar = {
-                //the showTopBar changes with the single tap on screen to show or hide the bars
-                // and emulates full screen effect
-                if (pinnedTopBar || showTopBar) {
-                    ReadingPadTopBar(navController = navController, viewModel = viewModel)
-                }
-            },
-            bottomBar = {
-                if (pinnedTopBar || showTopBar) {
-                    ReadingPadBottomBar(viewModel = viewModel, navController)
-                }
+        Scaffold(containerColor = Color(backgroundColor), topBar = {
+            //the showTopBar changes with the single tap on screen to show or hide the bars
+            // and emulates full screen effect
+            if (pinnedTopBar || showTopBar) {
+                ReadingPadTopBar(navController = navController, viewModel = viewModel)
             }
+            if (showFullScreenImage) {
+                FullScreenImageTopBar(viewModel = viewModel)
+            }
+        }, bottomBar = {
+            if (pinnedTopBar || showTopBar) {
+                ReadingPadBottomBar(viewModel = viewModel, navController)
+            }
+        }
 
         ) { values ->
             // passing the values to the lazyColumn or to the Box doesn't allow the topBar to be above the page
@@ -141,8 +137,7 @@ fun ReadingPadScreen(
                 )
 */
                 PagesScreen(
-                    bookContentViewModel = viewModel,
-                    listState = listState
+                    bookContentViewModel = viewModel, listState = listState
                 )
             }
 
@@ -162,7 +157,9 @@ fun ReadingPadScreen(
             }
 
             if (showBookmarkListDialog) {
-                BookmarkListDialog(viewModel, backgroundHeight = bookmarkDialogHeight.dp, dialogWidth.dp, listState)
+                BookmarkListDialog(
+                    viewModel, backgroundHeight = bookmarkDialogHeight.dp, dialogWidth.dp, listState
+                )
             }
 
             if (showPageNumberDialog) {
@@ -170,21 +167,23 @@ fun ReadingPadScreen(
             }
 
             if (imageClicked != null) {
-                showFullScreenImage = true
+                viewModel.setShowFullScreenImage(true)
+                viewModel.setTopBarVisibility(true)
             }
 
             if (showFullScreenImage) {
-                FullScreenImage(imageData = imageClicked!!) {
-                    //onClose do the following
-                    showFullScreenImage = false
-                    viewModel.onImageClick(null) // Reset the clicked image state
-                }
+                FullScreenImage(viewModel = viewModel,
+                    imageData = imageClicked!!,
+                    onClose = {
+                        viewModel.setImageRotation(0f)
+                        viewModel.setShowFullScreenImage(false)
+                        viewModel.onImageClick(null) // Reset the clicked image state
+                    })
             }
             if (openCustomTheme) {
-               // ColorPicker(onColorChange = {}, modifier = Modifier)
+                // ColorPicker(onColorChange = {}, modifier = Modifier)
                 CustomThemeScreen(
-                    viewModel = viewModel,
-                    dialogWidth = dialogWidth.dp
+                    viewModel = viewModel, dialogWidth = dialogWidth.dp
                 )
             }
         }
@@ -202,7 +201,7 @@ fun ReadingPadScreen(
             } else if (showEditBookmarkDialog) {
                 viewModel.setShowEditBookmarkDialog(false)
             } else if (showFullScreenImage) {
-                showFullScreenImage = false
+                viewModel.setShowFullScreenImage(false)
                 viewModel.onImageClick(null)
             } else if (openCustomTheme) {
                 viewModel.setShowCustomThemePage(false)

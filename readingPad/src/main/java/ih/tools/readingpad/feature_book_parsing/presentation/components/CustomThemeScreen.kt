@@ -50,122 +50,119 @@ fun CustomThemeScreen(
     }
     var backgroundColor by remember { mutableIntStateOf(viewModel.backgroundColor.value) }
     var fontColor by remember { mutableIntStateOf(viewModel.fontColor.value) }
+
+    //an outer box that fills the entire screen but transparent to allow the custom placement of the inner box
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 40.dp)
+            .clickable(onClick = {
+                onDismiss()
+            }),
+        contentAlignment = Alignment.Center
     ) {
-        //an outer box that fills the entire screen but transparent to allow the custom placement of the inner box
+
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 40.dp)
-                .clickable(onClick = {
-                    viewModel.setShowCustomThemePage(false)
-                })
+                .width(dialogWidth)
+                .clickable { }
         ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                ThemePreviewer(
+                    viewModel = viewModel,
+                    modifier = Modifier
+                        .background(
+                            MaterialTheme.colorScheme.secondaryContainer,
+                            shape = RoundedCornerShape(12)
+                        )
+                        .fillMaxWidth()
 
-            Box(
-                modifier = Modifier
-                    .width(dialogWidth)
-                    .clickable { }
-            ) {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    ThemePreviewer(
-                        viewModel = viewModel,
-                        modifier = Modifier
-                            .background(
-                                MaterialTheme.colorScheme.secondaryContainer,
-                                shape = RoundedCornerShape(12)
-                            )
-                            .fillMaxWidth()
-
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                MaterialTheme.colorScheme.secondaryContainer,
-                                shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
-                            )
-                            .fillMaxWidth()
-                    ) {
-                        when (selectedTabIndex) {
-                            0 -> BackgroundColorScreen(modifier = Modifier, viewModel)
-                            1 -> FontColorScreen(modifier = Modifier, viewModel)
-                        }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Box(
+                    modifier = Modifier
+                        .background(
+                            MaterialTheme.colorScheme.secondaryContainer,
+                            shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+                        )
+                        .fillMaxWidth()
+                ) {
+                    when (selectedTabIndex) {
+                        0 -> BackgroundColorScreen(modifier = Modifier, viewModel)
+                        1 -> FontColorScreen(modifier = Modifier, viewModel)
                     }
+                }
 
-                    //Spacer(modifier = Modifier.height(2.dp))
+                //Spacer(modifier = Modifier.height(2.dp))
 
-                    TabRow(
-                        selectedTabIndex = selectedTabIndex,
-                        containerColor = Color.Transparent,
+                TabRow(
+                    selectedTabIndex = selectedTabIndex,
+                    containerColor = Color.Transparent,
 
-                        modifier = Modifier
-                        //.padding(4.dp)
-                    ) {
-                        // first tab, Background color
-                        Tab(
-                            selected = (selectedTabIndex == 0),
-                            onClick = { selectedTabIndex = 0 },
-                            if (selectedTabIndex == 0) {
-                                Modifier
+                    modifier = Modifier
+                    //.padding(4.dp)
+                ) {
+                    // first tab, Background color
+                    Tab(
+                        selected = (selectedTabIndex == 0),
+                        onClick = { selectedTabIndex = 0 },
+                        if (selectedTabIndex == 0) {
+                            Modifier
 //                                .padding(horizontal = 8.dp)
-                                    .background(
-                                        MaterialTheme.colorScheme.secondaryContainer,
-                                        shape = RoundedCornerShape(bottomStart = 12.dp)
-                                    )
-                            } else {
-                                Modifier
-                                // .padding(horizontal = 8.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.secondaryContainer,
+                                    shape = RoundedCornerShape(bottomStart = 12.dp)
+                                )
+                        } else {
+                            Modifier
+                            // .padding(horizontal = 8.dp)
 //                                .background(MaterialTheme.colorScheme.onSecondaryContainer,
 //                                    shape = RoundedCornerShape(12))
-                            },
-                            selectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                            unselectedContentColor = MaterialTheme.colorScheme.secondaryContainer
+                        },
+                        selectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        unselectedContentColor = MaterialTheme.colorScheme.secondaryContainer
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    Icons.Filled.FormatColorFill,
-                                    contentDescription = "Background color"
-                                )
-                                Text(text = "Background")
-                            }
+                            Icon(
+                                Icons.Filled.FormatColorFill,
+                                contentDescription = "Background color"
+                            )
+                            Text(text = "Background")
                         }
-                        // second tab, Font color
-                        Tab(
-                            selected = (selectedTabIndex == 1),
-                            onClick = { selectedTabIndex = 1 },
-                            if (selectedTabIndex == 1) {
-                                Modifier
-                                    //  .padding(horizontal = 8.dp)
-                                    .background(
-                                        MaterialTheme.colorScheme.secondaryContainer,
-                                        shape = RoundedCornerShape(bottomEnd = 12.dp)
-                                    )
-                            } else {
-                                Modifier
-                                //   .padding(horizontal = 8.dp)
-//                                .background(MaterialTheme.colorScheme.onSecondaryContainer,
-//                                    shape = RoundedCornerShape(12))
-                            },
-                            selectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                            unselectedContentColor = MaterialTheme.colorScheme.secondaryContainer
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Icon(
-                                    Icons.Filled.FormatColorText,
-                                    contentDescription = "Font color"
-                                )
-                                Text(text = "Font")
-                            }
-                        }
-
                     }
+                    // second tab, Font color
+                    Tab(
+                        selected = (selectedTabIndex == 1),
+                        onClick = { selectedTabIndex = 1 },
+                        if (selectedTabIndex == 1) {
+                            Modifier
+                                //  .padding(horizontal = 8.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.secondaryContainer,
+                                    shape = RoundedCornerShape(bottomEnd = 12.dp)
+                                )
+                        } else {
+                            Modifier
+                            //   .padding(horizontal = 8.dp)
+//                                .background(MaterialTheme.colorScheme.onSecondaryContainer,
+//                                    shape = RoundedCornerShape(12))
+                        },
+                        selectedContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        unselectedContentColor = MaterialTheme.colorScheme.secondaryContainer
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                Icons.Filled.FormatColorText,
+                                contentDescription = "Font color"
+                            )
+                            Text(text = "Font")
+                        }
+                    }
+
                 }
             }
         }

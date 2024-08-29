@@ -1,19 +1,21 @@
 package alexschool.bookreader.ui.theme
 
+import alexschool.bookreader.R
 import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
@@ -23,8 +25,6 @@ private val DarkColorScheme = darkColorScheme(
     surfaceContainer = Color.DarkGray
 
 
-
-
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -32,7 +32,6 @@ private val LightColorScheme = lightColorScheme(
     secondary = PurpleGrey40,
     tertiary = Pink40,
     surfaceContainer = Color.LightGray
-
 
 
     /* Other default colors to override
@@ -46,6 +45,73 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+val defaultTypography = Typography(
+    // ... your default font family settings
+)
+
+val customTypography = Typography(
+    displayLarge = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    ),
+    displayMedium = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    ),
+    displaySmall = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    ),
+    headlineLarge = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    ),
+    headlineMedium = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    ),
+    titleLarge = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    ),
+    titleMedium = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    ),
+    titleSmall = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    ),
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    ),
+    bodySmall = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    ),
+    labelLarge = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    ),
+    labelMedium = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    ),
+    labelSmall = TextStyle(
+        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+        fontWeight = FontWeight.Normal,
+    )
+)
+
 @Composable
 fun AlexSchoolTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -53,16 +119,7 @@ fun AlexSchoolTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if(darkTheme) DarkColorScheme else LightColorScheme
-//    val colorScheme = when {
-//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-//            val context = LocalContext.current
-//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-//        }
-//
-//        darkTheme -> DarkColorScheme
-//        else -> LightColorScheme
-//    }
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {

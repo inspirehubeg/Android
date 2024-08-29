@@ -16,9 +16,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,24 +35,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import ih.tools.readingpad.R
+import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 
 @Composable
 fun FullScreenImage(
     imageData: ByteArray,
     onClose: () -> Unit,
+    viewModel: BookContentViewModel
 ) {
-    var rotation by remember { mutableFloatStateOf(0f) }
-
+    val rotation by viewModel.imageRotation.collectAsState()
+    val im = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
+    val imageBitmap = im.asImageBitmap()
+    val imageWidth = imageBitmap.width.toFloat()
+    val imageHeight = imageBitmap.height.toFloat()
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         Scrim(
-            onRotateLeft = { rotation -= 90f },
-            onRotateRight = { rotation += 90f },
             onClose = onClose
         )
+
         PhotoImage(imageData, rotation = rotation)
+
     }
 }
 
@@ -60,6 +65,11 @@ fun FullScreenImage(
 fun PhotoImage(image: ByteArray, modifier: Modifier = Modifier, rotation: Float) {
     var zoom by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
+    Log.d("PhotoImage", "rotation: ${rotation}")
+    if (rotation == 90f || rotation == -90f) {
+        Log.d("PhotoImage", "rotation back to 0")
+        offset = Offset.Zero
+    }
 
     if (image.isEmpty()) {
         // Display a placeholder or error message
@@ -73,21 +83,31 @@ fun PhotoImage(image: ByteArray, modifier: Modifier = Modifier, rotation: Float)
             val imageHeight = imageBitmap.height.toFloat()
             val aspectRatio = if (rotation == 90f || rotation == -90f) {
                 imageHeight / imageWidth
-            }else imageWidth / imageHeight
+            } else imageWidth / imageHeight
             Column {
                 BoxWithConstraints(
                     modifier = Modifier
-                        .background(Color.Red)
-                        .aspectRatio(imageWidth/imageHeight)
+                        //.background(Color.Red)
+                        .aspectRatio(imageWidth / imageHeight)
                 ) {
                     val zoomState =
-                        rememberTransformableState { zoomChange, panChange, _ ->
+                        rememberTransformableState { zoomChange, panChange, rotationChange ->
                             zoom = (zoom * zoomChange).coerceIn(1f, 3f)
                             val extraWidth = (zoom - 1) * constraints.maxWidth.toFloat()
                             val extraHeight = ((zoom - 1) * constraints.maxHeight.toFloat())
                             var pan = panChange
-                            if (rotation == 90f || rotation == -90f) {
-                                pan = Offset(0f, 0f)
+                            when (rotation) {
+                                -90f -> {
+                                    pan = Offset(panChange.y, -panChange.x)
+                                }
+
+                                90f -> {
+                                    pan = Offset(-panChange.y, panChange.x)
+                                }
+
+                                180f -> {
+                                    pan = -panChange
+                                }
                             }
                             Log.d(
                                 "PhotoImage",
@@ -107,30 +127,43 @@ fun PhotoImage(image: ByteArray, modifier: Modifier = Modifier, rotation: Float)
                         //  painter = painterResource(id = R.drawable.andre),
                         contentDescription = stringResource(R.string.full_screen_image),
                         modifier = modifier
-                            .aspectRatio(imageWidth/imageHeight)
+                            .aspectRatio(imageWidth / imageHeight)
                             .graphicsLayer {
                                 translationX = offset.x
                                 translationY = offset.y
                                 scaleX = zoom
                                 scaleY = zoom
                                 rotationZ = rotation
-                                Log.d("PhotoImage", "rotation: $rotation")
+                                //Log.d("PhotoImage", "rotation: $rotation")
                             }
                             .transformable(state = zoomState)
                             .pointerInput(Unit) {
                                 detectTapGestures(
-                                    onDoubleTap = { tapOffset ->
-                                        zoom = if (zoom > 1f) 1f else 2f
-                                        Log.d(
-                                            "PhotoImage",
-                                            "onDoubleTap: zoom =${zoom}, tapOffset = $tapOffset"
-                                        )
 
-                                        offset = calculateDoubleTapOffset(zoom, size, tapOffset)
-                                        Log.d(
-                                            "PhotoImage",
-                                            "onDoubleTap: offset = $offset, size = $size"
-                                        )
+                                    onDoubleTap = { tapOffset ->
+                                        Log.d("PhotoImage", "rotation: $rotation")
+                                        if (rotation == 90f || rotation == -90f) {
+                                            //when rotation
+                                            zoom = if (zoom > 1f) 1f else 2f
+                                            offset = Offset.Zero
+                                        } else {
+                                            zoom = if (zoom > 1f) 1f else 2f
+                                            Log.d(
+                                                "PhotoImage",
+                                                "onDoubleTap: zoom =${zoom}, tapOffset = $tapOffset"
+                                            )
+
+                                            offset = calculateDoubleTapOffset(
+                                                zoom,
+                                                size,
+                                                tapOffset,
+                                                rotation
+                                            )
+                                            Log.d(
+                                                "PhotoImage",
+                                                "onDoubleTap: offset = $offset, size = $size"
+                                            )
+                                        }
                                     }
                                 )
                             }
@@ -148,7 +181,6 @@ fun PhotoImage(image: ByteArray, modifier: Modifier = Modifier, rotation: Float)
 
 @Composable
 fun Scrim(
-    onRotateRight: () -> Unit, onRotateLeft: () -> Unit,
     onClose: () -> Unit, modifier: Modifier = Modifier
 ) {
     Box(
@@ -165,13 +197,6 @@ fun Scrim(
             modifier = Modifier
                 .align(Alignment.TopCenter)
         ) {
-            Button(onClick = onRotateLeft) {
-                Text(text = "Rotate left")
-            }
-            Button(onClick = onRotateRight) {
-                Text(text = "Rotate right")
-
-            }
         }
     }
 }
@@ -180,7 +205,8 @@ fun Scrim(
 fun calculateDoubleTapOffset(
     zoom: Float,
     size: IntSize,
-    tapOffset: Offset
+    tapOffset: Offset,
+    rotation: Float
 ): Offset {
     val imageCenter = Offset(size.width / 2f, size.height / 2f)
 

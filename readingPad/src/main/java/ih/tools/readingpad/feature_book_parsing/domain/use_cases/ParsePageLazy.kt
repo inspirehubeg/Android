@@ -11,10 +11,22 @@ import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
 import ih.tools.readingpad.feature_book_parsing.domain.model.SpannedPage
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 
-/** this takes a page content as encoded string to decode it and apply different spanning to it
- * then return it as a spannable string to be displayed in the text view
+/**
+ * Parses the content of a page lazily, handling different elements like text, fonts, links, and images.
+ * This class processes encoded page content and converts it into a SpannableStringBuilder for display.
  */
 class ParsePageLazy {
+    /**
+     * Parses the encoded content of a book page and converts it into a SpannableStringBuilder.
+     *
+     * @param pageEncodedString The encoded content of the page.
+     * @param metadata Metadata about the book, including encoding information.
+     * @param context The application context.
+     * @param book The book object.
+     * @param lazyListState The LazyListState of the LazyColumn displaying the book content.
+     * @param viewModel The ViewModel associated with the book content.
+     * @return A SpannableStringBuilder containing the parsed content with formatting and interactive elements.
+     */
     suspend fun invoke(
         pageEncodedString: String,
         metadata: Metadata,
@@ -24,13 +36,16 @@ class ParsePageLazy {
         viewModel: BookContentViewModel
     ): SpannableStringBuilder {
         val encoding = metadata.encoding
-        val TAG_START = encoding.tags.tagStart
-        val TAG_LINK_TARGET = encoding.tags.internalLinkTarget
+        val tagStart = encoding.tags.tagStart
+        val tagLinkTarget = encoding.tags.internalLinkTarget
         var pageSpannableStringBuilder = SpannableStringBuilder()
 
-        // Regex splits the string according to different tags to get different parsed elements
+        /**
+         * Regex to match elements enclosed in tags, excluding internal link targets.
+         * Matches patterns like "##...**" (start tag to end tag) but not "##l...*".
+         */
         val regex = Regex(
-            "$TAG_START(?!$TAG_LINK_TARGET)(.*?)\\*\\*",
+            "$tagStart(?!$tagLinkTarget)(.*?)\\*\\*",
             RegexOption.DOT_MATCHES_ALL
         )
         var lastIndex = 0
@@ -78,7 +93,12 @@ class ParsePageLazy {
                     is ParsedElement.Image -> {
                         Log.d("ParseBook", "Image element is ${parsedTag.content}")
                         pageSpannableStringBuilder =
-                            ParseImage().invoke(parsedTag, pageSpannableStringBuilder, context, viewModel = viewModel)
+                            ParseImage().invoke(
+                                parsedTag,
+                                pageSpannableStringBuilder,
+                                context,
+                                viewModel = viewModel
+                            )
                     }
 
                 }
@@ -96,13 +116,21 @@ class ParsePageLazy {
         if (lastIndex < pageEncodedString.length) {
             pageSpannableStringBuilder.append(pageEncodedString.substring(lastIndex))
         }
-        // textView.text = spannedBook
         return pageSpannableStringBuilder
     }
 }
 
-/** This applies the Parse page lazy class to each page in the book to parse the page content
- * and return a list of spanned pages with their page numbers
+/**
+ * Converts a list of pages with plain text content to a list of pages with formatted, spanned content.
+ * This function applies the ParsePageLazy class to each page to parse the content and return a list of SpannedPage objects.
+ *
+ * @param pages The list of pages to convert.
+ * @param metadata Metadata about the book, including encoding information.
+ * @param context The application context.
+ * @param book The book object.
+ * @param lazyListState The LazyListState of the LazyColumn displaying the book content.
+ * @param bookContentViewModel The ViewModel associated with the book content.
+ * @return A list of SpannedPage objects, where each page has its content formatted as a SpannableStringBuilder.
  */
 suspend fun convertPagesToSpannedPagesLazy(
     pages: List<Page>,
@@ -112,11 +140,13 @@ suspend fun convertPagesToSpannedPagesLazy(
     lazyListState: LazyListState,
     bookContentViewModel: BookContentViewModel
 ): List<SpannedPage> {
+    val parsePageLazy = ParsePageLazy() // Create a single instance of ParsePageLazy
+
     return pages.map { pageContent ->
         val spannableContent = SpannableStringBuilder(pageContent.body.text)
         // Apply formatting to spannableContent here
         val decodedSpannedPage =
-            ParsePageLazy().invoke(
+            parsePageLazy.invoke(
                 pageContent.body.text,
                 metadata,
                 context,

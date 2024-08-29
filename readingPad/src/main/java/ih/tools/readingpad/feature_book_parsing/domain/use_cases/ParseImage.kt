@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
+import android.os.Build
 import android.text.Layout
 import android.text.Spannable
 import android.text.SpannableString
@@ -16,8 +17,20 @@ import android.view.View
 import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 
+/**
+ * Parses image elements within a book and adds them to a SpannableStringBuilder.
+ */
 class ParseImage {
-    suspend operator fun invoke(
+    /**
+     * Adds an image to a SpannableStringBuilder based on a parsed image element.
+     *
+     * @param parsedTag The parsed image element containing image data and alignment information.
+     * @param spannedText The SpannableStringBuilder to add the image to.
+     * @param context The application context.
+     * @param viewModel The ViewModel associated with the book content.
+     * @return The SpannableStringBuilder with the image added.
+     */
+    operator fun invoke(
         parsedTag: ParsedElement.Image,
         spannedText: SpannableStringBuilder,
         context: Context,
@@ -31,8 +44,16 @@ class ParseImage {
     }
 }
 
+
 /**
- * produce a spannable string with the image
+ * Creates a SpannableString containing an image with specified alignment, size, and click functionality.
+ *
+ * @param align The alignment of the image ("c" for center, "n" for normal, "o" for opposite).
+ * @param byteArray The byte array containing the image data.
+ * @param ratio The width ratio of the image relative to the screen width.
+ * @param context The application context.
+ * @param viewModel The ViewModel associated with the book content.
+ * @return A SpannableString containing the image with applied styles and click functionality.
  */
 fun addPhoto(
     align: String,
@@ -42,29 +63,41 @@ fun addPhoto(
     viewModel: BookContentViewModel
 ): SpannableString {
 
-    val spannableString = SpannableString("0")
-    var span: Any? = null
-    if (align == "c") {
-        span = AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER)
-    } else if (align == "n") {
-        span = AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL)
-    } else if (align == "o") {
-        span = AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE)
+    val spannableString = SpannableString("0") //Use a placeholder character
+    val span =
+        when (align) {
+            "c" -> {
+                AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER)
+            }
+
+            "n" -> {
+                AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL)
+            }
+
+            "o" -> {
+                AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE)
+            }
+
+            else -> null
+        }
+    span?.let {
+        spannableString.setSpan(it, 0, spannableString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 
-    spannableString.setSpan(span, 0, spannableString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-
     // use ImageSpan
-    // val image = BitmapDrawable(BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size))
     val bitmapObj = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     val bitmapDrawable = BitmapDrawable(context.resources, bitmapObj)
 
 
-    val displayMetrics = DisplayMetrics()
-    (context as Activity).windowManager
-        .defaultDisplay
-        .getMetrics(displayMetrics)
-    val width = displayMetrics.widthPixels
+    val width = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        val windowMetrics = (context as Activity).windowManager.currentWindowMetrics
+        windowMetrics.bounds.width()
+    } else {
+        val displayMetrics = DisplayMetrics()
+        (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
+        displayMetrics.widthPixels
+    }
+
 
     // Set the desired width and height for the image
     bitmapDrawable.setBounds(
@@ -73,9 +106,9 @@ fun addPhoto(
         (width * ratio / 100),
         (width * bitmapDrawable.intrinsicHeight / bitmapDrawable.intrinsicWidth * ratio / 100)
     )
-    span = ImageSpan(bitmapDrawable, ImageSpan.ALIGN_BASELINE)
+    val imageSpan = ImageSpan(bitmapDrawable, ImageSpan.ALIGN_BASELINE)
 
-    spannableString.setSpan(span, 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+    spannableString.setSpan(imageSpan, 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
 
 
     val clickableSpan = object : ClickableSpan() {
@@ -84,7 +117,6 @@ fun addPhoto(
             viewModel.onImageClick(byteArray)
         }
     }
-   // clickableSpan.tag = byteArray // Store the image data as a tag
     spannableString.setSpan(clickableSpan, 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
     return spannableString
 }

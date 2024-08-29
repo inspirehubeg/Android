@@ -1,5 +1,6 @@
 package ih.tools.readingpad.feature_book_parsing.presentation.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -60,7 +61,16 @@ fun CustomFontDialog(
         ) {
             Slider(
                 value = fontSize,
-                onValueChange = { newSize -> viewModel.setFontSize(newSize) },
+                onValueChange = { newSize ->
+                    viewModel.setFontSize(newSize)
+                    if (viewModel.fontSizeChanged.value) {
+                        Log.d("CustomFontDialog", "fontSizeChanged")
+                        viewModel.scrollToIndex(
+                            targetPageIndex = viewModel.currentPageIndex.value,
+                        )
+                        viewModel.setFontSizeChanged(false)
+                    }
+                },
                 valueRange = 12f..32f,
                 steps = 24
             )

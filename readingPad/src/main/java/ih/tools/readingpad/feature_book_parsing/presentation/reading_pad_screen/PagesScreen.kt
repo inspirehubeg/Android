@@ -33,10 +33,24 @@ fun PagesScreen(
 ) {
     val context = LocalContext.current
     val book = bookContentViewModel.book
-    val verticalScroll by bookContentViewModel.verticalScroll.collectAsState()
 
     val firstVisibleItemIndex = remember { derivedStateOf { listState.firstVisibleItemIndex } }
     bookContentViewModel.setPageNumber(firstVisibleItemIndex.value + 1)
+
+    val isLoading by bookContentViewModel.isLoading.collectAsState()
+    //to be changed when a bigger book is available for use
+    val currentChapterIndex = 0
+    val currentChapter = book.chapters[currentChapterIndex]
+    val chapterSpannedPages = remember { mutableStateListOf<SpannedPage>() }
+
+//    LaunchedEffect(key1 = currentChapterIndex) {
+//        chapterSpannedPages.clear()
+//        chapterSpannedPages.addAll(
+//            bookContentViewModel.getSpannedPagesForChapter(currentChapterIndex, currentChapter.pages)
+//        )
+//    }
+
+
 
     // val pages = mutableListOf<Page>()
     val itemPages = remember { mutableStateListOf<SpannedPage>() }
@@ -65,7 +79,15 @@ fun PagesScreen(
 
 
     }
-    // if (verticalScroll) {
+
+//    if (isLoading) {
+//      Display loading indicator
+//    Consider using a more informative loading indicator, such as a progress bar that shows the percentage of completion.
+//    Provide a way for the user to cancel the loading process if it takes too long.
+//    If the loading process involves network requests, handle potential errors gracefully
+//    and display appropriate messages to the user.
+//        CircularProgressIndicator()
+//    } else {
     LazyColumn(
         state = listState
     ) {

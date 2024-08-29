@@ -10,18 +10,18 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Book
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Metadata
-import ih.tools.readingpad.feature_book_parsing.presentation.recycler_view.IHRecyclerView
-import ih.tools.readingpad.feature_book_parsing.presentation.text_view.IHTextView
 import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.feature_book_parsing.presentation.recycler_view.IHRecyclerView
 import ih.tools.readingpad.feature_book_parsing.presentation.recycler_view.ViewHolder
+import ih.tools.readingpad.feature_book_parsing.presentation.text_view.IHTextView
 
 /**
  * This parses an internal link source and applies it to the spannable string
  * this one is used with the recycler view
  */
 class ParseInternalLink {
-    suspend operator fun invoke(
+     operator fun invoke(
         spannedText: SpannableStringBuilder,
         parsedTag: ParsedElement.InternalLinkSource,
         metadata: Metadata,

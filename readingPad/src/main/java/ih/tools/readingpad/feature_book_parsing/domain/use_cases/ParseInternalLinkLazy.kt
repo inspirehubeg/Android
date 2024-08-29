@@ -16,11 +16,22 @@ import ih.tools.readingpad.feature_book_parsing.presentation.text_view.IHTextVie
 import ih.tools.readingpad.ui.theme.LightBlue
 
 /**
- * This parses an internal link source and applies it to the spannable string
- * this one is used with the lazy column
+ * Parses internal link source elements within a book and applies them to a SpannableStringBuilder.
+ * This class is specifically designed for use with Lazy Column to handle internal navigation within the book.
  */
 class ParseInternalLinkLazy {
-    suspend operator fun invoke(
+    /**
+     * Applies internal link customizations to a SpannableStringBuilder based on a parsed link element.
+     *
+     * @param spannedText The SpannableStringBuilder to apply the link to.
+     * @param parsedTag The parsed internal link element containing link information.
+     * @param metadata Metadata about the book, including target link information.
+     * @param book The book object.
+     * @param lazyListState The LazyListState of the LazyColumn displaying the book content.
+     * @param bookContentViewModel The ViewModel associated with the book content.
+     * @return The SpannableStringBuilder with the internal link applied.
+     */
+     operator fun invoke(
         spannedText: SpannableStringBuilder,
         parsedTag: ParsedElement.InternalLinkSource,
         metadata: Metadata,
@@ -47,7 +58,19 @@ class ParseInternalLinkLazy {
 
 }
 
-//used with the lazy column
+/**
+ * Applies customizations to an internal link within a SpannableStringBuilder.
+ * This function is designed for use with LazyColumn and handles navigation to the target page.
+ *
+ * @param spannable The SpannableStringBuilder containing the link.
+ *@param start The starting index of the link text.
+ * @param end The ending index of the link text.
+ * @param metadata Metadata about the book, including target link information.
+ * @param key The key identifying the target link.
+ * @param book The book object.
+ * @param lazyListState The LazyListState of the LazyColumn displaying the book content.
+ * @param bookContentViewModel The ViewModel associated with the book content.
+ */
 fun applyLinkCustomizationsLazy(
     spannable: SpannableStringBuilder,
     start: Int,
@@ -68,33 +91,53 @@ fun applyLinkCustomizationsLazy(
             ds.color = LightBlue.toArgb()
             ds.isUnderlineText = true
         }
-
         override fun onClick(widget: View) {
-            val targetLinks = metadata.targetLinks
-            val targetLink = targetLinks.find { it.key == key }
-            val targetPageNumber = targetLink?.pageNumber
-            val targetIndex = targetLink?.index
-            val targetChapterNumber = targetLink?.chapterNumber
-            val targetBookId = targetLink?.bookId
-            val bookChapters = book.chapters
-            Log.d("onClick", "targetPageNumber = $targetPageNumber")
-            for (i in bookChapters.indices) {
-                if (targetChapterNumber == i + 1) {
-                    val chapter = bookChapters[i]
-                    val chapterPages = chapter.pages
-                    for (j in chapterPages.indices) {
-                        if (targetPageNumber == j + 1) {
-                            val targetPageIndex = j
-                            if (widget is IHTextView){
-                                bookContentViewModel.scrollToIndexLazy(targetPageIndex,lazyListState, targetIndex!! )
+            val targetLink = metadata.targetLinks.find { it.key == key } ?: return
+
+            val targetChapterNumber = targetLink.chapterNumber
+            val targetPageNumber = targetLink.pageNumber
+            val targetIndex = targetLink.index
+
+            book.chapters.forEachIndexed { chapterIndex, chapter ->
+                if (targetChapterNumber == chapterIndex + 1) {
+                    chapter.pages.forEachIndexed { pageIndex, _ ->
+                        if (targetPageNumber == pageIndex + 1) {
+                            if (widget is IHTextView) {
+                                bookContentViewModel.scrollToIndexLazy(pageIndex, lazyListState, targetIndex)
                             }
-                        } else {
-                            // fetch the target chapter from db
+                            return // Exit the loops once the target page is found
                         }
                     }
                 }
             }
         }
+//        override fun onClick(widget: View) {
+//            val targetLinks = metadata.targetLinks
+//            val targetLink = targetLinks.find { it.key == key }
+//            val targetPageNumber = targetLink?.pageNumber
+//            val targetIndex = targetLink?.index
+//            val targetChapterNumber = targetLink?.chapterNumber
+//            val targetBookId = targetLink?.bookId
+//
+//            val bookChapters = book.chapters
+//            Log.d("onClick", "targetPageNumber = $targetPageNumber")
+//            for (i in bookChapters.indices) {
+//                if (targetChapterNumber == i + 1) {
+//                    val chapter = bookChapters[i]
+//                    val chapterPages = chapter.pages
+//                    for (j in chapterPages.indices) {
+//                        if (targetPageNumber == j + 1) {
+//                            val targetPageIndex = j
+//                            if (widget is IHTextView){
+//                                bookContentViewModel.scrollToIndexLazy(targetPageIndex,lazyListState, targetIndex!! )
+//                            }
+//                        } else {
+//                            // fetch the target chapter from db
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
     spannable.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 }

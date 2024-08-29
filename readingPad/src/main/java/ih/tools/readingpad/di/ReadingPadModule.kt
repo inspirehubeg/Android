@@ -9,7 +9,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import ih.tools.readingpad.feature_book_parsing.data.PreferencesManager
-import ih.tools.readingpad.feature_book_parsing.data.data_source.AppDatabase
+import ih.tools.readingpad.feature_book_parsing.data.data_source.ReadingPadDatabase
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.BookParserUseCases
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseBook
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseFont
@@ -47,8 +47,10 @@ import javax.inject.Singleton
 
 
 /**
-ReadingPad library module to handle dependency injection with dagger hilt
- */
+ * Dagger Hilt module for providing dependencies related to the ReadingPad library.
+ * This module is installed in the SingletonComponent,
+ * ensuring that dependencies are available throughout the application lifecycle.*/
+
 @Module
 @InstallIn(SingletonComponent::class)
 object ReadingPadModule {
@@ -59,57 +61,98 @@ object ReadingPadModule {
     for example the regular @Provide functions
      */
 
-    /** provides database object to any class that needs it*/
+    /**
+     * Provides an instance of AppDatabase.
+     *
+     * @param context The application context.
+     * @return An instance of AppDatabase.
+     */
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
+    fun provideDatabase(@ApplicationContext context: Context): ReadingPadDatabase {
         return Room.databaseBuilder(
             context,
-            AppDatabase::class.java, "database-name"
+            ReadingPadDatabase::class.java, "reading_pad_database"
         ).build()
     }
 
-    /** provides highlight dao object to any class that needs it*/
+    /**
+     * Provides an instance of HighlightDao.
+     *
+     * @param database The AppDatabase instance.
+     * @return An instance of HighlightDao.
+     */
     @Provides
     @Singleton
-    fun highlightDao(database: AppDatabase): HighlightDao {
+    fun highlightDao(database: ReadingPadDatabase): HighlightDao {
         return database.highlightDao
     }
 
-    /** provides highlight repository object to any class that needs it*/
+    /**
+     * Provides an instance of HighlightRepository.
+     *
+     * @param database The AppDatabase instance.
+     * @return An instance of HighlightRepository.
+     */
     @Provides
     @Singleton
-    fun provideHighlightRepository(db: AppDatabase): HighlightRepository {
-        return HighlightRepositoryImpl(db.highlightDao)
+    fun provideHighlightRepository(database: ReadingPadDatabase): HighlightRepository {
+        return HighlightRepositoryImpl(database.highlightDao)
     }
 
-    /** provides bookmark dao object to any class that needs it*/
+    /**
+     * Provides an instance of BookmarkDao.
+     *
+     * @param database The AppDatabase instance.
+     * @return An instance of BookmarkDao.
+     */
     @Provides
     @Singleton
-    fun bookmarkDao(database: AppDatabase): BookmarkDao {
+    fun provideBookmarkDao(database: ReadingPadDatabase): BookmarkDao {
         return database.bookmarkDao
     }
 
-    /** provides bookmark repository object to any class that needs it*/
+    /**
+     * Provides an instance of BookmarkRepository.
+     *
+     * @param database The AppDatabase instance.
+     * @return An instance of BookmarkRepository.
+     */
     @Provides
     @Singleton
-    fun provideBookmarkRepository(db: AppDatabase): BookmarkRepository {
-        return BookmarkRepositoryImpl(db.bookmarkDao)
+    fun provideBookmarkRepository(database: ReadingPadDatabase): BookmarkRepository {
+        return BookmarkRepositoryImpl(database.bookmarkDao)
     }
 
-    /** provides theme color repository object to any class that needs it*/
+    /**
+     * Provides an instance of ThemeColorRepository.
+     *
+     * @param database The AppDatabase instance.
+     * @return An instance of ThemeColorRepository.
+     */
     @Provides
     @Singleton
-    fun provideThemeColorRepository(db: AppDatabase): ThemeColorRepository {
-        return ThemeColorRepositoryImpl(db.themeColorDao)
+    fun provideThemeColorRepository(database: ReadingPadDatabase): ThemeColorRepository {
+        return ThemeColorRepositoryImpl(database.themeColorDao)
     }
 
-    /** provides a context to any class that needs it */
+    /**
+     * Provides the application context.
+     *
+     * @param application The application instance.
+     * @return The application context.
+     */
     @Provides
     @Singleton
     fun provideContext(application: Application): Context = application.applicationContext
 
-    /** provides bookmark use cases object to any class that needs it*/
+
+    /**
+     * Provides an instance of BookmarkUseCases.
+     *
+     * @param repository The BookmarkRepository instance.
+     * @return An instance of BookmarkUseCases.
+     */
     @Provides
     @Singleton
     fun provideBookmarkUseCases(repository: BookmarkRepository): BookmarkUseCases {
@@ -122,7 +165,12 @@ object ReadingPadModule {
         )
     }
 
-    /** provides highlight use cases object to any class that needs it*/
+    /**
+     * Provides an instance of HighlightUseCases.
+     *
+     * @param repository The HighlightRepository instance.
+     * @return An instance of HighlightUseCases.
+     */
     @Provides
     @Singleton
     fun provideHighlightUseCases(repository: HighlightRepository): HighlightUseCases {
@@ -134,7 +182,11 @@ object ReadingPadModule {
         )
     }
 
-    /** provides book parser use cases object to any class that needs it*/
+    /**
+     * Provides an instance of BookParserUseCases.
+     *
+     * @return An instance of BookParserUseCases.
+     */
     @Provides
     @Singleton
     fun provideBookParserUseCases(): BookParserUseCases {
@@ -150,6 +202,12 @@ object ReadingPadModule {
         )
     }
 
+    /**
+     * Provides an instance of ThemeColorUseCases.
+     *
+     * @param repository The ThemeColorRepository instance.
+     * @return An instance of ThemeColorUseCases.
+     */
     @Provides
     @Singleton
     fun provideThemeColorUseCases(repository: ThemeColorRepository): ThemeColorUseCases {
@@ -162,7 +220,12 @@ object ReadingPadModule {
         )
     }
 
-    /** provides preferences manager object to any class that needs it*/
+    /**
+     * Provides an instance of PreferencesManager.
+     *
+     * @param context The application context.
+     * @return An instance of PreferencesManager.
+     */
     @Provides
     @Singleton
     fun providePreferencesManager(@ApplicationContext context: Context): PreferencesManager {
