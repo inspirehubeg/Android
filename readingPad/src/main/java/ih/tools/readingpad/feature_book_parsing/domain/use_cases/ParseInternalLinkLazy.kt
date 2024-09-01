@@ -55,7 +55,6 @@ class ParseInternalLinkLazy {
 
         return spannedText
     }
-
 }
 
 /**
@@ -63,7 +62,7 @@ class ParseInternalLinkLazy {
  * This function is designed for use with LazyColumn and handles navigation to the target page.
  *
  * @param spannable The SpannableStringBuilder containing the link.
- *@param start The starting index of the link text.
+ * @param start The starting index of the link text.
  * @param end The ending index of the link text.
  * @param metadata Metadata about the book, including target link information.
  * @param key The key identifying the target link.
@@ -111,33 +110,6 @@ fun applyLinkCustomizationsLazy(
                 }
             }
         }
-//        override fun onClick(widget: View) {
-//            val targetLinks = metadata.targetLinks
-//            val targetLink = targetLinks.find { it.key == key }
-//            val targetPageNumber = targetLink?.pageNumber
-//            val targetIndex = targetLink?.index
-//            val targetChapterNumber = targetLink?.chapterNumber
-//            val targetBookId = targetLink?.bookId
-//
-//            val bookChapters = book.chapters
-//            Log.d("onClick", "targetPageNumber = $targetPageNumber")
-//            for (i in bookChapters.indices) {
-//                if (targetChapterNumber == i + 1) {
-//                    val chapter = bookChapters[i]
-//                    val chapterPages = chapter.pages
-//                    for (j in chapterPages.indices) {
-//                        if (targetPageNumber == j + 1) {
-//                            val targetPageIndex = j
-//                            if (widget is IHTextView){
-//                                bookContentViewModel.scrollToIndexLazy(targetPageIndex,lazyListState, targetIndex!! )
-//                            }
-//                        } else {
-//                            // fetch the target chapter from db
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
     spannable.setSpan(clickableSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 }

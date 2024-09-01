@@ -198,7 +198,7 @@ fun FontSizeSetting(
         Slider(
             value = fontSize,
             onValueChange = { newFontSize ->
-                viewModel.setFontSize(newFontSize)
+                viewModel.setFontSize(newFontSize, 0f)
             },
             valueRange = 12f..42f,
             steps = 24

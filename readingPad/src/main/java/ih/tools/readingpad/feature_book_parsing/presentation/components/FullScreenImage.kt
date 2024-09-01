@@ -43,7 +43,6 @@ fun FullScreenImage(
     onClose: () -> Unit,
     viewModel: BookContentViewModel
 ) {
-    val rotation by viewModel.imageRotation.collectAsState()
     val im = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
     val imageBitmap = im.asImageBitmap()
     val imageWidth = imageBitmap.width.toFloat()
@@ -56,18 +55,18 @@ fun FullScreenImage(
             onClose = onClose
         )
 
-        PhotoImage(imageData, rotation = rotation)
+        PhotoImage(imageData, viewModel = viewModel )
 
     }
 }
 
 @Composable
-fun PhotoImage(image: ByteArray, modifier: Modifier = Modifier, rotation: Float) {
+fun PhotoImage(image: ByteArray, modifier: Modifier = Modifier, viewModel: BookContentViewModel) {
+    val rotation by viewModel.imageRotation.collectAsState()
     var zoom by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
     Log.d("PhotoImage", "rotation: ${rotation}")
     if (rotation == 90f || rotation == -90f) {
-        Log.d("PhotoImage", "rotation back to 0")
         offset = Offset.Zero
     }
 
@@ -141,8 +140,9 @@ fun PhotoImage(image: ByteArray, modifier: Modifier = Modifier, rotation: Float)
                                 detectTapGestures(
 
                                     onDoubleTap = { tapOffset ->
-                                        Log.d("PhotoImage", "rotation: $rotation")
+                                        Log.d("PhotoImage", "rotation: after double tap $rotation")
                                         if (rotation == 90f || rotation == -90f) {
+
                                             //when rotation
                                             zoom = if (zoom > 1f) 1f else 2f
                                             offset = Offset.Zero

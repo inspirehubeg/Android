@@ -55,7 +55,7 @@ fun PagesScreen(
     // val pages = mutableListOf<Page>()
     val itemPages = remember { mutableStateListOf<SpannedPage>() }
     val metadata = getMetadata(context)
-
+    val scrollable by bookContentViewModel.oneFingerScroll.collectAsState()
     // to calculate the height and width of the screen
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp
@@ -89,7 +89,8 @@ fun PagesScreen(
 //        CircularProgressIndicator()
 //    } else {
     LazyColumn(
-        state = listState
+        state = listState,
+        userScrollEnabled = scrollable
     ) {
         itemsIndexed(itemPages) { index, page ->
             // Only display the current page

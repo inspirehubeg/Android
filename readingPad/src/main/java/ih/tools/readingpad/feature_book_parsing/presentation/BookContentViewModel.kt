@@ -67,6 +67,13 @@ class BookContentViewModel @Inject constructor(
     private val _verticalScroll = MutableStateFlow(preferencesManager.isVerticalScroll())
     val verticalScroll = _verticalScroll.asStateFlow()
 
+    private val _oneFingerScroll = MutableStateFlow(true)
+    val oneFingerScroll = _oneFingerScroll.asStateFlow()
+    fun setOneFingerScroll(value: Boolean){
+        Log.d("test", "setOneFingerScroll is called $value")
+        _oneFingerScroll.value = value
+    }
+
     private val _showCustomThemePage = MutableStateFlow(false)
     val showCustomThemePage = _showCustomThemePage.asStateFlow()
     fun setShowCustomThemePage(open: Boolean) {
@@ -433,9 +440,9 @@ class BookContentViewModel @Inject constructor(
         }
     }
 
-    fun scrollToIndex(targetPageIndex: Int) {
+    private fun scrollToIndex(targetPageIndex: Float) {
         viewModelScope.launch {
-            lazyListState.scrollToItem(targetPageIndex)
+            lazyListState.scrollBy(targetPageIndex)
         }
     }
 
@@ -567,11 +574,29 @@ class BookContentViewModel @Inject constructor(
     }
 
 
-    fun setFontSize(fontSize: Float) {
+    fun setFontSize(fontSize: Float, currentY: Float) {
         _currentPageIndex.value = lazyListState.firstVisibleItemIndex
+        val fontSizePercentage = fontSize/ _fontSize.value
 
+        Log.d("IHTextView", "lazylist y ${lazyListState.firstVisibleItemScrollOffset}")
+
+        Log.d("IHTextView", "currentY $currentY")
+
+        Log.d("IHTextView", "ratio $fontSizePercentage")
         preferencesManager.setFontSize(fontSize)
         _fontSize.value = fontSize
+        var y = 0
+//        if (currentY == 0f){
+//            //the offset on the top of the screen
+//
+//        }
+        y = lazyListState.firstVisibleItemScrollOffset
+
+        val newY = y*fontSizePercentage *1.01f
+        Log.d("john", "y = ${y}")
+        Log.d("john", "newY = ${newY}")
+        Log.d("john", "move = ${newY-y}")
+       scrollToIndex((newY-y))
         _fontSizeChanged.value = true
     }
 

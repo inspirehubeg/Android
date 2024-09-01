@@ -6,6 +6,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.style.RelativeSizeSpan
 import android.util.AttributeSet
 import android.util.Log
 import android.view.ActionMode
@@ -16,6 +17,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.text.getSpans
 import androidx.core.text.toSpannable
 import androidx.recyclerview.widget.RecyclerView
 import ih.tools.readingpad.R
@@ -112,7 +114,7 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
         fontSize = viewModel.fontSize.value
         pageNumber = currentPageNumber
         coroutineScope.launch {
-            delay(200) // this delay to allow the coroutine to fetch the book bookmarks before getting the page bookmarks
+            delay(1000) // this delay to allow the coroutine to fetch the book bookmarks before getting the page bookmarks
             viewModel.getHighlightsForPage(pageNumber, this@IHTextView)
             viewModel.getBookmarksForPage(pageNumber, this@IHTextView)
         }
@@ -165,10 +167,17 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
     fun getYCoordinateForIndex(index: Int): Int {
         val newIndex = getDatabaseIndex(index)
         // the target line
+        Log.d("layout", "${layout}")
         val targetLine = layout.getLineForOffset(newIndex)
         // Return the Y coordinate of the top of the line
         val lineTop = layout.getLineTop(targetLine)
         return lineTop
+    }
+
+    fun getTopPageIndex() : Int{
+       val y = scrollY
+
+        return y
     }
 
 
@@ -274,7 +283,14 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
         } else context.getDrawable(R.drawable.bookmark1)!!
         val bitmapDrawable = BitmapDrawable(resources, image.toBitmap())
 
-        bitmapDrawable.setBounds(0, 0, (lineHeight * .7).toInt(), lineHeight)
+        val fontSpans = spannableString.getSpans<RelativeSizeSpan>(viewStart,viewStart)
+        if (fontSpans.isNotEmpty()){
+            val spanFontSize = (fontSpans[0].sizeChange)
+            bitmapDrawable.setBounds(0,0 , (lineHeight * spanFontSize * .7).toInt(), ((lineHeight * spanFontSize).toInt()))
+        }else{
+            bitmapDrawable.setBounds(0, 0, (lineHeight * .7).toInt(), lineHeight)
+        }
+
         val imageSpan = IHBookmarkImageSpan(bitmapDrawable, id)
 
         spannableString.setSpan(
@@ -359,34 +375,47 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
                 }
 
                 MotionEvent.ACTION_POINTER_UP -> {
+                    Log.d("test", "inside ActionUp")
                     // Reset initialPointerDistance when a finger is lifted
                     initialPointerDistance = 0f
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-                    // Handle pinch gesture
+//                    // Handle pinch gesture
                     if (event.pointerCount == 2) {
+//                        if (viewModel.oneFingerScroll.value) {
+//                            viewModel.setOneFingerScroll(false)
+//                        }
                         if (initialPointerDistance == 0f) {
                             Log.d("twoFingers", "initialPointerDistance is 0")
-                            initialPointerDistance =
-                                distance(event) // Initialize only on first move
+                            initialPointerDistance = distance(event) // Initialize only on first move
                         }
                         val currentDistance = distance(event)
+//                        if (currentDistance - initialPointerDistance < 3f) {
+//                            Log.d(
+//                                "IHTextView",
+//                                "distance is too small = ${currentDistance - initialPointerDistance}"
+//                            )
+//                            return false
+//                        }
                         val newScale = scale * (currentDistance / initialPointerDistance)
                         if (newScale != scale) {
                             scale = newScale
                             val minScale = 12f / fontSize // Minimum scale for font size 12
                             val maxScale = 32f / fontSize // Maximum scale for font size 32
                             scale = scale.coerceIn(minScale, maxScale) // Adjust zoom limits
-
                             val newFontSize = fontSize * scale
                             textSize = newFontSize // Update text size
-                            viewModel.setFontSize(newFontSize) // Save the updated font size
+                           viewModel.setFontSize(newFontSize, event.y) // Save the updated font size
                             if (viewModel.fontSizeChanged.value) {
-                                viewModel.scrollToIndex(pageNumber - 1)
+                                //viewModel.scrollToIndex(pageNumber - 1)
                                 viewModel.setFontSizeChanged(false)
                             }
                             initialPointerDistance = currentDistance
+//                    }
+//                    else if (viewModel.oneFingerScroll.value == false){
+//                        //viewModel.setOneFingerScroll(true)
+//                    }
                         }
                     }
                 }
