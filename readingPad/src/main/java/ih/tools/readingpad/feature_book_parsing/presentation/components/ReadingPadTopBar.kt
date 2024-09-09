@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -27,9 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
@@ -44,8 +43,12 @@ fun ReadingPadTopBar(
     val pinnedTopBar by viewModel.pinnedTopBar.collectAsState()
     var topAppBarHeight by remember { mutableStateOf(48.dp) } // Initial height
     var showSearchBar by remember { mutableStateOf(false) }
-    topAppBarHeight = if (showSearchBar) 64.dp else 48.dp // Expands the height when the search opens
+    topAppBarHeight =
+        if (showSearchBar) 64.dp else 48.dp // Expands the height when the search opens
     var searchText by remember { mutableStateOf("") }
+    val isDrawerOpen by viewModel.isDrawerOpen.collectAsState()
+
+    val showCustomSelectionMenu by viewModel.showCustomSelectionMenu.collectAsState()
 
     Surface(modifier = Modifier.height(topAppBarHeight)) {
         CenterAlignedTopAppBar(
@@ -98,28 +101,33 @@ fun ReadingPadTopBar(
                             }
                         },
                     )
-                } else {
+                }else if (showCustomSelectionMenu){
+                    CustomSelectionMenu(viewModel = viewModel)
+                }
+                else {
                     Text(text = "") // Or maybe chapter name
                 }
             },
 
             navigationIcon = {
-                if (!showSearchBar) { // Only show actions when search bar is closed
+                if (!showSearchBar && !showCustomSelectionMenu) { // Only show actions when search bar is closed
                     IconButton(onClick = {
-                        navController.navigateUp()
+                        if (isDrawerOpen) {
+                            viewModel.closeDrawer()
+                        } else viewModel.openDrawer()
                     })
                     {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.navigate_back)
-                        )
+                        Icon(Icons.Filled.Menu, contentDescription = "Menu")
                     }
                 }
             },
             actions = {
-                if (!showSearchBar) { // Only show actions when search bar is closed
+                if (!showSearchBar && !showCustomSelectionMenu) { // Only show actions when search bar is closed
                     IconButton(onClick = { showSearchBar = !showSearchBar }) {
-                        Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search))
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = stringResource(R.string.search)
+                        )
                     }
                     IconButton(onClick = {
                         viewModel.setPinnedTopBar(!pinnedTopBar)

@@ -33,4 +33,6 @@ interface HighlightRepository {
         chapterNumber: Int,
         pageNumber: Int
     ): Flow<List<Highlight>>
+
+    fun getHighlightsForBook(bookId: String): Flow<List<Highlight>>
 }

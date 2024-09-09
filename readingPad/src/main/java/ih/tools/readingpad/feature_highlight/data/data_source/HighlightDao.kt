@@ -53,4 +53,14 @@ interface HighlightDao {
         chapterNumber: Int,
         pageNumber: Int
     ): Flow<List<Highlight>>
+
+
+    /**
+     * Retrieves all highlights for a specific book.
+     *
+     * @param bookId The ID of the book.
+     * @return A Flow emitting a list of highlights for the book.
+     */
+    @Query("SELECT * FROM highlights WHERE bookId = :bookId")
+     fun getHighlightsForBook(bookId: String): Flow<List<Highlight>>
 }

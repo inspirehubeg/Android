@@ -50,8 +50,6 @@ fun PagesScreen(
 //        )
 //    }
 
-
-
     // val pages = mutableListOf<Page>()
     val itemPages = remember { mutableStateListOf<SpannedPage>() }
     val metadata = getMetadata(context)
@@ -93,8 +91,6 @@ fun PagesScreen(
         userScrollEnabled = scrollable
     ) {
         itemsIndexed(itemPages) { index, page ->
-            // Only display the current page
-            Log.d("PagesScreen", "page index = $index")
             XMLViewLazyItem(
                 page = page,
                 viewModel = bookContentViewModel,

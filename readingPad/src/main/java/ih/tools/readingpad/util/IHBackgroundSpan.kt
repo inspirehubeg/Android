@@ -1,6 +1,5 @@
 package ih.tools.readingpad.util
 
-import android.graphics.Color
 import android.text.style.BackgroundColorSpan
 
 /**
@@ -18,7 +17,7 @@ class IHBackgroundSpan(color: Int) : BackgroundColorSpan(color), IHSpan {
      *
      * @param id The unique identifier for the span.
      */
-    constructor(id: Long) : this(Color.YELLOW) {
+    constructor(id: Long, color: Int) : this(color) {
         this.id = id
     }
 }

@@ -38,5 +38,13 @@ val Grey = Color(0xFFD8D3D6)
 val Blue = Color(0xFF96adfc)
 val Green = Color(0xFFa8f29a)
 
+val HighlightFrenchLime = Color(0xFFaeff77)
+val HighlightLaserLemon = Color(0xFFffff77)
+val HighlightUltraRed = Color(0xFFff7792)
+val HighlightMayaBlue = Color(0xFF77c9ff)
+val HighlightCheeseOrange = Color(0xFFffae77)
+
+
+
 
 

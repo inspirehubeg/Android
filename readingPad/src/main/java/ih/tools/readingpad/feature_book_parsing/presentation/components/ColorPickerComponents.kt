@@ -61,8 +61,8 @@ fun ColorPicker(
     val savedFontColors by viewModel.savedFontColors.observeAsState(emptyList())
     val savedBackgroundColors by viewModel.savedBackgroundColors.observeAsState(emptyList())
 
-    var initialColor = Color.Green
-    var onColorChange: (ColorEnvelope) -> Unit = {}
+    val initialColor: Color
+    val onColorChange: (ColorEnvelope) -> Unit
 
     val currentThemeFontColor by viewModel.currentThemeFontColor.observeAsState()
     val currentThemeBackgroundColor by viewModel.currentThemeBackgroundColor.observeAsState()
@@ -71,21 +71,18 @@ fun ColorPicker(
     val (showDeleteColorDialog, setShowDeleteColorDialog) = remember { mutableStateOf(false) }
     val (colorToDelete, setColorToDelete) = remember { mutableStateOf<ThemeColor?>(null) }
 
-    if (colorType == ThemeColorType.FONT){
+    if (colorType == ThemeColorType.FONT) {
         initialColor = Color(currentThemeFontColor!!)
-        onColorChange = {colorEnvelope ->
-          viewModel.setCurrentThemeFontColor(colorEnvelope.color.toArgb())
+        onColorChange = { colorEnvelope ->
+            viewModel.setCurrentThemeFontColor(colorEnvelope.color.toArgb())
         }
     } else {
-        initialColor= Color(currentThemeBackgroundColor!!)
-        onColorChange = {colorEnvelope ->
+        initialColor = Color(currentThemeBackgroundColor!!)
+        onColorChange = { colorEnvelope ->
             viewModel.setCurrentThemeBackgroundColor(colorEnvelope.color.toArgb())
         }
     }
-
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp
-    val screenWidth = configuration.screenWidthDp.dp
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
 
     //the entire color picker box containing the color picker and the saved colors
@@ -342,7 +339,7 @@ fun ColorPicker(
             text = { Text("Delete all saved colors?") },
             confirmButton = {
                 Button(onClick = {
-                    if (colorType == ThemeColorType.FONT){
+                    if (colorType == ThemeColorType.FONT) {
                         viewModel.deleteAllThemeFontColors()
                     } else {
                         viewModel.deleteAllThemeBackgroundColors()

@@ -3,20 +3,49 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_highlight"
-        android:title="Highlight"
+        android:id="@+id/action_copy"
+        android:title="@string/copy_icon"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_bookmark"
-        android:title="Bookmark"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_remove_bookmark"
-        android:title="Remove Bookmark"
+        android:title="@string/bookmark_icon"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_remove_highlight"
-        android:title="Remove highlight"
+        android:id="@+id/action_add_note"
+        android:title="@string/note_icon"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_yellow_highlight"
+        android:title="@string/yellow_highlight_icon"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_orange_highlight"
+        android:title="@string/orange_highlight_icon"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_green_highlight"
+        android:title="@string/green_highlight_icon"
+        app:showAsAction="ifRoom" />
+<!--    <item-->
+<!--        android:id="@+id/action_blue_highlight"-->
+<!--        android:title="@string/blue_highlight_icon"-->
+<!--        app:showAsAction="ifRoom" />-->
+
+
+<!--    <item-->
+<!--        android:id="@+id/action_remove_bookmark"-->
+<!--        android:title="Remove Bookmark"-->
+<!--        app:showAsAction="ifRoom" />-->
+
+    <item
+        android:id="@+id/action_remove_highlight"
+        android:title="@string/remove_highlight_icon"
+        app:showAsAction="ifRoom" />
+
+<!--    <item-->
+<!--        android:id="@+id/action_remove_highlight"-->
+<!--        android:title="Remove highlight"-->
+<!--        app:showAsAction="ifRoom" />-->
 </menu>

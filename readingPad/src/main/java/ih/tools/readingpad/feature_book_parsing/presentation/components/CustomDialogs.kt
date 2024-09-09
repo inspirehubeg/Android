@@ -72,9 +72,7 @@ fun CustomFontDialog(
 
 @Composable
 fun PageSelector(viewModel: BookContentViewModel, listState: LazyListState) {
-    val pageNumber by viewModel.pageNumber
     var number: String by remember { mutableStateOf("") }
-    // number = pageNumber.toString()
     var isError by remember { mutableStateOf(true) }
     Box(
         contentAlignment = Alignment.BottomCenter,

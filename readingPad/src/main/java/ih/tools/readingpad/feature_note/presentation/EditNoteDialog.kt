@@ -1,11 +1,11 @@
-package ih.tools.readingpad.feature_bookmark.presentation
+package ih.tools.readingpad.feature_note.presentation
 
-import android.util.Log
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilledIconButton
@@ -28,28 +28,34 @@ import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 
 @Composable
-fun AddBookmarkDialog(
+fun EditNoteDialog(
     viewModel: BookContentViewModel,
-
-    ) {
-    var bookmarkName by remember { mutableStateOf(viewModel.bookmarkName.value) }
+) {
+    var noteText by remember { mutableStateOf(viewModel.noteClickEvent.value?.noteText) }
+    val noteId by remember { mutableStateOf(viewModel.noteClickEvent.value?.id) }
     val context = LocalContext.current
+
     val onDismiss = {
-        viewModel.setShowAddBookmarkDialog(false)
-        viewModel.setBookmarkClickEvent(null)
+        viewModel.setShowEditNoteDialog(false)
+        viewModel.setNoteClickEvent(null)
     }
+
     AlertDialog(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
-        onDismissRequest = { onDismiss() },
+        onDismissRequest = {
+            onDismiss()
+        },
+
+        //title = { Text("Enter Bookmark Name") },
         text = {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(text = stringResource(R.string.bookmark_dialog_name))
+                Text(text = "Note")
                 Spacer(modifier = Modifier.width(4.dp))
                 TextField(
                     singleLine = true,
-                    placeholder = { Text(stringResource(R.string.bookmark_placeholder)) },
-                    value = bookmarkName,
-                    onValueChange = { bookmarkName = it }
+                    placeholder = { Text(stringResource(R.string.bookmark_placeholder))  },
+                    value = noteText!!,
+                    onValueChange = { noteText = it }
                 )
             }
         },
@@ -68,33 +74,38 @@ fun AddBookmarkDialog(
                 }
                 Spacer(modifier = Modifier.weight(2f))
 
+                FilledIconButton(
+                    modifier = Modifier,
+                    onClick = {
+                        viewModel.removeNoteById(noteId ?: 0)
+                        onDismiss()
+                    }
+                ) {
+                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+                    //Text("Delete")
+                }
+
+                Spacer(modifier = Modifier.width(4.dp))
+
 
                 FilledIconButton(
                     modifier = Modifier,
                     onClick = {
-                        if (viewModel.textView.value != null) {
-                            viewModel.addBookmark(
-                                bookmarkName = bookmarkName.ifBlank {
+                        if (viewModel.noteSpans[noteId] != null) {
+                            viewModel.updateNoteText(
+                                noteId!!,
+                                newText = noteText!!.ifBlank {
                                     context.getString(R.string.default_new_bookmark_name)
-                                },
-                                start = viewModel.bookmarkStart.value,
-                                end = viewModel.bookmarkEnd.value,
-                                textView = viewModel.textView.value!!
+                                }
                             )
-                            Log.d(
-                                "new", "viewModel.textView is not null page ${viewModel.textView.value!!.pageNumber}"
-                            )
-                        } else {
-                            Log.e("new", "viewModel.textView is null")
+                            viewModel.setNoteClickEvent(null)
                         }
                         onDismiss()
                     }
                 ) {
-                    Icon(Icons.Default.Done, contentDescription = stringResource(R.string.done))
+                    Icon(Icons.Default.Done, contentDescription = "Done")
                     //Text("OK")
                 }
-
-
             }
         },
     )

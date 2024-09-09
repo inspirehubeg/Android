@@ -49,4 +49,8 @@ class HighlightRepositoryImpl(
         return highlightDao.getPageHighlights(bookId, chapterNumber, pageNumber)
     }
 
+    override fun getHighlightsForBook(bookId: String): Flow<List<Highlight>> {
+        return highlightDao.getHighlightsForBook(bookId)
+    }
+
 }

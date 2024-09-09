@@ -32,9 +32,18 @@ import ih.tools.readingpad.feature_highlight.data.data_source.HighlightDao
 import ih.tools.readingpad.feature_highlight.data.repository.HighlightRepositoryImpl
 import ih.tools.readingpad.feature_highlight.domain.repository.HighlightRepository
 import ih.tools.readingpad.feature_highlight.domain.use_cases.AddHighlight
+import ih.tools.readingpad.feature_highlight.domain.use_cases.GetBookHighlights
 import ih.tools.readingpad.feature_highlight.domain.use_cases.GetPageHighlights
 import ih.tools.readingpad.feature_highlight.domain.use_cases.HighlightUseCases
 import ih.tools.readingpad.feature_highlight.domain.use_cases.RemoveHighlightById
+import ih.tools.readingpad.feature_note.data.repository.NoteRepositoryImpl
+import ih.tools.readingpad.feature_note.domain.repository.NoteRepository
+import ih.tools.readingpad.feature_note.domain.use_cases.AddNote
+import ih.tools.readingpad.feature_note.domain.use_cases.DeleteNoteById
+import ih.tools.readingpad.feature_note.domain.use_cases.GetBookNotes
+import ih.tools.readingpad.feature_note.domain.use_cases.GetPageNotes
+import ih.tools.readingpad.feature_note.domain.use_cases.NoteUseCases
+import ih.tools.readingpad.feature_note.domain.use_cases.UpdateNoteText
 import ih.tools.readingpad.feature_theme_color.data.repository.ThemeColorRepositoryImpl
 import ih.tools.readingpad.feature_theme_color.domain.repository.ThemeColorRepository
 import ih.tools.readingpad.feature_theme_color.domain.use_case.AddThemeColorUseCase
@@ -177,8 +186,8 @@ object ReadingPadModule {
         return HighlightUseCases(
             addHighlight = AddHighlight(repository),
             getPageHighlights = GetPageHighlights(repository),
-            removeHighlightById = RemoveHighlightById(repository)
-
+            removeHighlightById = RemoveHighlightById(repository),
+            getBookHighlights = GetBookHighlights(repository)
         )
     }
 
@@ -230,6 +239,25 @@ object ReadingPadModule {
     @Singleton
     fun providePreferencesManager(@ApplicationContext context: Context): PreferencesManager {
         return PreferencesManager(context)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideNoteUseCases(repository: NoteRepository): NoteUseCases {
+        return NoteUseCases(
+            addNote = AddNote(repository),
+            deleteNoteById = DeleteNoteById(repository),
+            getBookNotes = GetBookNotes(repository),
+            getPageNotes = GetPageNotes(repository),
+            updateNoteText = UpdateNoteText(repository)
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideNoteRepository(database: ReadingPadDatabase): NoteRepository {
+        return NoteRepositoryImpl(database.noteDao)
     }
 
 }

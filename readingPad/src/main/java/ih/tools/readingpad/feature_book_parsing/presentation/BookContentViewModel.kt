@@ -8,6 +8,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -30,9 +31,14 @@ import ih.tools.readingpad.feature_bookmark.domain.use_cases.BookmarkUseCases
 import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkClickableSpan
 import ih.tools.readingpad.feature_highlight.domain.model.Highlight
 import ih.tools.readingpad.feature_highlight.domain.use_cases.HighlightUseCases
+import ih.tools.readingpad.feature_note.domain.model.Note
+import ih.tools.readingpad.feature_note.domain.use_cases.NoteUseCases
 import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColor
 import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColorType
 import ih.tools.readingpad.feature_theme_color.domain.use_case.ThemeColorUseCases
+import ih.tools.readingpad.ui.theme.HighlightLaserLemon
+import ih.tools.readingpad.util.IHNoteSpan
+import ih.tools.readingpad.util.IHSpan
 import ih.tools.readingpad.util.showToast
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -52,26 +58,60 @@ class BookContentViewModel @Inject constructor(
     private val bookmarkUseCases: BookmarkUseCases,
     private val preferencesManager: PreferencesManager,
     private val themeColorUseCases: ThemeColorUseCases,
+    private val noteUseCases: NoteUseCases,
     private val context: Context
 ) : ViewModel() {
-
     private val _savedFontColors = MutableLiveData<List<ThemeColor>>()
     val savedFontColors = _savedFontColors
 
     private val _savedBackgroundColors = MutableLiveData<List<ThemeColor>>()
     val savedBackgroundColors = _savedBackgroundColors
 
+    private fun getSavedColors() {
+        viewModelScope.launch {
+            _savedFontColors.value =
+                themeColorUseCases.getThemeColorsUseCase(type = ThemeColorType.FONT)
+
+            _savedBackgroundColors.value =
+                themeColorUseCases.getThemeColorsUseCase(type = ThemeColorType.BACKGROUND)
+        }
+    }
+
     private val _imageClicked = MutableStateFlow<ByteArray?>(null)
     val imageClicked: StateFlow<ByteArray?> = _imageClicked.asStateFlow()
+    fun onImageClick(imageData: ByteArray?) {
+        _imageClicked.value = imageData
+    }
 
     private val _verticalScroll = MutableStateFlow(preferencesManager.isVerticalScroll())
     val verticalScroll = _verticalScroll.asStateFlow()
+    fun setVerticalScroll(isVertical: Boolean) {
+        preferencesManager.setVerticalScroll(isVertical)
+        _verticalScroll.value = isVertical
+    }
 
     private val _oneFingerScroll = MutableStateFlow(true)
     val oneFingerScroll = _oneFingerScroll.asStateFlow()
-    fun setOneFingerScroll(value: Boolean){
+    fun setOneFingerScroll(value: Boolean) {
         Log.d("test", "setOneFingerScroll is called $value")
         _oneFingerScroll.value = value
+    }
+
+    private val _isDrawerOpen = MutableStateFlow(false)
+    val isDrawerOpen: StateFlow<Boolean> = _isDrawerOpen.asStateFlow()
+
+    fun openDrawer() {
+        _isDrawerOpen.value = true
+    }
+
+    fun closeDrawer() {
+        _isDrawerOpen.value = false
+    }
+
+    private val _showUserInputPage = MutableStateFlow(false)
+    val showUserInputPage = _showUserInputPage.asStateFlow()
+    fun toggleShowUserInputPage() {
+        _showUserInputPage.value = !_showUserInputPage.value
     }
 
     private val _showCustomThemePage = MutableStateFlow(false)
@@ -82,16 +122,32 @@ class BookContentViewModel @Inject constructor(
 
     private val _showBookmarkListDialog = MutableStateFlow(false)
     val showBookmarkListDialog = _showBookmarkListDialog.asStateFlow()
+    fun setShowBookmarkListDialog(show: Boolean) {
+        _showBookmarkListDialog.value = show
+    }
 
     private val _showPageNumberDialog = MutableStateFlow(false)
     val showPageNumberDialog = _showPageNumberDialog.asStateFlow()
+    fun setShowPageNumberDialog(show: Boolean) {
+        _showPageNumberDialog.value = show
+    }
+    private val _showPagesSlider = MutableStateFlow(false)
+    val showPagesSlider = _showPagesSlider.asStateFlow()
+    fun setShowPagesSlider(show: Boolean) {
+        _showPagesSlider.value = show
+    }
 
     private val _showAddBookmarkDialog = MutableStateFlow(false)
     val showAddBookmarkDialog = _showAddBookmarkDialog.asStateFlow()
-
+    fun setShowAddBookmarkDialog(show: Boolean) {
+        _showAddBookmarkDialog.value = show
+    }
 
     private val _showEditBookmarkDialog = MutableStateFlow(false)
     val showEditBookmarkDialog = _showEditBookmarkDialog.asStateFlow()
+    fun setShowEditBookmarkDialog(show: Boolean) {
+        _showEditBookmarkDialog.value = show
+    }
 
     private val _showFullScreenImage = MutableStateFlow(false)
     val showFullScreenImage = _showFullScreenImage.asStateFlow()
@@ -101,20 +157,76 @@ class BookContentViewModel @Inject constructor(
 
     private val _showThemeSelector = MutableStateFlow(false)
     val showThemeSelector: StateFlow<Boolean> = _showThemeSelector.asStateFlow()
+    fun setShowThemeSelector(show: Boolean) {
+        _showThemeSelector.value = show
+    }
 
     private val _showFontSlider = MutableStateFlow(false)
     val showFontSlider: StateFlow<Boolean> = _showFontSlider.asStateFlow()
+    fun setShowFontSlider(show: Boolean) {
+        _showFontSlider.value = show
+    }
 
-    // this part is temporary, it fetches the book from Raw but it should be replaced by fetching the book by id in the init{}
-    private val metadata = getMetadata(context)
-    private val bookInfo = getBookInfo(context)
-    val book = fetchBook(bookInfo)
-    private val offsets = metadata.tokenOffsets
-    private var tokenName: String = ""
+    private val _showCustomSelectionMenu = MutableStateFlow(false)
+    val showCustomSelectionMenu: StateFlow<Boolean> = _showCustomSelectionMenu.asStateFlow()
+    fun setShowCustomSelectionMenu(show: Boolean) {
+        _showCustomSelectionMenu.value = show
+    }
+
+    private val _preferredHighlightColor = MutableStateFlow(HighlightLaserLemon)
+    val preferredHighlightColor: StateFlow<Color> = _preferredHighlightColor.asStateFlow()
+    fun setPreferredHighlightColor(color: Color) {
+        _preferredHighlightColor.value = color
+    }
+
+    private val _selectedSpans = MutableStateFlow<Array<IHSpan>>(emptyArray())
+    val selectedSpans: StateFlow<Array<IHSpan>> = _selectedSpans.asStateFlow()
+    fun setSelectedSpans(spans: Array<IHSpan>) {
+        _selectedSpans.value = spans
+    }
+
+
 
     // clickable bookmark span listener
     private val _bookmarkClickEvent = MutableStateFlow<IHBookmarkClickableSpan?>(null)
     val bookmarkClickEvent: StateFlow<IHBookmarkClickableSpan?> = _bookmarkClickEvent.asStateFlow()
+    fun setBookmarkClickEvent(span: IHBookmarkClickableSpan?) {
+        _bookmarkClickEvent.value = span
+    }
+    // clickable note span listener
+    private val _noteClickEvent = MutableStateFlow<IHNoteSpan?>(null)
+    val noteClickEvent: StateFlow<IHNoteSpan?> = _noteClickEvent.asStateFlow()
+    fun setNoteClickEvent(span: IHNoteSpan?) {
+        _noteClickEvent.value = span
+    }
+
+    private val _editNote = MutableStateFlow(false)
+    val editNote: StateFlow<Boolean> = _editNote.asStateFlow()
+    fun setEditNote(edit: Boolean) {
+        _editNote.value = edit
+    }
+    private val _noteEnd = MutableStateFlow(0)
+    val noteEnd: StateFlow<Int> = _noteEnd
+    fun setNoteEnd(end: Int) {
+        _noteEnd.value = end
+    }
+
+    private val _noteStart = MutableStateFlow(0)
+    val noteStart: StateFlow<Int> = _noteStart
+    fun setNoteStart(start: Int) {
+        _noteStart.value = start
+    }
+    private val _showAddNoteDialog = MutableStateFlow(false)
+    val showAddNoteDialog = _showAddNoteDialog.asStateFlow()
+    fun setShowAddNoteDialog(show: Boolean) {
+        _showAddNoteDialog.value = show
+    }
+
+    private val _showEditNoteDialog = MutableStateFlow(false)
+    val showEditNoteDialog = _showEditNoteDialog.asStateFlow()
+    fun setShowEditNoteDialog(show: Boolean) {
+        _showEditNoteDialog.value = show
+    }
 
     private val _imageRotation = MutableStateFlow(0f)
     val imageRotation: StateFlow<Float> = _imageRotation.asStateFlow()
@@ -124,56 +236,165 @@ class BookContentViewModel @Inject constructor(
 
     private val _editBookmark = MutableStateFlow(false)
     val editBookmark: StateFlow<Boolean> = _editBookmark.asStateFlow()
+    fun setEditBookmark(edit: Boolean) {
+        _editBookmark.value = edit
+    }
 
     private val _bookmarkEnd = MutableStateFlow(0)
     val bookmarkEnd: StateFlow<Int> = _bookmarkEnd
+    fun setBookmarkEnd(end: Int) {
+        _bookmarkEnd.value = end
+    }
 
     private val _bookmarkStart = MutableStateFlow(0)
     val bookmarkStart: StateFlow<Int> = _bookmarkStart
+    fun setBookmarkStart(start: Int) {
+        _bookmarkStart.value = start
+    }
+
+
+    private val _bookmarkName = MutableStateFlow("")
+    val bookmarkName: StateFlow<String> = _bookmarkName
+    fun setBookmarkName(name: String) {
+        _bookmarkName.value = name
+    }
 
     private val _bookmarkPageNumber = MutableStateFlow(0)
     private val bookmarkPageNumber: StateFlow<Int> = _bookmarkPageNumber
+    fun setBookmarkPageNumber(pageNumber: Int) {
+        _bookmarkPageNumber.value = pageNumber
+    }
+
+    private val _notePageNumber = MutableStateFlow(0)
+    private val notePageNumber: StateFlow<Int> = _notePageNumber
+    fun setNotePageNumber(pageNumber: Int) {
+        _notePageNumber.value = pageNumber
+    }
 
     private val _textView = MutableStateFlow<IHTextView?>(null)
     val textView: StateFlow<IHTextView?> = _textView
+    fun setTextView(textView: IHTextView) {
+        _textView.value = textView
+    }
 
     private val _showTopBar = MutableStateFlow(true)
     val showTopBar: StateFlow<Boolean> = _showTopBar.asStateFlow()
+    fun setTopBarVisibility(isVisible: Boolean) {
+        _showTopBar.value = isVisible
+    }
 
-    private var getAllHighlightsJob: Job? = null
-    private var getAllBookmarksJob: Job? = null
+    private val _fontColor = MutableStateFlow(preferencesManager.getFontColor())
+    val fontColor = _fontColor
+    fun setFontColor(color: Int) {
+        preferencesManager.setFontColor(color)
+        _fontColor.value = color
+    }
+
+    private val _darkTheme = MutableStateFlow(preferencesManager.isDarkTheme())
+    val darkTheme = _darkTheme
+    fun setDarkTheme(isDark: Boolean, textColor: Int, backgroundColor: Int) {
+        preferencesManager.setDarkTheme(isDark)
+        _darkTheme.value = isDark
+        setFontColor(textColor)
+        setBackgroundColor(backgroundColor)
+    }
+
+    private val _pinnedTopBar = MutableStateFlow(preferencesManager.isPinnedTopBar())
+    val pinnedTopBar = _pinnedTopBar
+    fun setPinnedTopBar(isPinned: Boolean) {
+        preferencesManager.setPinnedTopBar(isPinned)
+        _pinnedTopBar.value = isPinned
+    }
+
+    private val _pageNumber = mutableIntStateOf(1)
+    val pageNumber: State<Int> = _pageNumber
+    fun setPageNumber(number: Int) {
+        _pageNumber.intValue = number
+    }
+
+    private val _fontWeight = MutableStateFlow(preferencesManager.getFontWeight())
+    val fontWeight = _fontWeight
+    fun setFontWeight(fontWeight: Int) {
+        preferencesManager.setFontWeight(fontWeight)
+        _fontWeight.value = fontWeight
+    }
+
+    private val _backgroundColor = MutableStateFlow(preferencesManager.getBackgroundColor())
+    val backgroundColor = _backgroundColor
+    fun setBackgroundColor(backgroundColor: Int) {
+        preferencesManager.setBackgroundColor(backgroundColor)
+        _backgroundColor.value = backgroundColor
+    }
+
+    private val _currentThemeFontColor = MutableLiveData(fontColor.value)
+    val currentThemeFontColor = _currentThemeFontColor
+    fun setCurrentThemeFontColor(colorInt: Int) {
+        _currentThemeFontColor.value = colorInt
+    }
+
+    private val _currentThemeBackgroundColor = MutableLiveData(backgroundColor.value)
+    val currentThemeBackgroundColor = _currentThemeBackgroundColor
+    fun setCurrentThemeBackgroundColor(colorInt: Int) {
+        _currentThemeBackgroundColor.value = colorInt
+    }
+
+    private val _linkNavigationPage = MutableStateFlow(false)
+    val linkNavigationPage: StateFlow<Boolean> = _linkNavigationPage
+    fun setLinkNavigationPage(value: Boolean) {
+        _linkNavigationPage.value = value
+    }
 
     private val _fontSize = MutableStateFlow(preferencesManager.getFontSize())
     val fontSize: StateFlow<Float> = _fontSize
 
-    private val _fontColor = MutableStateFlow(preferencesManager.getFontColor())
-    val fontColor = _fontColor
+    private val _fontSizeChanged = MutableStateFlow(false)
+    val fontSizeChanged: StateFlow<Boolean> = _fontSizeChanged
 
-    private val _darkTheme = MutableStateFlow(preferencesManager.isDarkTheme())
-    val darkTheme = _darkTheme
+    fun setFontSizeChanged(value: Boolean) {
+        _fontSizeChanged.value = value
+    }
 
-    private val _pinnedTopBar = MutableStateFlow(preferencesManager.isPinnedTopBar())
-    val pinnedTopBar = _pinnedTopBar
+    fun setFontSize(fontSize: Float, currentY: Float) {
+        _currentPageIndex.value = lazyListState.firstVisibleItemIndex
+        val fontSizePercentage = fontSize / _fontSize.value
 
-    private val _pageNumber = mutableIntStateOf(1)
-    val pageNumber: State<Int> = _pageNumber
+        Log.d("IHTextView", "lazylist y ${lazyListState.firstVisibleItemScrollOffset}")
 
-    private val _fontWeight = MutableStateFlow(preferencesManager.getFontWeight())
-    val fontWeight = _fontWeight
+        Log.d("IHTextView", "currentY $currentY")
 
-    private val _backgroundColor = MutableStateFlow(preferencesManager.getBackgroundColor())
-    val backgroundColor = _backgroundColor
+        Log.d("IHTextView", "ratio $fontSizePercentage")
+        preferencesManager.setFontSize(fontSize)
+        _fontSize.value = fontSize
+        var y = 0
+//        if (currentY == 0f){
+//            //the offset on the top of the screen
+//
+//        }
+        y = lazyListState.firstVisibleItemScrollOffset
 
-    private val _currentThemeFontColor = MutableLiveData(fontColor.value)
-    val currentThemeFontColor = _currentThemeFontColor
+        val newY = y * fontSizePercentage * 1.01f
+        Log.d("john", "y = $y")
+        Log.d("john", "newY = $newY")
+        Log.d("john", "move = ${newY - y}")
+        scrollToIndex((newY - y))
+        _fontSizeChanged.value = true
+    }
 
-    private val _currentThemeBackgroundColor = MutableLiveData(backgroundColor.value)
-    val currentThemeBackgroundColor = _currentThemeBackgroundColor
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _linkNavigationPage = MutableStateFlow(false)
-    val linkNavigationPage: StateFlow<Boolean> = _linkNavigationPage
+    // this part is temporary, it fetches the book from Raw but it should be replaced by
+    // fetching the book by id in the init{}
+    private val metadata = getMetadata(context)
+    private val bookInfo = getBookInfo(context)
+    val book = fetchBook(bookInfo)
+    private val offsets = metadata.tokenOffsets
+    private var tokenName: String = ""
 
+    private var getAllHighlightsJob: Job? = null
+    private var getAllBookmarksJob: Job? = null
     val bookmarkSpans = mutableMapOf<Long, IHBookmarkClickableSpan>()
+    val noteSpans = mutableMapOf<Long, IHNoteSpan>()
 
     private val _state = mutableStateOf(BookDetailsState())
     val state: State<BookDetailsState> = _state
@@ -182,12 +403,6 @@ class BookContentViewModel @Inject constructor(
     private val _currentPageIndex = MutableStateFlow(0)
     val currentPageIndex: StateFlow<Int> = _currentPageIndex
 
-    private val _fontSizeChanged = MutableStateFlow(false)
-    val fontSizeChanged: StateFlow<Boolean> = _fontSizeChanged
-
-    fun setFontSizeChanged(value: Boolean) {
-        _fontSizeChanged.value = value
-    }
 
     init {
         // this part is temporary, it fetches the book from Raw but it should be replaced by fetching the book by id in the init{}
@@ -209,12 +424,14 @@ class BookContentViewModel @Inject constructor(
                 bookAuthor = book.bookInfo.author.name,
                 // bookCategory = book.category,
                 numberOfChapters = book.bookInfo.chaptersNumber,
+                numberOfPages = book.bookInfo.pagesNumber,
                 bookDescription = book.bookInfo.description,
+
                 // imageUrl = book.bookInfo.cover,
             )
-            //getHighlightsForPage(1)
             getBookBookmarks(bookInfo.id)
-            // getBookmarksForBook(state.value.bookId)
+            getBookHighlights(bookInfo.id)
+            getBookNotes(bookInfo.id)
             Log.d(
                 "BookContentViewModel",
                 "spannable content = ${state.value.spannableContent.length}"
@@ -224,7 +441,14 @@ class BookContentViewModel @Inject constructor(
     }
 
 
-    fun addHighlight(pageNumber: Int, start: Int, end: Int, textView: IHTextView) {
+    fun addHighlight(
+        pageNumber: Int,
+        start: Int,
+        end: Int,
+        textView: IHTextView,
+        highlightText: String,
+        color: Int
+    ) {
         val originalStart = textView.getDatabaseIndex(start)
         val originalEnd = textView.getDatabaseIndex(end)
         viewModelScope.launch {
@@ -235,35 +459,18 @@ class BookContentViewModel @Inject constructor(
                 start = originalStart,
                 end = originalEnd,
                 chapterNumber = state.value.currentChapterNumber,
-                pageNumber = pageNumber
+                pageNumber = pageNumber,
+                text = highlightText,
+                color = color
             )
             val highlightId = highlightUseCases.addHighlight(highlight)
             Log.d("BookContentViewModel", "highlight is saved from {$start} to {$end}")
             Log.d("BookContentViewModel", "getHighlightsForBook is invoked")
-            textView.drawSingleHighlight(highlightId, start, end, true)
+            textView.drawSingleHighlight(highlightId, start, end, true, color = color)
+            // _state.value.bookHighlights.add(highlight)
+            getBookHighlights(bookId)
         }
 
-    }
-
-    fun removeHighlightById(highlightId: Long) {
-        viewModelScope.launch {
-            highlightUseCases.removeHighlightById(highlightId)
-        }
-    }
-
-    fun removeBookmarkById(bookmarkId: Long) {
-        viewModelScope.launch {
-            bookmarkUseCases.removeBookmarkById(bookmarkId)
-            bookmarkSpans[bookmarkId]?.let { textView.value?.removeSingleCustomSpan(it) }
-        }
-    }
-
-    //updates bookmark title for existing bookmarks
-    fun updateBookmarkTitle(bookmarkId: Long, newTitle: String) {
-        viewModelScope.launch {
-            bookmarkUseCases.updateBookmarkTitle(bookmarkId, newTitle)
-            bookmarkSpans[bookmarkId]?.bookmarkName = newTitle
-        }
     }
 
     fun addBookmark(bookmarkName: String, start: Int, end: Int, textView: IHTextView) {
@@ -280,13 +487,8 @@ class BookContentViewModel @Inject constructor(
                 bookmarkTitle = bookmarkName
             )
             val newBookmarkId = bookmarkUseCases.addBookmark(newBookmark)
-//            _state.value= state.value.copy(
-//                bookBookmarks = state.value.bookBookmarks + newBookmark
-//            )
             getBookBookmarks(bookId)
-            for (i in state.value.bookBookmarks) {
-                Log.d("new", "bookmark = ${i.bookmarkTitle}")
-            }
+
             Log.d("new", "addBookmark is invoked page# = ${textView.pageNumber}")
             textView.drawSingleBookmark(
                 newBookmarkId,
@@ -298,46 +500,115 @@ class BookContentViewModel @Inject constructor(
         }
     }
 
+    fun addNote(noteText: String, start: Int, end: Int, textView: IHTextView) {
+        val originalStart = textView.getDatabaseIndex(start)
+        val originalEnd = textView.getDatabaseIndex(end)
+        viewModelScope.launch {
+            val bookId = _state.value.bookId
+            val newNote = Note(
+                bookId = bookId,
+                start = originalStart,
+                end = originalEnd,
+                chapterNumber = state.value.currentChapterNumber,
+                pageNumber = notePageNumber.value,
+                text = noteText
+            )
+            val newNoteId = noteUseCases.addNote(newNote)
+            getBookNotes(bookId)
+
+            Log.d("new", "addBookmark is invoked page# = ${textView.pageNumber}")
+            textView.drawSingleNote(
+                newNoteId,
+                noteText,
+                start,
+                end,
+                true
+            )
+        }
+    }
+
+    fun removeHighlightById(highlightId: Long) {
+        viewModelScope.launch {
+            highlightUseCases.removeHighlightById(highlightId)
+        }
+    }
+
+    fun removeBookmarkById(bookmarkId: Long) {
+        viewModelScope.launch {
+            bookmarkUseCases.removeBookmarkById(bookmarkId)
+            bookmarkSpans[bookmarkId]?.let { textView.value?.removeSingleCustomSpan(it) }
+        }
+    }
+
+    fun removeNoteById(noteId: Long) {
+        viewModelScope.launch {
+            noteUseCases.deleteNoteById(noteId)
+            noteSpans[noteId]?.let { textView.value?.removeSingleCustomSpan(it) }
+        }
+    }
+
+    //updates bookmark title for existing bookmarks
+    fun updateBookmarkTitle(bookmarkId: Long, newTitle: String) {
+        viewModelScope.launch {
+            bookmarkUseCases.updateBookmarkTitle(bookmarkId, newTitle)
+            bookmarkSpans[bookmarkId]?.bookmarkName = newTitle
+        }
+    }
+
+    fun updateNoteText(noteId: Long, newText: String) {
+        viewModelScope.launch {
+            noteUseCases.updateNoteText(noteId, newText)
+            noteSpans[noteId]?.noteText = newText
+        }
+    }
+
+
     fun getHighlightsForPage(pageNumber: Int, textView: IHTextView) {
         viewModelScope.launch {
-            highlightUseCases.getPageHighlights(
-                bookId = state.value.bookId,
-                chapterNumber = state.value.currentChapterNumber,
-                pageNumber = pageNumber
-            ).onEach { highlights ->
-                _state.value = state.value.copy(
-                    bookHighlights = highlights
-                )
-                Log.d(
-                    "IHTextView",
-                    "pageNumber = $pageNumber getHighlightsForBook is successful $highlights"
-                )
-                textView.drawAllHighlights(state.value.bookHighlights)
-
-            }.launchIn(viewModelScope)
-
+            val hi = state.value.bookHighlights.filter { it.pageNumber == pageNumber }
+            hi.apply {
+                textView.drawAllHighlights(this)
+            }
             Log.d("IHTextView", "HighlightsForBook is spanned")
         }
     }
 
     fun getBookmarksForPage(pageNumber: Int, textView: IHTextView) {
-        Log.d("IHTextView", "getBookmarksForPage is called")
-        val pageBookmarks = state.value.bookBookmarks.filter {
-            it.pageNumber == pageNumber
-        }
-        Log.d("IHTextView", "all bookmarks = ${state.value.bookBookmarks.size}")
-        Log.d("IHTextView", "getBookmarksForPage # $pageNumber = ${pageBookmarks.size}")
-        pageBookmarks.forEach { bookmark ->
-            textView.drawSingleBookmark(
-                bookmark.id,
-                bookmark.bookmarkTitle,
-                bookmark.start,
-                bookmark.end,
-                false
-            )
-            Log.d("IHTextView", "page bookmark list = ${bookmark.bookmarkTitle}")
+        viewModelScope.launch {
+            val pageBookmarks = state.value.bookBookmarks.filter {
+                it.pageNumber == pageNumber
+            }
+            pageBookmarks.forEach { bookmark ->
+                textView.drawSingleBookmark(
+                    bookmark.id,
+                    bookmark.bookmarkTitle,
+                    bookmark.start,
+                    bookmark.end,
+                    false
+                )
+                Log.d("IHTextView", "page bookmark list = ${bookmark.bookmarkTitle}")
+            }
         }
     }
+
+    fun getNotesForPage(pageNumber: Int, textView: IHTextView) {
+        viewModelScope.launch {
+            val pageNotes = state.value.bookNotes.filter {
+                it.pageNumber == pageNumber
+            }
+            pageNotes.forEach { note ->
+                textView.drawSingleNote(
+                    note.id,
+                    note.text,
+                    note.start,
+                    note.end,
+                    false
+                )
+                Log.d("IHTextView", "page notes list = ${note.text}")
+            }
+        }
+    }
+
 
     private fun getBookBookmarks(bookId: String) {
         viewModelScope.launch {
@@ -353,13 +624,31 @@ class BookContentViewModel @Inject constructor(
         }
     }
 
-    private fun getSavedColors() {
+    private fun getBookHighlights(bookId: String) {
         viewModelScope.launch {
-            _savedFontColors.value =
-                themeColorUseCases.getThemeColorsUseCase(type = ThemeColorType.FONT)
+            highlightUseCases.getBookHighlights(
+                bookId,
+            ).onEach { highlights ->
+                _state.value = state.value.copy(
+                    bookHighlights = highlights
+                )
+                Log.d("BookContentViewModel", "getHighlightsForBook is successful $highlights")
+            }
+                .launchIn(viewModelScope)
+        }
+    }
 
-            _savedBackgroundColors.value =
-                themeColorUseCases.getThemeColorsUseCase(type = ThemeColorType.BACKGROUND)
+    private fun getBookNotes(bookId: String) {
+        viewModelScope.launch {
+            noteUseCases.getBookNotes(
+                bookId,
+            ).onEach { notes ->
+                _state.value = state.value.copy(
+                    bookNotes = notes
+                )
+                Log.d("BookContentViewModel", "getNotesForBook is successful $notes")
+            }
+                .launchIn(viewModelScope)
         }
     }
 
@@ -411,7 +700,7 @@ class BookContentViewModel @Inject constructor(
                 pageNumber = pageNumber
             ).onEach { highlights ->
                 _state.value = state.value.copy(
-                    bookHighlights = highlights
+                    bookHighlights = highlights.toMutableList()
                 )
 
                 Log.d("BookContentViewModel", "getHighlightsForBook is successful $highlights")
@@ -447,24 +736,12 @@ class BookContentViewModel @Inject constructor(
     }
 
     fun scrollToIndexLazy(targetPageIndex: Int, lazyListState: LazyListState, targetIndex: Int) {
-
         viewModelScope.launch {
-
             if (targetPageIndex != lazyListState.firstVisibleItemIndex) {
                 _linkNavigationPage.value = true
-                Log.d(
-                    "BookContentViewModel",
-                    "linkNavigationPage = ${linkNavigationPage.value}"
-                )
-                Log.d(
-                    "BookContentViewModel",
-                    "is current page = ${textView.value?.pageNumber}"
-                )
-
             }
             // Scroll to the target page if it's not already visible
             lazyListState.scrollToItem(targetPageIndex)
-
             snapshotFlow { lazyListState.isScrollInProgress }
                 .filter { !it } // Wait until scrolling is finished
                 .first() // Take only the first emission
@@ -502,143 +779,6 @@ class BookContentViewModel @Inject constructor(
 
     }
 
-
-    //setters functions
-
-    fun setCurrentThemeFontColor(colorInt: Int) {
-        _currentThemeFontColor.value = colorInt
-    }
-
-    fun setCurrentThemeBackgroundColor(colorInt: Int) {
-        _currentThemeBackgroundColor.value = colorInt
-    }
-
-    fun setShowBookmarkListDialog(show: Boolean) {
-        _showBookmarkListDialog.value = show
-    }
-
-    fun setShowPageNumberDialog(show: Boolean) {
-        _showPageNumberDialog.value = show
-    }
-
-    fun setShowAddBookmarkDialog(show: Boolean) {
-        _showAddBookmarkDialog.value = show
-    }
-
-    fun setShowEditBookmarkDialog(show: Boolean) {
-        _showEditBookmarkDialog.value = show
-    }
-
-    fun setShowThemeSelector(show: Boolean) {
-        _showThemeSelector.value = show
-    }
-
-    fun setShowFontSlider(show: Boolean) {
-        _showFontSlider.value = show
-    }
-
-    fun setBookmarkClickEvent(span: IHBookmarkClickableSpan?) {
-        _bookmarkClickEvent.value = span
-    }
-
-    fun setEditBookmark(edit: Boolean) {
-        _editBookmark.value = edit
-    }
-
-    fun setBookmarkEnd(end: Int) {
-        _bookmarkEnd.value = end
-    }
-
-    fun setBookmarkStart(start: Int) {
-        _bookmarkStart.value = start
-    }
-
-    fun setBookmarkPageNumber(pageNumber: Int) {
-        _bookmarkPageNumber.value = pageNumber
-    }
-
-    fun setTextView(textView: IHTextView) {
-        _textView.value = textView
-    }
-
-    fun setTopBarVisibility(isVisible: Boolean) {
-        _showTopBar.value = isVisible
-    }
-
-    fun setPageNumber(number: Int) {
-        _pageNumber.intValue = number
-    }
-
-    fun setLinkNavigationPage(value: Boolean) {
-        _linkNavigationPage.value = value
-    }
-
-
-    fun setFontSize(fontSize: Float, currentY: Float) {
-        _currentPageIndex.value = lazyListState.firstVisibleItemIndex
-        val fontSizePercentage = fontSize/ _fontSize.value
-
-        Log.d("IHTextView", "lazylist y ${lazyListState.firstVisibleItemScrollOffset}")
-
-        Log.d("IHTextView", "currentY $currentY")
-
-        Log.d("IHTextView", "ratio $fontSizePercentage")
-        preferencesManager.setFontSize(fontSize)
-        _fontSize.value = fontSize
-        var y = 0
-//        if (currentY == 0f){
-//            //the offset on the top of the screen
-//
-//        }
-        y = lazyListState.firstVisibleItemScrollOffset
-
-        val newY = y*fontSizePercentage *1.01f
-        Log.d("john", "y = ${y}")
-        Log.d("john", "newY = ${newY}")
-        Log.d("john", "move = ${newY-y}")
-       scrollToIndex((newY-y))
-        _fontSizeChanged.value = true
-    }
-
-    fun setFontColor(color: Int) {
-        preferencesManager.setFontColor(color)
-        _fontColor.value = color
-    }
-
-    fun setFontWeight(fontWeight: Int) {
-        preferencesManager.setFontWeight(fontWeight)
-        _fontWeight.value = fontWeight
-    }
-
-    fun setBackgroundColor(backgroundColor: Int) {
-        preferencesManager.setBackgroundColor(backgroundColor)
-        _backgroundColor.value = backgroundColor
-    }
-
-
-    fun onImageClick(imageData: ByteArray?) {
-        _imageClicked.value = imageData
-    }
-
-    fun setPinnedTopBar(isPinned: Boolean) {
-        preferencesManager.setPinnedTopBar(isPinned)
-        _pinnedTopBar.value = isPinned
-    }
-
-    fun setVerticalScroll(isVertical: Boolean) {
-        preferencesManager.setVerticalScroll(isVertical)
-        _verticalScroll.value = isVertical
-    }
-
-    fun setDarkTheme(isDark: Boolean, textColor: Int, backgroundColor: Int) {
-        preferencesManager.setDarkTheme(isDark)
-        _darkTheme.value = isDark
-        setFontColor(textColor)
-        setBackgroundColor(backgroundColor)
-    }
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
 
     /**
      * Cache to store converted pages for each chapter.

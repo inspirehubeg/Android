@@ -25,4 +25,16 @@
     <string name="full_screen_image">Full screen image</string>
     <string name="error_loading_image">Error loading image</string>
     <string name="add_custom_theme">Add Custom Theme</string>
+
+
+    <string name="bookmark_icon" translatable="false">🏷️</string>
+    <string name="green_highlight_icon" translatable="false">🟢</string>
+    <string name="yellow_highlight_icon" translatable="false">🟡</string>
+    <string name="orange_highlight_icon" translatable="false">🟠</string>
+    <string name="blue_highlight_icon" translatable="false">🔵</string>
+    <string name="note_icon" translatable="false">📝</string>
+    <string name="copy_icon" translatable="false">➢</string>
+    <string name="remove_highlight_icon" translatable="false">✖️</string>
+
+
 </resources>

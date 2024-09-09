@@ -1,4 +1,4 @@
-package ih.tools.readingpad.feature_bookmark.presentation
+package ih.tools.readingpad.feature_note.presentation
 
 import android.util.Log
 import androidx.compose.foundation.layout.Row
@@ -28,28 +28,28 @@ import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 
 @Composable
-fun AddBookmarkDialog(
+fun AddNoteDialog(
     viewModel: BookContentViewModel,
 
     ) {
-    var bookmarkName by remember { mutableStateOf(viewModel.bookmarkName.value) }
+    var noteText by remember { mutableStateOf("") }
     val context = LocalContext.current
     val onDismiss = {
-        viewModel.setShowAddBookmarkDialog(false)
-        viewModel.setBookmarkClickEvent(null)
+        viewModel.setShowAddNoteDialog(false)
+        viewModel.setNoteClickEvent(null)
     }
     AlertDialog(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         onDismissRequest = { onDismiss() },
         text = {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(text = stringResource(R.string.bookmark_dialog_name))
+                Text(text = "Note")
                 Spacer(modifier = Modifier.width(4.dp))
                 TextField(
                     singleLine = true,
-                    placeholder = { Text(stringResource(R.string.bookmark_placeholder)) },
-                    value = bookmarkName,
-                    onValueChange = { bookmarkName = it }
+                    placeholder = { Text("Add your note") },
+                    value = noteText,
+                    onValueChange = { noteText = it }
                 )
             }
         },
@@ -73,12 +73,12 @@ fun AddBookmarkDialog(
                     modifier = Modifier,
                     onClick = {
                         if (viewModel.textView.value != null) {
-                            viewModel.addBookmark(
-                                bookmarkName = bookmarkName.ifBlank {
+                            viewModel.addNote(
+                                noteText = noteText.ifBlank {
                                     context.getString(R.string.default_new_bookmark_name)
                                 },
-                                start = viewModel.bookmarkStart.value,
-                                end = viewModel.bookmarkEnd.value,
+                                start = viewModel.noteStart.value,
+                                end = viewModel.noteEnd.value,
                                 textView = viewModel.textView.value!!
                             )
                             Log.d(

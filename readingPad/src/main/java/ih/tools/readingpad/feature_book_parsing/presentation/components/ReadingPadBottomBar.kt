@@ -1,19 +1,25 @@
 package ih.tools.readingpad.feature_book_parsing.presentation.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmarks
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.FormatSize
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +33,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.ui.theme.Green
+import ih.tools.readingpad.ui.theme.LightBackground
 
 @Composable
 fun ReadingPadBottomBar(
@@ -37,60 +45,78 @@ fun ReadingPadBottomBar(
     val showThemeSelector by viewModel.showThemeSelector.collectAsState()
     val showBookmarkListDialog by viewModel.showBookmarkListDialog.collectAsState()
     val showPageNumberDialog by viewModel.showPageNumberDialog.collectAsState()
+    val showPagesSlider by viewModel.showPagesSlider.collectAsState()
     val pageNumber by viewModel.pageNumber
+    val numberOfPages = viewModel.state.value.numberOfPages
+    Log.d("number of pages", "$numberOfPages")
     val oneFingerScroll by viewModel.oneFingerScroll.collectAsState()
     // the list of bottom bar items, they are displayed in the same order
     val itemList: List<NavigationItem> = listOf(
         // this is just a place holder to be changed later with a working icon
-        NavigationItem(
-            title = stringResource(R.string.settings),
-            selectedIcon = {
-                Icon(Icons.Default.Settings, "")
-            },
-            showDialog = false,
-            onClick = {
-               // viewModel.setOneFingerScroll(!oneFingerScroll)
-                //viewModel.setVerticalScroll(!verticalScroll)
-               // viewModel.setShowCustomThemePage(true)
-            }
-        ),
+
 
         NavigationItem(
             title = stringResource(R.string.bookmarks),
-            selectedIcon = {
-                Icon(Icons.Default.Bookmarks, contentDescription = stringResource(R.string.bookmarks))
+            content = {
+                val currentPage = viewModel.pageNumber.value
+                val totalPages = 5  /*viewModel.state.value.numberOfPages*/
+                val progress = if (totalPages > 0) currentPage.toFloat() / totalPages else 0f
+
+                //LinearProgressIndicator(progress = { progress })
+                CircularProgressIndicator(
+                    progress = { progress },
+                    strokeWidth = 20.dp, // Adjust stroke width as needed
+                    color = Green // Customize color as needed
+                )
+                //Icon(Icons.Default.Bookmarks, contentDescription = stringResource(R.string.bookmarks))
             },
             showDialog = showBookmarkListDialog,
             onClick = {
-                viewModel.setShowBookmarkListDialog(!showBookmarkListDialog)
+                viewModel.setShowPagesSlider(!showPagesSlider)
                 viewModel.setShowThemeSelector(false)
                 viewModel.setShowFontSlider(false)
                 viewModel.setShowPageNumberDialog(false)
                 viewModel.setShowCustomThemePage(false)
             }
         ),
-
+        NavigationItem(
+            title = stringResource(R.string.settings),
+            content = {
+                //Icon(Icons.Default.Dashboard, "")
+            },
+            showDialog = false,
+            onClick = {
+                // viewModel.toggleShowUserInputPage()
+                //viewModel.setTopBarVisibility(false)
+                // viewModel.setOneFingerScroll(!oneFingerScroll)
+                //viewModel.setVerticalScroll(!verticalScroll)
+                // viewModel.setShowCustomThemePage(true)
+            }
+        ),
         NavigationItem(
             title = stringResource(R.string.page_number),
-            selectedIcon = {
+            content = {
                 Box(
                     modifier = Modifier
                         .background(
                             color = MaterialTheme.colorScheme.onSecondaryContainer, // Customize background color
-                            shape = RoundedCornerShape(16.dp)
+                            shape = RoundedCornerShape(12.dp)
                         )
                         .padding(8.dp),
-                    contentAlignment = Alignment.Center
-
                 ) {
+
+
+//                        Box(Modifier.padding(end = 4.dp)){
                     Text(
                         text = pageNumber.toString(),
                         color = MaterialTheme.colorScheme.secondaryContainer,
                         fontSize = 20.sp
                     )
                 }
+
+
             },
-            showDialog = false,
+            showDialog = showPageNumberDialog,
             onClick = {
                 viewModel.setShowPageNumberDialog(!showPageNumberDialog)
                 viewModel.setShowBookmarkListDialog(false)
@@ -102,8 +128,11 @@ fun ReadingPadBottomBar(
         ),
         NavigationItem(
             title = stringResource(R.string.font_size),
-            selectedIcon = {
-                Icon(Icons.Default.FormatSize, contentDescription = stringResource(R.string.adjust_font_size))
+            content = {
+                Icon(
+                    Icons.Default.FormatSize,
+                    contentDescription = stringResource(R.string.adjust_font_size)
+                )
             },
             showDialog = showFontSlider,
             onClick = {
@@ -117,8 +146,11 @@ fun ReadingPadBottomBar(
         ),
         NavigationItem(
             title = stringResource(R.string.themes),
-            selectedIcon = {
-                Icon(Icons.Default.ColorLens, contentDescription = stringResource(R.string.choose_a_theme))
+            content = {
+                Icon(
+                    Icons.Default.ColorLens,
+                    contentDescription = stringResource(R.string.choose_a_theme)
+                )
             },
             showDialog = showThemeSelector,
             onClick = {
@@ -141,13 +173,43 @@ fun ReadingPadBottomBar(
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             modifier = Modifier.padding(top = 4.dp)
         ) {
-            itemList.forEach { navigationItem ->
-                NavigationBarItem(
-                    modifier = Modifier.padding(4.dp),
-                    selected = navigationItem.showDialog,
-                    onClick = { navigationItem.onClick() },
-                    icon = navigationItem.selectedIcon,
-                )
+            //when the progress clicked
+            if (showPagesSlider) {
+                var number = pageNumber.toFloat()
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(vertical = 4.dp, horizontal = 16.dp)
+                        .background(LightBackground, RoundedCornerShape(10.dp)),
+                ) {
+                    IconButton(onClick = { viewModel.setShowPagesSlider(false) }) {
+                        Icon(Icons.Default.Cancel, contentDescription ="" )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Slider(
+                        modifier = Modifier.padding(4.dp),
+                        value = number,
+                        onValueChange = {
+                            number = it
+                            viewModel.navigateToPage(
+                                number.toInt() - 1,
+                                lazyListState = viewModel.lazyListState
+                            )
+                        },
+                        valueRange = 1f..5f,
+                        steps = 5
+                    )
+                }
+            } else {
+
+                itemList.forEach { navigationItem ->
+                    NavigationBarItem(
+                        modifier = Modifier.padding(4.dp),
+                        selected = navigationItem.showDialog,
+                        onClick = { navigationItem.onClick() },
+                        icon = navigationItem.content,
+                    )
+                }
             }
         }
     }
@@ -235,7 +297,8 @@ fun ReadingPadBottomBar(
 
 data class NavigationItem(
     val title: String,
-    val selectedIcon: @Composable () -> Unit,
+    //val modifier: Modifier,
+    val content: @Composable () -> Unit,
     var showDialog: Boolean,
     val onClick: () -> Unit = {}
 )

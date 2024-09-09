@@ -12,6 +12,7 @@ import androidx.room.PrimaryKey
  * @property pageNumber The page number where the highlight is located.
  * @property start The starting character index of the highlighted text.
  * @property end The ending character index of the highlighted text.
+ * @property text The highlighted text.
  */
 @Entity(tableName = "highlights")
 
@@ -21,5 +22,7 @@ data class Highlight(
     val chapterNumber: Int,
     val pageNumber: Int,
     val start: Int,
-    val end: Int
+    val end: Int,
+    val text: String,
+    val color: Int
 )
