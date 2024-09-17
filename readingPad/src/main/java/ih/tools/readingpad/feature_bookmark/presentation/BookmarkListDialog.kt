@@ -42,14 +42,13 @@ import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
 @Composable
 fun BookmarkListDialog(
     viewModel: BookContentViewModel,
-    backgroundHeight: Dp,
     dialogWidth: Dp,
     listState: LazyListState,
 ) {
     val bookmarks = viewModel.state.value.bookBookmarks
     val fontSize by viewModel.fontSize.collectAsState()
     val onDismiss = {
-        viewModel.setShowBookmarkListDialog(false)
+
     }
     //an outer box that fills the entire screen but transparent to allow the custom placement of the inner box
     Box(

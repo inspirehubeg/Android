@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -24,20 +25,26 @@ import ih.tools.readingpad.feature_book_fetching.domain.use_cases.getMetadata
 import ih.tools.readingpad.feature_book_parsing.domain.model.SpannedPage
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.convertPagesToSpannedPagesLazy
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.ui.UIStateViewModel
 
 /** This lazy column represents the inside of the ReadingPadScreen with pages as its items*/
 @Composable
 fun PagesScreen(
-    bookContentViewModel: BookContentViewModel,
+    viewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel,
     listState: LazyListState,
 ) {
     val context = LocalContext.current
-    val book = bookContentViewModel.book
+    val book = viewModel.book
 
     val firstVisibleItemIndex = remember { derivedStateOf { listState.firstVisibleItemIndex } }
-    bookContentViewModel.setPageNumber(firstVisibleItemIndex.value + 1)
+    viewModel.setPageNumber(firstVisibleItemIndex.value + 1)
 
-    val isLoading by bookContentViewModel.isLoading.collectAsState()
+    //when first visible item index == 0 then load the previous chapter and add it to the book
+
+    //when first visible item index == itemPages.size -2 then load the next chapter and add it to the book
+
+    val isLoading by viewModel.isLoading.collectAsState()
     //to be changed when a bigger book is available for use
     val currentChapterIndex = 0
     val currentChapter = book.chapters[currentChapterIndex]
@@ -49,33 +56,48 @@ fun PagesScreen(
 //            bookContentViewModel.getSpannedPagesForChapter(currentChapterIndex, currentChapter.pages)
 //        )
 //    }
-
+    val uiSettings = uiStateViewModel.uiSettings.collectAsState()
     // val pages = mutableListOf<Page>()
-    val itemPages = remember { mutableStateListOf<SpannedPage>() }
+    val itemPages = remember {
+        mutableStateOf(listOf<SpannedPage>())
+    }
+    // val itemPages = remember { mutableStateListOf<SpannedPage>() }
     val metadata = getMetadata(context)
-    val scrollable by bookContentViewModel.oneFingerScroll.collectAsState()
+    val scrollable by viewModel.oneFingerScroll.collectAsState()
     // to calculate the height and width of the screen
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp
     val screenWidth = configuration.screenWidthDp
+    val showHighlights = uiSettings.value.showHighlightsBookmarks
+//    if (itemPages.value.isNotEmpty() && firstVisibleItemIndex.value >= itemPages.value.size - 2) {
+//        Log.d(
+//            "PagesScreen",
+//            "fetch next chapter called firstVisibleItemIndex = ${firstVisibleItemIndex.value}, itemPages.size = ${itemPages.value.size}"
+//        )
+//        bookContentViewModel.fetchNextChapter()
+//    }
 
-    LaunchedEffect(key1 = book) { // Launch a coroutine when 'book' changes
+
+//    if (firstVisibleItemIndex.value == 0){
+//        bookContentViewModel.loadPreviousChapter()
+//    }
+    LaunchedEffect(key1 = viewModel.chapterCount.value) { // Launch a coroutine when 'chapter' changes
         val pages = book.chapters[book.chapters.size - 1].pages
+        Log.d("PagesScreen", "chapters size = ${book.chapters.size}")
         val spannedPages = convertPagesToSpannedPagesLazy(
             pages,
             metadata,
             context,
             book,
             listState,
-            bookContentViewModel
+            viewModel,
+            uiStateViewModel
         )
-        itemPages.clear()
+        //itemPages.clear()
         if (spannedPages.isNotEmpty()) {
-            itemPages.addAll(spannedPages)
-            Log.d("PagesScreen", "spanned pages is not empty ${itemPages[0].pageNumber}")
+            itemPages.value += spannedPages
+            Log.d("PagesScreen", "item pages size = ${itemPages.value.size}")
         } else Log.d("PagesScreen", "spanned pages is empty")
-
-
     }
 
 //    if (isLoading) {
@@ -90,11 +112,16 @@ fun PagesScreen(
         state = listState,
         userScrollEnabled = scrollable
     ) {
-        itemsIndexed(itemPages) { index, page ->
+        itemsIndexed(itemPages.value, key = { index, page ->
+            "${page.pageNumber}-${showHighlights}"
+        }) { index, page ->
+           val chapterIndex =  viewModel.getCurrentChapterIndex(page.pageNumber)
             XMLViewLazyItem(
                 page = page,
-                viewModel = bookContentViewModel,
-                modifier = Modifier
+                viewModel = viewModel,
+                modifier = Modifier,
+                chapterIndex = chapterIndex,
+                uiStateViewModel = uiStateViewModel
             )
             Spacer( //indicates the pages divider
                 modifier = Modifier

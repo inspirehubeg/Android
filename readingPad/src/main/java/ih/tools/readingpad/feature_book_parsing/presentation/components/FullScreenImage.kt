@@ -36,12 +36,14 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.ui.UIStateViewModel
 
 @Composable
 fun FullScreenImage(
     imageData: ByteArray,
     onClose: () -> Unit,
-    viewModel: BookContentViewModel
+    viewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel
 ) {
     val im = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
     val imageBitmap = im.asImageBitmap()
@@ -55,14 +57,15 @@ fun FullScreenImage(
             onClose = onClose
         )
 
-        PhotoImage(imageData, viewModel = viewModel )
+        PhotoImage(imageData, uiStateViewModel =  uiStateViewModel )
 
     }
 }
 
 @Composable
-fun PhotoImage(image: ByteArray, modifier: Modifier = Modifier, viewModel: BookContentViewModel) {
-    val rotation by viewModel.imageRotation.collectAsState()
+fun PhotoImage(image: ByteArray, modifier: Modifier = Modifier,
+               uiStateViewModel: UIStateViewModel) {
+    val rotation by uiStateViewModel.imageRotation.collectAsState()
     var zoom by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
     Log.d("PhotoImage", "rotation: ${rotation}")

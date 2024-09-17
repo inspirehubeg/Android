@@ -38,18 +38,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColorType
+import ih.tools.readingpad.ui.UIStateViewModel
 
 @Composable
 fun CustomThemeScreen(
     viewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel,
     dialogWidth: Dp,
 ) {
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val onDismiss = {
-        viewModel.setShowCustomThemePage(false)
+        //viewModel.setShowCustomThemePage(false)
+        uiStateViewModel.showDialog(null)
+        uiStateViewModel.showScreen(null)
     }
-    var backgroundColor by remember { mutableIntStateOf(viewModel.backgroundColor.value) }
-    var fontColor by remember { mutableIntStateOf(viewModel.fontColor.value) }
+//    var backgroundColor by remember { mutableIntStateOf(viewModel.backgroundColor.value) }
+//    var fontColor by remember { mutableIntStateOf(viewModel.fontColor.value) }
 
     //an outer box that fills the entire screen but transparent to allow the custom placement of the inner box
     Box(
@@ -75,8 +79,8 @@ fun CustomThemeScreen(
                             MaterialTheme.colorScheme.secondaryContainer,
                             shape = RoundedCornerShape(12)
                         )
-                        .fillMaxWidth()
-
+                        .fillMaxWidth(),
+                    uiStateViewModel = uiStateViewModel
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Box(
@@ -174,8 +178,9 @@ fun CustomThemeScreen(
 fun ThemePreviewer(
     viewModel: BookContentViewModel,
     modifier: Modifier,
+    uiStateViewModel: UIStateViewModel
 
-    ) {
+) {
     val fontColor by viewModel.currentThemeFontColor.observeAsState()
     val backgroundColor by viewModel.currentThemeBackgroundColor.observeAsState()
     //val fontSize by viewModel.fontSize.collectAsState()
@@ -207,9 +212,13 @@ fun ThemePreviewer(
         }
 
         FilledIconButton(onClick = {
-            viewModel.setShowCustomThemePage(false)
-            viewModel.setFontColor(fontColor!!)
-            viewModel.setBackgroundColor(backgroundColor!!)
+            uiStateViewModel.showScreen(null)
+            uiStateViewModel.showDialog(null)
+            uiStateViewModel.setFontColor(fontColor!!)
+            uiStateViewModel.setBackgroundColor(backgroundColor!!)
+//            viewModel.setShowCustomThemePage(false)
+//            viewModel.setFontColor(fontColor!!)
+//            viewModel.setBackgroundColor(backgroundColor!!)
         }) {
             Icon(
                 Icons.Filled.DoneAll,

@@ -1,7 +1,6 @@
 package ih.tools.readingpad.feature_book_fetching.domain.book_reader
 
 import book_reader.Offset
-import book_reader.TargetLink
 import com.google.gson.Gson
 
 data class Metadata(val encoding: Encoding, val tokenOffsets: List<Offset>, val targetLinks: List<TargetLink>) {

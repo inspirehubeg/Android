@@ -18,6 +18,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -27,20 +28,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.ui.UIStateViewModel
 import ih.tools.readingpad.ui.theme.Beige
 
 @Composable
 fun NavigationDrawer(
     drawerState: DrawerState,
     content: @Composable () -> Unit,
-    viewModel: BookContentViewModel
+    viewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel
 ) {
     // to calculate the height and width of the screen
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-
+    val drawerGesturesEnabled = uiStateViewModel.uiSettings.collectAsState().value.areDrawerGesturesEnabled
     ModalNavigationDrawer(
+        gesturesEnabled = drawerGesturesEnabled,
         drawerContent = {
             ModalDrawerSheet(
                 modifier = Modifier
@@ -69,7 +73,7 @@ fun NavigationDrawer(
                     Column {
                         if (selectedTabIndex == 0) {
                             BookIndexDrawerSheet(viewModel)
-                        } else UserInputsDrawerSheet(viewModel)
+                        } else UserInputsDrawerSheet(viewModel, uiStateViewModel)
                     }
                 }
             }
@@ -88,7 +92,8 @@ fun BookIndexDrawerSheet(
 
 @Composable
 fun UserInputsDrawerSheet(
-    viewModel: BookContentViewModel
+    viewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel
 ) {
 
     val lazyListState = viewModel.lazyListState
@@ -129,7 +134,8 @@ fun UserInputsDrawerSheet(
                                     targetIndex = bookmark.start,
                                     lazyListState = viewModel.lazyListState
                                 )
-                                viewModel.closeDrawer()
+                                //viewModel.closeDrawer()
+                                uiStateViewModel.setIsDrawerOpen(false)
                             })
                     }
                 }
@@ -171,7 +177,8 @@ fun UserInputsDrawerSheet(
                                     targetIndex = highlight.start,
                                     lazyListState = lazyListState
                                 )
-                                viewModel.closeDrawer()
+                                //viewModel.closeDrawer()
+                                uiStateViewModel.setIsDrawerOpen(false)
                             })
                     }
                 }
@@ -211,7 +218,8 @@ fun UserInputsDrawerSheet(
                                     targetIndex = note.start,
                                     lazyListState = viewModel.lazyListState
                                 )
-                                viewModel.closeDrawer()
+                                //viewModel.closeDrawer()
+                                uiStateViewModel.setIsDrawerOpen(false)
                             })
                     }
                 }

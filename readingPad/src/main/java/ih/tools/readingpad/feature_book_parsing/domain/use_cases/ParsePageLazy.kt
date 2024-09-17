@@ -10,6 +10,7 @@ import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Page
 import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
 import ih.tools.readingpad.feature_book_parsing.domain.model.SpannedPage
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.ui.UIStateViewModel
 
 /**
  * Parses the content of a page lazily, handling different elements like text, fonts, links, and images.
@@ -27,13 +28,14 @@ class ParsePageLazy {
      * @param viewModel The ViewModel associated with the book content.
      * @return A SpannableStringBuilder containing the parsed content with formatting and interactive elements.
      */
-    suspend fun invoke(
+     fun invoke(
         pageEncodedString: String,
         metadata: Metadata,
         context: Context,
         book: Book,
         lazyListState: LazyListState,
-        viewModel: BookContentViewModel
+        viewModel: BookContentViewModel,
+        uiStateViewModel: UIStateViewModel
     ): SpannableStringBuilder {
         val encoding = metadata.encoding
         val tagStart = encoding.tags.tagStart
@@ -91,13 +93,12 @@ class ParsePageLazy {
                     }
 
                     is ParsedElement.Image -> {
-                        Log.d("ParseBook", "Image element is ${parsedTag.content}")
                         pageSpannableStringBuilder =
                             ParseImage().invoke(
                                 parsedTag,
                                 pageSpannableStringBuilder,
                                 context,
-                                viewModel = viewModel
+                                uiStateViewModel
                             )
                     }
 
@@ -132,13 +133,15 @@ class ParsePageLazy {
  * @param bookContentViewModel The ViewModel associated with the book content.
  * @return A list of SpannedPage objects, where each page has its content formatted as a SpannableStringBuilder.
  */
-suspend fun convertPagesToSpannedPagesLazy(
+ fun convertPagesToSpannedPagesLazy(
     pages: List<Page>,
     metadata: Metadata,
     context: Context,
     book: Book,
     lazyListState: LazyListState,
-    bookContentViewModel: BookContentViewModel
+    bookContentViewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel
+
 ): List<SpannedPage> {
     val parsePageLazy = ParsePageLazy() // Create a single instance of ParsePageLazy
 
@@ -152,7 +155,8 @@ suspend fun convertPagesToSpannedPagesLazy(
                 context,
                 book,
                 lazyListState,
-                bookContentViewModel
+                bookContentViewModel,
+                uiStateViewModel
             )
         SpannedPage(decodedSpannedPage, pageContent.pageNumber)
     }

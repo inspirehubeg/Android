@@ -17,7 +17,6 @@ data class BookDetailsState (
     val bookDescription : String = "",
     val numberOfChapters: Int = 0,
     val numberOfPages: Int = 0,
-    val currentChapterNumber: Int = 0,
     val pageContent: String ="",
     val bookBookmarks: List<Bookmark> = emptyList(),
     val bookNotes: List<Note> = emptyList(),

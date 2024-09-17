@@ -19,9 +19,12 @@ import androidx.recyclerview.widget.RecyclerView
 import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkClickableSpan
+import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkSpan
 import ih.tools.readingpad.feature_highlight.domain.model.Highlight
+import ih.tools.readingpad.ui.UIStateViewModel
 import ih.tools.readingpad.util.BOOKMARK_ICON
 import ih.tools.readingpad.util.IHBackgroundSpan
+import ih.tools.readingpad.util.IHNoteClickableSpan
 import ih.tools.readingpad.util.IHNoteSpan
 import ih.tools.readingpad.util.IHSpan
 import ih.tools.readingpad.util.NOTE_ICON
@@ -77,7 +80,9 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
 
     private lateinit var spannableString: Spannable
     private lateinit var viewModel: BookContentViewModel
+    private lateinit var uiStateViewModel: UIStateViewModel
     var pageNumber: Int = 1
+    var chapterNumber: Int = 1
     private var fontSize by Delegates.notNull<Float>() //by Delegates.notNull() is used to initialize the variable later instead of late init with primitive types
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
@@ -99,7 +104,9 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
     fun setText(
         spannableStringBuilder: SpannableStringBuilder,
         bookContentViewModel: BookContentViewModel,
-        currentPageNumber: Int
+        stateViewModel: UIStateViewModel,
+        currentPageNumber: Int,
+        currentChapterIndex: Int
     ) {
         Log.d("IHTextView", "setText is called")
 
@@ -107,14 +114,19 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
         spannableString = this.getText().toSpannable()
 
         viewModel = bookContentViewModel
+        uiStateViewModel = stateViewModel
         fontSize = viewModel.fontSize.value
         pageNumber = currentPageNumber
-        coroutineScope.launch {
-            delay(200) // this delay to allow the coroutine to fetch the book bookmarks before getting the page bookmarks
-            viewModel.getHighlightsForPage(pageNumber, this@IHTextView)
-            viewModel.getBookmarksForPage(pageNumber, this@IHTextView)
-            viewModel.getNotesForPage(pageNumber, this@IHTextView)
+        chapterNumber = currentChapterIndex + 1
+        if (stateViewModel.uiSettings.value.showHighlightsBookmarks) {
+            coroutineScope.launch {
+                delay(200) // this delay to allow the coroutine to fetch the book bookmarks before getting the page bookmarks
+                viewModel.getHighlightsForPage(pageNumber, this@IHTextView)
+                viewModel.getBookmarksForPage(pageNumber, this@IHTextView)
+                viewModel.getNotesForPage(pageNumber, this@IHTextView)
+            }
         }
+
         this.customSelectionActionModeCallback =
             CustomMenu() //using custom selection menu with highlight and bookmark options
     }
@@ -128,7 +140,7 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
 
     fun getDatabaseIndex(index: Int): Int {
         val bookmarkSpans = spannableString.getSpans(0, index, IHBookmarkClickableSpan::class.java)
-        val noteSpans = spannableString.getSpans(0, index, IHNoteSpan::class.java)
+        val noteSpans = spannableString.getSpans(0, index, IHNoteClickableSpan::class.java)
         return index - ((bookmarkSpans.size * 3) + (noteSpans.size * 2))
     }
 
@@ -140,7 +152,7 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
      */
     private fun getViewIndex(index: Int): Int {
         val bookmarkSpans = spannableString.getSpans(0, index, IHBookmarkClickableSpan::class.java)
-        val noteSpans = spannableString.getSpans(0, index, IHNoteSpan::class.java)
+        val noteSpans = spannableString.getSpans(0, index, IHNoteClickableSpan::class.java)
 
         return index + ((bookmarkSpans.size * 3) + (noteSpans.size * 2))
     }
@@ -229,6 +241,10 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
         }
     }
 
+    fun removeBookmarkSpans(bookmarkId: Long) {
+
+    }
+
     /**
      * Removes a single custom span (highlight or bookmark) from the text.
      *
@@ -244,7 +260,7 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
             if (spanStart >= 3)
                 textSpan.replace(spanStart, spanStart + 3, "")
             spannableString = textSpan
-        } else if (span is IHNoteSpan) {
+        } else if (span is IHNoteClickableSpan) {
             val spanStart = spannableString.getSpanStart(span)
             textSpan.removeSpan(span)
             if (spanStart >= 2)
@@ -268,8 +284,10 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
      */
     fun drawSingleBookmark(id: Long, name: String, start: Int, end: Int, isViewIndex: Boolean) {
         var viewStart = start
+        var viewEnd = end
         if (!isViewIndex) {
             viewStart = getViewIndex(start)
+            viewEnd = getViewIndex(end)
         } else {
             for (i in start downTo 0) {
                 val char = spannableString[i]
@@ -278,19 +296,42 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
                     break
                 }
             }
+            for (i in end until spannableString.length) {
+                val char = spannableString[i]
+                if (char == ('\n')) {
+                    viewEnd = i - 1
+                    break
+                }
+            }
         }
+
+
         //val bookmarkIcon = "\uD83C\uDFF7\uFE0F"
         val textSpan = SpannableStringBuilder()
         textSpan.append(spannableString)
         textSpan.insert(viewStart, BOOKMARK_ICON) // Placeholder for the bookmark image
         spannableString = textSpan
 
-        val span = IHBookmarkClickableSpan(id = id, name = name, viewModel = viewModel)
-        viewModel.bookmarkSpans[id] = span
+        val clickableSpan = IHBookmarkClickableSpan(
+            id = id,
+            name = name,
+            viewModel = viewModel,
+            uiStateViewModel = uiStateViewModel
+        )
+
         spannableString.setSpan(
-            span,
+            clickableSpan,
             viewStart,
             viewStart + 3,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        val bookmarkSpan = IHBookmarkSpan(id = id)
+        viewModel.bookmarkClickableSpans[id] = clickableSpan
+        viewModel.bookmarkSpans[id] = bookmarkSpan
+        spannableString.setSpan(
+            bookmarkSpan,
+            viewStart,
+            viewEnd,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         Log.d("drawSingleBookmark", "drawSingleBookmark is called, start = $start, end = $end")
@@ -300,8 +341,10 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
 
     fun drawSingleNote(id: Long, noteText: String, start: Int, end: Int, isViewIndex: Boolean) {
         var viewStart = start
+        var viewEnd = end
         if (!isViewIndex) {
             viewStart = getViewIndex(start)
+            viewEnd = getViewIndex(end)
         }
 
         val textSpan = SpannableStringBuilder()
@@ -309,12 +352,25 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
         textSpan.insert(viewStart, NOTE_ICON) // Placeholder for the bookmark image
         spannableString = textSpan
 
-        val span = IHNoteSpan(id = id, text = noteText, viewModel = viewModel)
-        viewModel.noteSpans[id] = span
+        val span = IHNoteClickableSpan(
+            id = id,
+            text = noteText,
+            viewModel = viewModel,
+            uiStateViewModel = uiStateViewModel
+        )
+        viewModel.noteClickableSpans[id] = span
         spannableString.setSpan(
             span,
             viewStart,
             viewStart + 2,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        val noteSpan = IHNoteSpan(id = id)
+        viewModel.noteSpans[id] = noteSpan
+        spannableString.setSpan(
+            noteSpan,
+            viewStart,
+            viewEnd,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         Log.d("drawSingleBookmark", "drawSingleBookmark is called, start = $start, end = $end")
@@ -345,14 +401,17 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
         }
 
         val selectedSpans = spannableString.getSpans(spanStart, spanEnd, IHSpan::class.java)
-        viewModel.setSelectedSpans(selectedSpans)
+        viewModel.setSelectedSpans(selectedSpans.toList())
+        for (span in selectedSpans) {
+            Log.d("getBackgroundSpans", "selectedSpans = ${span.id}")
+        }
 
         return selectedSpans
     }
 
     private var scale = 1f
     private var initialPointerDistance = 0f
-    private var pressStart: Int = 0
+    var pressStart = -1
 
     /**
      * Handles touch events on the TextView.
@@ -365,6 +424,7 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
     override fun onTouch(view: View?, event: MotionEvent?): Boolean {
         if (event != null) {
             Log.d("onTouch", "onTouch is called")
+
             //whenever a touch happens on the screen the current text view is sent to the viewModel
             // to allow the highlight and bookmark functions in that exact text view
             viewModel.setTextView(this)
@@ -372,6 +432,8 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
             when (event.action and MotionEvent.ACTION_MASK) {
                 MotionEvent.ACTION_DOWN -> {
                     pressStart = this.getOffsetForPosition(event.x, event.y)
+                    pressStart = this.getOffsetForPosition(event.x, event.y)
+
                 }
 
                 MotionEvent.ACTION_POINTER_UP -> {
@@ -433,7 +495,12 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
                     // Check for a quick tap with no text selection to make the bars appear or disappear
                     if (event.eventTime - event.downTime < 300 && !hasSelection()) {
                         Log.d("onTouch", "quick tap")
-                        viewModel.setTopBarVisibility(!viewModel.showTopBar.value)
+                        // viewModel.setTopBarVisibility(!viewModel.showTopBar.value)
+                        if (!uiStateViewModel.uiSettings.value.pinnedTopBar){
+                            Log.d("onTouch", "topBar not pinned")
+                            uiStateViewModel.toggleTopBar(!uiStateViewModel.showTopBar.value)
+                        }
+
                     } else {
                         // Handle span selection
                         Log.d("onTouch", "selection")
@@ -491,20 +558,47 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
             }
         }
         val end = selectionEnd
-        val words = spannableString.substring(start, end).split(' ')
-        val bookmarkName = if (words.size >= 3) {
-            words.subList(0, 3).joinToString(" ")
-        } else words.joinToString(" ")
-        if (start != end) {
-            val bookmarkSpan =
-                IHBookmarkClickableSpan(viewModel = viewModel, name = bookmarkName)
-            //opens the dialog in the ui so that the user can add a name then save the bookmark to db
-            viewModel.setTextView(this@IHTextView)
-            viewModel.setBookmarkClickEvent(bookmarkSpan)
-            viewModel.setBookmarkStart(viewStart)
-            viewModel.setBookmarkName(bookmarkName)
-            viewModel.setBookmarkEnd(end)
-            viewModel.setBookmarkPageNumber(pageNumber)
+        var viewEnd: Int = end
+        for (i in end until spannableString.length) {
+            val char = spannableString[i]
+            if (char == ('\n')) {
+                viewEnd = i - 1
+                break
+            }
+            val text = spannableString.substring(start, end)
+                .replace(NOTE_ICON, "")
+                .replace(BOOKMARK_ICON, "")
+
+
+            val words = text.split(' ')
+            Log.d("filterWords", "filteredWords = $words")
+
+            val bookmarkName = if (words.size >= 3) {
+                words.subList(0, 3).joinToString(" ")
+            } else words.joinToString(" ")
+
+            if (start != end) {
+                val bookmarkClickableSpan =
+                    IHBookmarkClickableSpan(
+                        viewModel = viewModel,
+                        name = bookmarkName,
+                        uiStateViewModel = uiStateViewModel
+                    )
+                //opens the dialog in the ui so that the user can add a name then save the bookmark to db
+                viewModel.setTextView(this@IHTextView)
+                //viewModel.setBookmarkClickEvent(bookmarkClickableSpan)
+                uiStateViewModel.setBookmarkClickEvent(bookmarkClickableSpan)
+                uiStateViewModel.setBookmarkData( // Use uiStateViewModel for state
+                    viewStart,
+                    bookmarkName,
+                    viewEnd,
+                    pageNumber
+                )
+//                viewModel.setBookmarkStart(viewStart)
+//                viewModel.setBookmarkName(bookmarkName)
+//                viewModel.setBookmarkEnd(viewEnd)
+//                viewModel.setBookmarkPageNumber(pageNumber)
+            }
         }
     }
 
@@ -512,7 +606,10 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
         val start = selectionStart
         val end = selectionEnd
 
-        val words = spannableString.substring(start, end).split(' ')
+        val text = spannableString.substring(start, end)
+            .replace(NOTE_ICON, "")
+            .replace(BOOKMARK_ICON, "")
+        val words = text.split(' ')
         val highlightText = if (words.size >= 3) {
             words.subList(0, 3).joinToString(" ")
         } else words.joinToString(" ")
@@ -524,7 +621,7 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
                 end,
                 this@IHTextView,
                 highlightText,
-                color = viewModel.preferredHighlightColor.value.toArgb()
+                color = uiStateViewModel.preferredHighlightColor.value.toArgb()
             )
         }
     }
@@ -553,16 +650,25 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
         val end = selectionEnd
         if (start != end) {
             val noteSpan =
-                IHNoteSpan(viewModel = viewModel, text = "")
+                IHNoteClickableSpan(
+                    viewModel = viewModel,
+                    uiStateViewModel = uiStateViewModel,
+                    text = ""
+                )
             //opens the dialog in the ui so that the user can add a name then save the note to db
             viewModel.setTextView(this@IHTextView)
-            viewModel.setNoteClickEvent(noteSpan)
-            viewModel.setNoteStart(start)
-            viewModel.setNoteEnd(end)
-            viewModel.setNotePageNumber(pageNumber)
+            // viewModel.setNoteClickEvent(noteSpan)
+            uiStateViewModel.setNoteClickEvent(noteSpan)
+            uiStateViewModel.setNoteData( // Use uiStateViewModel for state
+                start,
+                end,
+                pageNumber
+            )
+//            viewModel.setNoteStart(start)
+//            viewModel.setNoteEnd(end)
+//            viewModel.setNotePageNumber(pageNumber)
         }
     }
-
 
 
     /**
@@ -603,12 +709,15 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
             mode: ActionMode,
             menu: Menu
         ): Boolean {
-            viewModel.setTopBarVisibility(true)
-            viewModel.setShowCustomSelectionMenu(true)
+            uiStateViewModel.toggleTopBar(true)
+            uiStateViewModel.setShowCustomSelectionMenu(true)
+//            viewModel.setTopBarVisibility(true)
+//            viewModel.setShowCustomSelectionMenu(true)
             viewModel.setTextView(this@IHTextView)
 
             menu.clear()
-            val highLightSpans = viewModel.selectedSpans.value.filterIsInstance<IHBackgroundSpan>()
+            val highLightSpans =
+                viewModel.selectedSpans.value.filterIsInstance<IHBackgroundSpan>()
             // Show/hide highlight actions based on selection
             if (highLightSpans.isEmpty()) {
                 menu.findItem(R.id.action_yellow_highlight)?.isVisible = true
@@ -693,13 +802,14 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
          * @param mode The ActionMode that was destroyed.
          */
         override fun onDestroyActionMode(mode: ActionMode?) {
-            viewModel.setShowCustomSelectionMenu(false)
-            viewModel.setTopBarVisibility(true)
+//            viewModel.setShowCustomSelectionMenu(false)
+//            viewModel.setTopBarVisibility(true)
+            uiStateViewModel.toggleTopBar(true)
+            uiStateViewModel.setShowCustomSelectionMenu(false)
+
         }
     }
 }
 
 
-
-
-
+//var pressStart: Int = -1

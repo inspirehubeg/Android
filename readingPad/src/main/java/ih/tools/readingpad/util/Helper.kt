@@ -49,6 +49,7 @@ fun updateTextViewStyle(
     fontColor: Int,
     fontWeight: Int
 ) {
+
     textView.textSize = fontSize
     textView.setTextColor(fontColor)
     textView.setTypeface(

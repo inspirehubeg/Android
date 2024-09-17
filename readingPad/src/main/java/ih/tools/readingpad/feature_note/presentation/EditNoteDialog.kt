@@ -1,8 +1,11 @@
 package ih.tools.readingpad.feature_note.presentation
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -15,29 +18,34 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.ui.UIStateViewModel
 
 @Composable
 fun EditNoteDialog(
     viewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel
 ) {
-    var noteText by remember { mutableStateOf(viewModel.noteClickEvent.value?.noteText) }
-    val noteId by remember { mutableStateOf(viewModel.noteClickEvent.value?.id) }
+   // var noteText by remember { mutableStateOf(viewModel.noteClickEvent.value?.noteText) }
+    val noteText = uiStateViewModel.noteClickEvent.collectAsState().value?.noteText
+    //val noteId by remember { mutableStateOf(viewModel.noteClickEvent.value?.id) }
+    val noteId = uiStateViewModel.noteClickEvent.collectAsState().value?.id
     val context = LocalContext.current
 
     val onDismiss = {
-        viewModel.setShowEditNoteDialog(false)
-        viewModel.setNoteClickEvent(null)
+//        viewModel.setShowEditNoteDialog(false)
+//        viewModel.setNoteClickEvent(null)
+        uiStateViewModel.showDialog(null)
+        uiStateViewModel.setNoteClickEvent(null)
+        uiStateViewModel.setNoteText("")
     }
 
     AlertDialog(
@@ -46,16 +54,29 @@ fun EditNoteDialog(
             onDismiss()
         },
 
-        //title = { Text("Enter Bookmark Name") },
+        title = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = "Edit Note",
+                    textAlign = TextAlign.Center, // Center align text
+                    modifier = Modifier.align(Alignment.Center) // Center within the Box)
+                )
+            }
+        },
         text = {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Note")
-                Spacer(modifier = Modifier.width(4.dp))
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 TextField(
-                    singleLine = true,
-                    placeholder = { Text(stringResource(R.string.bookmark_placeholder))  },
                     value = noteText!!,
-                    onValueChange = { noteText = it }
+                    onValueChange = { uiStateViewModel.setNoteText(it) },
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         },
@@ -91,14 +112,16 @@ fun EditNoteDialog(
                 FilledIconButton(
                     modifier = Modifier,
                     onClick = {
-                        if (viewModel.noteSpans[noteId] != null) {
-                            viewModel.updateNoteText(
-                                noteId!!,
-                                newText = noteText!!.ifBlank {
-                                    context.getString(R.string.default_new_bookmark_name)
-                                }
-                            )
-                            viewModel.setNoteClickEvent(null)
+                        if (viewModel.noteClickableSpans[noteId] != null) {
+                            if (noteText != null) {
+                                viewModel.updateNoteText(
+                                    noteId!!,
+                                    newText = noteText.ifBlank {
+                                        context.getString(R.string.default_new_bookmark_name)
+                                    }
+                                )
+                            }
+                            uiStateViewModel.setNoteClickEvent(null)
                         }
                         onDismiss()
                     }

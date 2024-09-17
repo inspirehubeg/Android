@@ -12,6 +12,7 @@ import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Page
 import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
 import ih.tools.readingpad.feature_book_parsing.domain.model.SpannedPage
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.ui.UIStateViewModel
 
 /**
  * Parses the content of a book, handling different elements like text, fonts, links, and images.
@@ -35,7 +36,8 @@ class ParseBook {
         context: Context,
         book: Book,
         recyclerView: RecyclerView,
-        viewModel: BookContentViewModel
+        viewModel: BookContentViewModel,
+        uiStateViewModel: UIStateViewModel
     ): SpannableStringBuilder {
         val encoding = metadata.encoding
         val TAG_START = encoding.tags.tagStart
@@ -91,7 +93,7 @@ class ParseBook {
                     // if the parsed tag is an image
                     is ParsedElement.Image -> {
                         Log.d("ParseBook", "Image element is ${parsedTag.content}")
-                        pageSpannableStringBuilder = ParseImage().invoke(parsedTag, pageSpannableStringBuilder, context, viewModel = viewModel )
+                        pageSpannableStringBuilder = ParseImage().invoke(parsedTag, pageSpannableStringBuilder, context, uiStateViewModel = uiStateViewModel )
                     }
 
                 }
@@ -191,8 +193,9 @@ suspend fun convertPagesToSpannedPages(
     val parseBook = ParseBook() // Create a single instance of ParseBook
     return pages.map { pageContent ->
         // Apply formatting to spannableContent here
-        val decodedSpannedPage =
-            parseBook.invoke(pageContent.body.text, metadata, context, book, recyclerView,bookContentViewModel)
-        SpannedPage(decodedSpannedPage, pageContent.pageNumber)
+//        val decodedSpannedPage =
+//            parseBook.invoke(pageContent.body.text, metadata, context, book, recyclerView,bookContentViewModel)
+        val spannableStringBuilder = SpannableStringBuilder()
+        SpannedPage(spannableStringBuilder, pageContent.pageNumber)
     }
 }

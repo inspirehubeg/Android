@@ -91,7 +91,16 @@ fun applyLinkCustomizationsLazy(
             ds.isUnderlineText = true
         }
         override fun onClick(widget: View) {
+            Log.d("onTouch", "onClick called")
+            //val textView = widget as IHTextView
+            if (widget is IHTextView) {
+                if (widget.pressStart != -1 && (widget.pressStart <= start || widget.pressStart >= end)){
+                    Log.d("onTouch", "clicked out of scope")
+                    return
+                }
+            }
             val targetLink = metadata.targetLinks.find { it.key == key } ?: return
+
 
             val targetChapterNumber = targetLink.chapterNumber
             val targetPageNumber = targetLink.pageNumber

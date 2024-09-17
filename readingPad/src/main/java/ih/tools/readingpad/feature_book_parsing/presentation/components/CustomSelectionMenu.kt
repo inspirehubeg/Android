@@ -1,5 +1,6 @@
 package ih.tools.readingpad.feature_book_parsing.presentation.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,7 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.NoteAdd
+import androidx.compose.material.icons.automirrored.filled.SpeakerNotes
 import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.ContentCopy
@@ -33,7 +34,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
-import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkClickableSpan
+import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkSpan
+import ih.tools.readingpad.ui.UIStateViewModel
 import ih.tools.readingpad.ui.theme.BookmarkDialogBrown
 import ih.tools.readingpad.ui.theme.HighlightCheeseOrange
 import ih.tools.readingpad.ui.theme.HighlightFrenchLime
@@ -44,21 +46,22 @@ import ih.tools.readingpad.util.IHBackgroundSpan
 import ih.tools.readingpad.util.IHNoteSpan
 
 @Composable
-fun CustomSelectionMenu(viewModel: BookContentViewModel) {
+fun CustomSelectionMenu(
+    viewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel
+) {
     val showColorsMenu = remember { mutableStateOf(false) }
-    val preferredHighlightColor by viewModel.preferredHighlightColor.collectAsState()
+    //val preferredHighlightColor by viewModel.preferredHighlightColor.collectAsState()
+   // val selectedSpans by viewModel.selectedSpans.collectAsState()
+// Update state observation
+    val preferredHighlightColor by uiStateViewModel.preferredHighlightColor.collectAsState()
     val selectedSpans by viewModel.selectedSpans.collectAsState()
-
-    val highLightSpans = selectedSpans.filterIsInstance<IHBackgroundSpan>()
-    val bookmarkSpans = selectedSpans.filterIsInstance<IHBookmarkClickableSpan>()
-    val noteSpans = selectedSpans.filterIsInstance<IHNoteSpan>()
-
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (highLightSpans.isEmpty()) {
+        if (selectedSpans.filterIsInstance<IHBackgroundSpan>().isEmpty()) {
             Row(
                 modifier = Modifier
                     .padding(vertical = 4.dp)
@@ -67,8 +70,7 @@ fun CustomSelectionMenu(viewModel: BookContentViewModel) {
                             (BookmarkDialogBrown)
                         } else {
                             (Color.Transparent)
-                        },
-                        shape = RoundedCornerShape(8.dp)
+                        }, shape = RoundedCornerShape(8.dp)
                     ),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
@@ -80,15 +82,16 @@ fun CustomSelectionMenu(viewModel: BookContentViewModel) {
                         modifier = Modifier.padding(horizontal = 4.dp)
                     ) {
                         items(highlightColors) { color ->
-                            if (color != preferredHighlightColor)
-                                Box(modifier = Modifier
-                                    .size(20.dp)
-                                    .background(color, CircleShape)
-                                    .clickable {
-                                        viewModel.setPreferredHighlightColor(color)
-                                        viewModel.textView.value?.addHighlightOnText()
-                                        showColorsMenu.value = false
-                                    })
+                            if (color != preferredHighlightColor) Box(modifier = Modifier
+                                .size(20.dp)
+                                .background(color, CircleShape)
+                                .clickable {
+                                    // Update event triggering
+                                    uiStateViewModel.setPreferredHighlightColor(color)
+                                    //viewModel.setPreferredHighlightColor(color)
+                                    viewModel.textView.value?.addHighlightOnText()
+                                    showColorsMenu.value = false
+                                })
                             Spacer(modifier = Modifier.width(4.dp))
                         }
                     }
@@ -96,27 +99,22 @@ fun CustomSelectionMenu(viewModel: BookContentViewModel) {
 
 
                 Row(
-                    modifier = Modifier,
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier, verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Box(
-                        modifier = Modifier
-                            .size(20.dp)
-                            .background(
-                                color = preferredHighlightColor,
-                                shape = CircleShape
-                            )
-                            .clickable {
-                                showColorsMenu.value = !showColorsMenu.value
-                            }
-                    )
+                    Box(modifier = Modifier
+                        .size(20.dp)
+                        .background(
+                            color = preferredHighlightColor, shape = CircleShape
+                        )
+                        .clickable {
+                            showColorsMenu.value = !showColorsMenu.value
+                        })
 
 
-                    IconButton(
-                        onClick = { // handle highlight
-                            viewModel.textView.value?.addHighlightOnText()
-                        }) {
+                    IconButton(onClick = { // handle highlight
+                        viewModel.textView.value?.addHighlightOnText()
+                    }) {
                         Icon(Icons.Default.Brush, contentDescription = "Highlight")
                     }
                 }
@@ -128,30 +126,28 @@ fun CustomSelectionMenu(viewModel: BookContentViewModel) {
             }) {
                 Icon(
                     modifier = Modifier.size(24.dp),
-                    painter = painterResource(id =R.drawable.eraser),
-                    contentDescription = "remove highlight")
+                    painter = painterResource(id = R.drawable.eraser),
+                    contentDescription = "remove highlight"
+                )
             }
         }
 
 
-        if (bookmarkSpans.isEmpty()){
+        if (selectedSpans.filterIsInstance<IHBookmarkSpan>().isEmpty()) {
+            Log.d("bookmark", "bookmark list is empty")
             IconButton(onClick = { // handle Add Bookmark
                 viewModel.textView.value?.addBookmarkOnText()
             }) {
                 Icon(Icons.Default.BookmarkAdd, contentDescription = "Bookmark")
             }
-        } else {
-//            IconButton(onClick = { // handle remove bookmark
-//                viewModel.removeBookmarkById()
-//            }) {
-//                Icon(Icons.Default.BookmarkRemove, contentDescription = "remove bookmark")
-//            }
         }
 
-        IconButton(onClick = { // handle Add Note
-            viewModel.textView.value?.addNoteOnText()
-        }) {
-            Icon(Icons.AutoMirrored.Filled.NoteAdd, contentDescription = "Note")
+        if (selectedSpans.filterIsInstance<IHNoteSpan>().isEmpty()) {
+            IconButton(onClick = { // handle Add Note
+                viewModel.textView.value?.addNoteOnText()
+            }) {
+                Icon(Icons.AutoMirrored.Filled.SpeakerNotes, contentDescription = "Note")
+            }
         }
 
         IconButton(onClick = { // handle text copy

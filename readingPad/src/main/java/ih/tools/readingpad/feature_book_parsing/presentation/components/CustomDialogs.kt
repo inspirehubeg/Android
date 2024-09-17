@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.ui.UIStateViewModel
 
 
 /** The font size slider */
@@ -36,6 +37,7 @@ import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewMode
 @Composable
 fun CustomFontDialog(
     viewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel
 ) {
     val fontSize by viewModel.fontSize.collectAsState()
     //outer transparent box to allow the custom positioning of the slider
@@ -44,7 +46,7 @@ fun CustomFontDialog(
             .fillMaxSize()
             .padding(bottom = 40.dp)
             .clickable(onClick = {
-                viewModel.setShowFontSlider(false)
+                uiStateViewModel.showDialog(null)
             })
     ) {
 
@@ -71,7 +73,7 @@ fun CustomFontDialog(
 }
 
 @Composable
-fun PageSelector(viewModel: BookContentViewModel, listState: LazyListState) {
+fun PageSelector(viewModel: BookContentViewModel, listState: LazyListState, uiStateViewModel: UIStateViewModel) {
     var number: String by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(true) }
     Box(
@@ -80,7 +82,7 @@ fun PageSelector(viewModel: BookContentViewModel, listState: LazyListState) {
             .fillMaxSize()
             .padding(bottom = 50.dp)
             .clickable(onClick = {
-                viewModel.setShowPageNumberDialog(false)
+                uiStateViewModel.showDialog(null)
             })
     ) {
         Box(
@@ -125,7 +127,8 @@ fun PageSelector(viewModel: BookContentViewModel, listState: LazyListState) {
                     modifier = Modifier.weight(1f),
                     onClick = {
                         viewModel.navigateToPage(number.toInt() - 1, listState)
-                        viewModel.setShowPageNumberDialog(false)
+                        uiStateViewModel.showDialog(null)
+                       // viewModel.setShowPageNumberDialog(false)
                     }
                 ) {
                     Text("Go")

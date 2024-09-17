@@ -14,6 +14,7 @@ import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.domain.model.SpannedPage
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.feature_book_parsing.presentation.text_view.IHTextView
+import ih.tools.readingpad.ui.UIStateViewModel
 import ih.tools.readingpad.util.updateTextViewStyle
 
 /**this is used as the item of the lazy column each XML view represents a textView represents a single page*/
@@ -21,7 +22,9 @@ import ih.tools.readingpad.util.updateTextViewStyle
 fun XMLViewLazyItem(
     page: SpannedPage,
     viewModel: BookContentViewModel,
-    modifier: Modifier
+    uiStateViewModel: UIStateViewModel,
+    modifier: Modifier,
+    chapterIndex: Int,
 ) {
     // Create a SpannableString from the book content
     val spannableString = remember {
@@ -42,7 +45,7 @@ fun XMLViewLazyItem(
 
             textView.movementMethod = LinkMovementMethod.getInstance() //enables the navigation
             // at the creation of each TextView we set the text with the page content
-            textView.setText(spannableString.value, viewModel, page.pageNumber)
+            textView.setText(spannableString.value, viewModel,uiStateViewModel, page.pageNumber, chapterIndex, )
             //pass the first text view to the viewModel after creation for the navigation of the links in the first page
             if (page.pageNumber == 1) {
                 viewModel.setTextView(textView)
@@ -59,6 +62,7 @@ fun XMLViewLazyItem(
                 viewModel.setTextView(textView)
                 viewModel.setLinkNavigationPage(false)
             }
+
             //this fun updates the text styles of the text view whenever any of these values change
             updateTextViewStyle(
                 textView,

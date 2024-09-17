@@ -20,10 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.ui.UIStateViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FullScreenImageTopBar(viewModel: BookContentViewModel) {
+fun FullScreenImageTopBar(
+    viewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel
+) {
 
     Surface(modifier = Modifier.height(48.dp)) {
         CenterAlignedTopAppBar(
@@ -41,8 +45,8 @@ fun FullScreenImageTopBar(viewModel: BookContentViewModel) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ){
                     IconButton(onClick = {
-                        if (viewModel.imageRotation.value == 0f || viewModel.imageRotation.value == 90f) {
-                            viewModel.setImageRotation(viewModel.imageRotation.value - 90f)
+                        if (uiStateViewModel.imageRotation.value == 0f || uiStateViewModel.imageRotation.value == 90f) {
+                            uiStateViewModel.setImageRotation(uiStateViewModel.imageRotation.value - 90f)
                         }
                         //Log.d("FullScreenImage", "rotation: $rotation")
                     }) {
@@ -50,8 +54,8 @@ fun FullScreenImageTopBar(viewModel: BookContentViewModel) {
                     }
 
                     IconButton(onClick = {
-                        if (viewModel.imageRotation.value == 0f || viewModel.imageRotation.value == -90f) {
-                            viewModel.setImageRotation(viewModel.imageRotation.value + 90f)
+                        if (uiStateViewModel.imageRotation.value == 0f || uiStateViewModel.imageRotation.value == -90f) {
+                            uiStateViewModel.setImageRotation(uiStateViewModel.imageRotation.value + 90f)
                         }
                     }) {
                         Icon( Icons.Default.Rotate90DegreesCw, contentDescription = "Rotate Right")
@@ -63,9 +67,12 @@ fun FullScreenImageTopBar(viewModel: BookContentViewModel) {
             actions = {
                 // this is the right part of the top bar
                 IconButton(onClick = {
-                    viewModel.setImageRotation(0f)
-                    viewModel.setShowFullScreenImage(false)
-                    viewModel.onImageClick(null) // Reset the clicked image state
+//                    viewModel.setImageRotation(0f)
+//                    viewModel.setShowFullScreenImage(false)
+//                    viewModel.onImageClick(null) // Reset the clicked image state
+                    uiStateViewModel.setImageRotation(0f)
+                    uiStateViewModel.showScreen(null)
+                    uiStateViewModel.onImageClick(null)
                 }) {
                     Icon(Icons.Default.Close, contentDescription = "close image")
                 }

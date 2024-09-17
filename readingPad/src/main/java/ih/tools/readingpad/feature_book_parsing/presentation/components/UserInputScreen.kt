@@ -16,9 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.ui.UIStateViewModel
 
 @Composable
-fun UserInputScreen(viewModel: BookContentViewModel, height: Dp, offset: Dp){
+fun UserInputScreen(uiStateViewModel: UIStateViewModel, viewModel: BookContentViewModel, height: Dp, offset: Dp){
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -29,7 +30,7 @@ fun UserInputScreen(viewModel: BookContentViewModel, height: Dp, offset: Dp){
     ) {
         Column {
             // Back button
-            IconButton(onClick = { viewModel.toggleShowUserInputPage() }) {
+            IconButton(onClick = { uiStateViewModel.showScreen(UIStateViewModel.ScreenType.UserInput) }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
 

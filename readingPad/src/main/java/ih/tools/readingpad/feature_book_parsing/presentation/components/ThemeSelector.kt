@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.ui.UIStateViewModel
 import ih.tools.readingpad.ui.theme.DarkBackground
 import ih.tools.readingpad.ui.theme.DarkGray
 import ih.tools.readingpad.ui.theme.LightBackground
@@ -40,10 +41,14 @@ import ih.tools.readingpad.ui.theme.LightGray
 @Composable
 fun ThemeSelectorMenu(
     viewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel
 ) {
 
-    val backgroundColor = viewModel.backgroundColor.collectAsState().value
-    val textColor = viewModel.fontColor.collectAsState().value
+   // val backgroundColor = viewModel.backgroundColor.collectAsState().value
+    val backgroundColor = uiStateViewModel.uiSettings.collectAsState().value.backgroundColor
+   // val textColor = viewModel.fontColor.collectAsState().value
+    val textColor = uiStateViewModel.uiSettings.collectAsState().value.fontColor
+
     val isLightTheme =
         (backgroundColor == LightBackground.toArgb()) && (textColor == DarkGray.toArgb())
     val isSepiaTheme =
@@ -52,7 +57,7 @@ fun ThemeSelectorMenu(
         (backgroundColor == DarkBackground.toArgb()) && (textColor == LightGray.toArgb())
     val isCustomTheme = !isDarkTheme && !isLightTheme && !isSepiaTheme
 
-    val onDismissRequest = { viewModel.setShowThemeSelector(false) }
+    val onDismissRequest = { uiStateViewModel.showDialog(null) }
     //outer transparent box that allows the custom positioning of the theme menu
     Box(
         modifier = Modifier
@@ -77,7 +82,7 @@ fun ThemeSelectorMenu(
                     textColor = LightGray.toArgb(),
                     isSelected = isDarkTheme,
                     onClick = {
-                        viewModel.setDarkTheme(
+                        uiStateViewModel.setDarkTheme(
                             true,
                             LightGray.toArgb(),
                             backgroundColor = DarkBackground.toArgb()
@@ -92,7 +97,7 @@ fun ThemeSelectorMenu(
                     textColor = DarkGray.toArgb(),
                     isSelected = isLightTheme,
                     onClick = {
-                        viewModel.setDarkTheme(
+                        uiStateViewModel.setDarkTheme(
                             false,
                             DarkGray.toArgb(),
                             backgroundColor = LightBackground.toArgb()
@@ -107,7 +112,7 @@ fun ThemeSelectorMenu(
                     textColor = LightBrown.toArgb(),
                     isSelected = isSepiaTheme,
                     onClick = {
-                        viewModel.setDarkTheme(
+                        uiStateViewModel.setDarkTheme(
                             false,
                             LightBrown.toArgb(),
                             backgroundColor = LightBeige2.toArgb()
@@ -128,8 +133,10 @@ fun ThemeSelectorMenu(
                             .background(color = MaterialTheme.colorScheme.surface)
                     ) {
                         IconButton(onClick = {
-                            viewModel.setShowThemeSelector(false)
-                            viewModel.setShowCustomThemePage(true)
+//                            viewModel.setShowThemeSelector(false)
+//                            viewModel.setShowCustomThemePage(true)
+                            uiStateViewModel.showDialog(null)
+                            uiStateViewModel.showScreen(UIStateViewModel.ScreenType.CustomTheme)
                         }) {
                             Icon(
                                 Icons.Default.Add,

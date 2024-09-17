@@ -46,7 +46,7 @@ class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(viewModel: BookContentViewModel, page: SpannedPage) {
         Log.d("IHTextView", "bind is called")
-        textView.setText(page.content, viewModel, currentPageNumber = page.pageNumber)
+        //textView.setText(page.content, viewModel, currentPageNumber = page.pageNumber)
         Log.d("BookContentViewModel", "page number in bind = ${page.pageNumber}")
         viewModel.setTextView(textView)
 

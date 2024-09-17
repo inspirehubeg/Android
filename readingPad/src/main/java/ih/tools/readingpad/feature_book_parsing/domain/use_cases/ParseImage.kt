@@ -15,7 +15,7 @@ import android.text.style.ImageSpan
 import android.util.DisplayMetrics
 import android.view.View
 import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
-import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.ui.UIStateViewModel
 
 /**
  * Parses image elements within a book and adds them to a SpannableStringBuilder.
@@ -34,11 +34,11 @@ class ParseImage {
         parsedTag: ParsedElement.Image,
         spannedText: SpannableStringBuilder,
         context: Context,
-        viewModel: BookContentViewModel
+        uiStateViewModel: UIStateViewModel
     ): SpannableStringBuilder {
         val start = spannedText.length
         val spannedImage =
-            addPhoto(parsedTag.alignment, parsedTag.content, parsedTag.ratio, context, viewModel)
+            addPhoto(parsedTag.alignment, parsedTag.content, parsedTag.ratio, context, uiStateViewModel )
         spannedText.append(spannedImage)
         return spannedText
     }
@@ -60,7 +60,7 @@ fun addPhoto(
     byteArray: ByteArray,
     ratio: Int,
     context: Context,
-    viewModel: BookContentViewModel
+    uiStateViewModel: UIStateViewModel
 ): SpannableString {
 
     val spannableString = SpannableString("0") //Use a placeholder character
@@ -114,7 +114,8 @@ fun addPhoto(
     val clickableSpan = object : ClickableSpan() {
         override fun onClick(widget: View) {
             // Trigger the event to display the larger image
-            viewModel.onImageClick(byteArray)
+            //viewModel.onImageClick(byteArray)
+            uiStateViewModel.onImageClick(byteArray)
         }
     }
     spannableString.setSpan(clickableSpan, 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
