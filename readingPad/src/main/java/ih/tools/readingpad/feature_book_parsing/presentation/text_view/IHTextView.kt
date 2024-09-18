@@ -115,7 +115,8 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
 
         viewModel = bookContentViewModel
         uiStateViewModel = stateViewModel
-        fontSize = viewModel.fontSize.value
+        //fontSize = viewModel.fontSize.value
+        fontSize = stateViewModel.uiSettings.value.fontSize
         pageNumber = currentPageNumber
         chapterNumber = currentChapterIndex + 1
         if (stateViewModel.uiSettings.value.showHighlightsBookmarks) {
@@ -469,13 +470,13 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
                             scale = scale.coerceIn(minScale, maxScale) // Adjust zoom limits
                             val newFontSize = fontSize * scale
                             textSize = newFontSize // Update text size
-                            viewModel.setFontSize(
+                            uiStateViewModel.setFontSize(
                                 newFontSize,
                                 event.y
                             ) // Save the updated font size
-                            if (viewModel.fontSizeChanged.value) {
+                            if (uiStateViewModel.fontSizeChanged.value) {
                                 //viewModel.scrollToIndex(pageNumber - 1)
-                                viewModel.setFontSizeChanged(false)
+                                uiStateViewModel.setFontSizeChanged(false)
                             }
                             initialPointerDistance = currentDistance
 //                    }

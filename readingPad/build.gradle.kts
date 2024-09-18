@@ -84,4 +84,7 @@ dependencies {
     //colorPicker
 
     implementation(libs.compose.colorpicker)
+
+    //Apache POI for word doc
+    implementation (libs.poi.ooxml)
 }

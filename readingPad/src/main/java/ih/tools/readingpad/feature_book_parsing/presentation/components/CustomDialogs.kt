@@ -39,7 +39,7 @@ fun CustomFontDialog(
     viewModel: BookContentViewModel,
     uiStateViewModel: UIStateViewModel
 ) {
-    val fontSize by viewModel.fontSize.collectAsState()
+    val fontSize = uiStateViewModel.uiSettings.collectAsState().value.fontSize
     //outer transparent box to allow the custom positioning of the slider
     Box(
         modifier = Modifier
@@ -63,7 +63,7 @@ fun CustomFontDialog(
             Slider(
                 value = fontSize,
                 onValueChange = { newSize ->
-                    viewModel.setFontSize(newSize, 0f)
+                    uiStateViewModel.setFontSize(newSize, 0f)
                 },
                 valueRange = 12f..32f,
                 steps = 24

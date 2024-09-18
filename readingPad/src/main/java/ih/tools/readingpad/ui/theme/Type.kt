@@ -2,9 +2,12 @@ package ih.tools.readingpad.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import ih.tools.readingpad.R
 
 // Set of Material typography styles to start with
 val Typography = Typography(
@@ -31,4 +34,12 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     )
     */
+)
+val bookerlyFont = FontFamily(
+    Font(R.font.bookerly_regular, FontWeight.Normal),
+    Font(R.font.bookerly_bold, FontWeight.Bold),
+    Font(R.font.bookerly_italic, FontWeight.Normal, FontStyle.Italic),
+    Font(R.font.bookerly_bold_italic, FontWeight.Bold, FontStyle.Italic),
+    Font(R.font.bookerly_light, FontWeight.Light),
+    Font(R.font.bookerly_light_italic, FontWeight.Light, FontStyle.Italic),
 )

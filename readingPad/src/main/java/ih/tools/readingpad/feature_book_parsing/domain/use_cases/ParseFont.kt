@@ -1,7 +1,9 @@
 package ih.tools.readingpad.feature_book_parsing.domain.use_cases
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
 import android.text.Layout
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -10,11 +12,16 @@ import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
+import android.text.style.TypefaceSpan
 import android.text.style.UnderlineSpan
 import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.core.content.res.ResourcesCompat
 import book_reader.Font
+import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Metadata
 import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
+import java.io.File
 
 /**
  * Parses font style elements within a book and applies them to a SpannableStringBuilder.
@@ -28,10 +35,12 @@ class ParseFont {
      * @param spannedText The SpannableStringBuilder to apply font styles to.
      * @return The SpannableStringBuilder with applied font styles.
      */
+    @RequiresApi(Build.VERSION_CODES.P)
     operator fun invoke(
         metadata: Metadata,
         parsedTag: ParsedElement.Font,
-        spannedText: SpannableStringBuilder
+        spannedText: SpannableStringBuilder,
+        context: Context
     ): SpannableStringBuilder {
 
         val start = spannedText.length
@@ -43,9 +52,30 @@ class ParseFont {
             parsedTag.fontTag,
             start,
             end,
-            metadata.encoding.fonts
+            metadata.encoding.fonts,
+            context
         )
         return spannedText
+    }
+}
+
+/**
+ * context.filesDir provides:
+ * Location: It points to a directory within the device's internal storage that is specifically allocated for your app.
+ * Path: The path is usually something like /data/data/[your_app_package_name]/files.
+ * Access: Only your app has read and write access to this directory.
+ * Persistence: Files stored here are persistent and remain even after the app is closed or the device is restarted.
+ * Deletion: Files in this directory are deleted when the app is uninstalled
+ */
+@RequiresApi(Build.VERSION_CODES.P)
+fun getTypefaceSpan(context: Context, fontFileName: String): TypefaceSpan {
+    val fontFile = File(context.filesDir, fontFileName) // Check internal storage
+    return if (fontFile.exists()) {
+        val typeface = Typeface.createFromFile(fontFile)
+        TypefaceSpan(typeface)
+    } else {
+        // Use default TypefaceSpan
+        TypefaceSpan(Typeface.DEFAULT)
     }
 }
 
@@ -59,14 +89,22 @@ class ParseFont {
  * @param fonts A map of font tags to their corresponding style information.
  */
 
+@RequiresApi(Build.VERSION_CODES.P)
 fun applyFontCustomizations(
     spannable: SpannableStringBuilder,
     fontTag: String,
     start: Int,
     end: Int,
-    fonts: Map<String, Font>
+    fonts: Map<String, Font>,
+    context: Context
 ) {
+
     val fontStyle = fonts[fontTag] ?: return // Return early if font style is not found
+    val bookerlyNormalTypeface = ResourcesCompat.getFont(context, R.font.bookerly_regular)?.let {
+        TypefaceSpan(it)
+    }
+
+    val customFontTypeface : TypefaceSpan = getTypefaceSpan(context, "bookerly_bold_italic.ttf")
 
     if (fontStyle.bold == "1") {
         spannable.setSpan(StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -75,7 +113,9 @@ fun applyFontCustomizations(
         spannable.setSpan(StyleSpan(Typeface.ITALIC), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
     if (fontStyle.underline == "1") {
+        //spannable.setSpan(bookerlyNormalTypeface, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         spannable.setSpan(UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+       // spannable.setSpan(customFontTypeface, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
     //center alignment
     when (fontStyle.align) {

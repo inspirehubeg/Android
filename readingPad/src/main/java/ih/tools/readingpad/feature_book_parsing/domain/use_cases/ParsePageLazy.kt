@@ -72,7 +72,7 @@ class ParsePageLazy {
                     is ParsedElement.Font -> {
                         Log.d("ParseBook", "Font element is ${parsedTag.content}")
                         pageSpannableStringBuilder =
-                            ParseFont().invoke(metadata, parsedTag, pageSpannableStringBuilder)
+                            ParseFont().invoke(metadata, parsedTag, pageSpannableStringBuilder, context)
                     }
 
                     is ParsedElement.WebLink -> {

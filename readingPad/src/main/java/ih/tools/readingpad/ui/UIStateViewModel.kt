@@ -1,16 +1,17 @@
 package ih.tools.readingpad.ui
 
 import android.util.Log
+import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ih.tools.readingpad.feature_book_parsing.data.PreferencesManager
-import ih.tools.readingpad.feature_book_parsing.presentation.text_view.IHTextView
 import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkClickableSpan
 import ih.tools.readingpad.ui.theme.HighlightLaserLemon
 import ih.tools.readingpad.util.IHNoteClickableSpan
-import ih.tools.readingpad.util.IHSpan
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -67,19 +68,16 @@ class UIStateViewModel @Inject constructor(
     // Other UI State
     private val _showTopBar = MutableStateFlow(true)
     val showTopBar = _showTopBar.asStateFlow()
-    private val _showPageSlider = MutableStateFlow(false)
-    val showPageSlider = _showPageSlider.asStateFlow()
-
-    private val _keepScreenOn = MutableStateFlow(false)
-    val keepScreenOn = _keepScreenOn.asStateFlow()
+//    private val _showPageSlider = MutableStateFlow(false)
+//    val showPageSlider = _showPageSlider.asStateFlow()
+//
+//    private val _keepScreenOn = MutableStateFlow(false)
+//    val keepScreenOn = _keepScreenOn.asStateFlow()
 
     private val _imageClicked = MutableStateFlow<ByteArray?>(null)
     val imageClicked = _imageClicked.asStateFlow()
     private val _preferredHighlightColor = MutableStateFlow(HighlightLaserLemon)
     val preferredHighlightColor: StateFlow<Color> = _preferredHighlightColor.asStateFlow()
-
-    private val _selectedSpans = MutableStateFlow<List<IHSpan>>(emptyList())
-    val selectedSpans: StateFlow<List<IHSpan>> = _selectedSpans.asStateFlow()
 
     private val _bookmarkClickEvent = MutableStateFlow<IHBookmarkClickableSpan?>(null)
     val bookmarkClickEvent: StateFlow<IHBookmarkClickableSpan?> =
@@ -118,17 +116,12 @@ class UIStateViewModel @Inject constructor(
     private val _bookmarkPageNumber = MutableStateFlow(0)
     val bookmarkPageNumber: StateFlow<Int> = _bookmarkPageNumber
 
-    private val _brightnessValue = MutableStateFlow(0.5f)
-    val brightnessValue: StateFlow<Float> = _brightnessValue.asStateFlow()
+    private val _brightnessLevel = MutableStateFlow(preferencesManager.getBrightnessLevel())
+    val brightnessLevel: StateFlow<Float> = _brightnessLevel.asStateFlow()
 
-    private val _textView = MutableStateFlow<IHTextView?>(null)
-    val textView: StateFlow<IHTextView?> = _textView
+//    private val _fontSizeChanged = MutableStateFlow(false)
+//    val fontSizeChanged: StateFlow<Boolean> = _fontSizeChanged
 
-    private val _fontSizeChanged = MutableStateFlow(false)
-    val fontSizeChanged: StateFlow<Boolean> = _fontSizeChanged
-
-    private val _linkNavigationPage = MutableStateFlow(false)
-    val linkNavigationPage: StateFlow<Boolean> = _linkNavigationPage
 
     private val _showCustomSelectionMenu = MutableStateFlow(false)
     val showCustomSelectionMenu: StateFlow<Boolean> = _showCustomSelectionMenu.asStateFlow()
@@ -140,12 +133,15 @@ class UIStateViewModel @Inject constructor(
     fun showDialog(dialogType: DialogType?) {
         viewModelScope.launch {
             _currentDialog.value = dialogType
+            _currentScreen.value = null
+            _imageClicked.value= null
         }
     }
 
     fun showScreen(screenType: ScreenType?) {
         viewModelScope.launch {
             _currentScreen.value = screenType
+            _currentDialog.value = null
         }
     }
 
@@ -155,11 +151,11 @@ class UIStateViewModel @Inject constructor(
         }
     }
 
-    fun setKeepScreenOn(keepOn: Boolean) {
-        viewModelScope.launch {
-            _keepScreenOn.value = keepOn
-        }
-    }
+//    fun setKeepScreenOn(keepOn: Boolean) {
+//        viewModelScope.launch {
+//            _keepScreenOn.value = keepOn
+//        }
+//    }
 
     fun onImageClick(imageData: ByteArray?) {
         viewModelScope.launch {
@@ -173,18 +169,18 @@ class UIStateViewModel @Inject constructor(
     fun toggleTopBar(value: Boolean) {
         viewModelScope.launch {
             _showTopBar.value = value
-            if (!value && currentDialog.value == DialogType.PagesSlider){
-               // setShowPagesSlider(false)
+            if (!value && currentDialog.value == DialogType.PagesSlider) {
+                // setShowPagesSlider(false)
                 Log.d("onTouch", "hide page slider")
                 _currentDialog.value = null
             }
         }
     }
-    fun setShowPagesSlider(show: Boolean) {
-        viewModelScope.launch {
-            _showPageSlider.value = show
-        }
-    }
+//    fun setShowPagesSlider(show: Boolean) {
+//        viewModelScope.launch {
+//            _showPageSlider.value = show
+//        }
+//    }
 
     fun setPreferredHighlightColor(color: Color) {
         viewModelScope.launch {
@@ -192,11 +188,11 @@ class UIStateViewModel @Inject constructor(
         }
     }
 
-    fun setSelectedSpans(spans: List<IHSpan>) {
-        viewModelScope.launch {
-            _selectedSpans.value = spans
-        }
-    }
+//    fun setSelectedSpans(spans: List<IHSpan>) {
+//        viewModelScope.launch {
+//            _selectedSpans.value = spans
+//        }
+//    }
 
     fun setBookmarkClickEvent(span: IHBookmarkClickableSpan?) {
         viewModelScope.launch {
@@ -215,6 +211,7 @@ class UIStateViewModel @Inject constructor(
             _editNote.value = edit
         }
     }
+
     fun setNoteText(text: String) {
         viewModelScope.launch {
             _noteText.value = text
@@ -227,9 +224,11 @@ class UIStateViewModel @Inject constructor(
 
         }
     }
+
     fun setBrightnessValue(value: Float) {
         viewModelScope.launch {
-            _brightnessValue.value = value
+            preferencesManager.setBrightnessLevel(value)
+            _brightnessLevel.value = value
         }
     }
 
@@ -251,30 +250,35 @@ class UIStateViewModel @Inject constructor(
         }
     }
 
-
-    fun setTextView(textView: IHTextView) {
-        viewModelScope.launch {
-            _textView.value = textView
-        }
+    private val _currentThemeFontColor = MutableLiveData(uiSettings.value.fontColor)
+    val currentThemeFontColor = _currentThemeFontColor
+    fun setCurrentThemeFontColor(colorInt: Int) {
+        _currentThemeFontColor.value = colorInt
     }
+
+    private val _currentThemeBackgroundColor = MutableLiveData(uiSettings.value.backgroundColor)
+    val currentThemeBackgroundColor = _currentThemeBackgroundColor
+    fun setCurrentThemeBackgroundColor(colorInt: Int) {
+        _currentThemeBackgroundColor.value = colorInt
+    }
+
+    private val _fontSizeChanged = MutableStateFlow(false)
+    val fontSizeChanged: StateFlow<Boolean> = _fontSizeChanged
 
     fun setFontSizeChanged(value: Boolean) {
-        viewModelScope.launch {
-            _fontSizeChanged.value = value
-        }
+        _fontSizeChanged.value = value
     }
 
-    fun setLinkNavigationPage(value: Boolean) {
-        viewModelScope.launch {
-            _linkNavigationPage.value = value
-        }
-    }
+    var lazyListState = LazyListState()
+    private val _currentPageIndex = MutableStateFlow(0)
+    val currentPageIndex: StateFlow<Int> = _currentPageIndex
 
     fun setBookmarkName(name: String) {
         viewModelScope.launch {
             _bookmarkName.value = name
         }
     }
+
     fun setBookmarkData(start: Int, name: String, end: Int, pageNumber: Int) {
         viewModelScope.launch {
             _bookmarkStart.value = start
@@ -293,7 +297,6 @@ class UIStateViewModel @Inject constructor(
     }
 
 
-
     fun setIsOneFingerScroll(isOneFingerScroll: Boolean) {
         viewModelScope.launch {
             _uiSettings.value = _uiSettings.value.copy(isOneFingerScroll = isOneFingerScroll)
@@ -305,17 +308,20 @@ class UIStateViewModel @Inject constructor(
             _uiSettings.value = _uiSettings.value.copy(isDrawerOpen = isDrawerOpen)
         }
     }
+
     fun setAreDrawerGesturesEnabled(areDrawerGesturesEnabled: Boolean) {
         viewModelScope.launch {
-            _uiSettings.value = _uiSettings.value.copy(areDrawerGesturesEnabled = areDrawerGesturesEnabled)
-        }
-    }
-    fun setShowHighlightsBookmarks(showHighlightsBookmarks: Boolean) {
-        viewModelScope.launch {
-            _uiSettings.value = _uiSettings.value.copy(showHighlightsBookmarks = showHighlightsBookmarks)
+            _uiSettings.value =
+                _uiSettings.value.copy(areDrawerGesturesEnabled = areDrawerGesturesEnabled)
         }
     }
 
+    fun setShowHighlightsBookmarks(showHighlightsBookmarks: Boolean) {
+        viewModelScope.launch {
+            _uiSettings.value =
+                _uiSettings.value.copy(showHighlightsBookmarks = showHighlightsBookmarks)
+        }
+    }
 
 
     fun setIsVerticalScroll(isVerticalScroll: Boolean) {
@@ -333,7 +339,7 @@ class UIStateViewModel @Inject constructor(
         }
     }
 
-    fun setDarkTheme(darkTheme: Boolean ,textColor: Int, backgroundColor: Int) {
+    fun setDarkTheme(darkTheme: Boolean, textColor: Int, backgroundColor: Int) {
         viewModelScope.launch {
             preferencesManager.setDarkTheme(darkTheme)
             _uiSettings.value = _uiSettings.value.copy(darkTheme = darkTheme)
@@ -342,10 +348,24 @@ class UIStateViewModel @Inject constructor(
         }
     }
 
-    fun setFontSize(fontSize: Float) {
+
+    fun setFontSize(fontSize: Float, currentY: Float) {
+        _currentPageIndex.value = lazyListState.firstVisibleItemIndex
+        val fontSizePercentage = fontSize / uiSettings.value.fontSize
+
+        preferencesManager.setFontSize(fontSize)
+        _uiSettings.value = _uiSettings.value.copy(fontSize = fontSize)
+        var y = 0
+        y = lazyListState.firstVisibleItemScrollOffset
+
+        val newY = y * fontSizePercentage * 1.01f
+        scrollToIndex((newY - y))
+        _fontSizeChanged.value = true
+    }
+
+    private fun scrollToIndex(targetPageIndex: Float) {
         viewModelScope.launch {
-            preferencesManager.setFontSize(fontSize)
-            _uiSettings.value = _uiSettings.value.copy(fontSize = fontSize)
+            lazyListState.scrollBy(targetPageIndex)
         }
     }
 
@@ -373,15 +393,11 @@ class UIStateViewModel @Inject constructor(
     // Enum classes for dialog and screen types
     enum class DialogType {
         Brightness, BookmarkList, PageNumber, AddBookmark, EditBookmark,
-        AddNote, EditNote,ThemeSelector, FontSlider, PagesSlider// ... other dialog types
+        AddNote, EditNote, ThemeSelector, FontSlider, PagesSlider// ... other dialog types
     }
 
     enum class ScreenType {
         UserInput, CustomTheme, FullScreenImage,
-         // ... other screen types
-    }
-
-    init {
-
+        // ... other screen types
     }
 }

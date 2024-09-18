@@ -49,10 +49,12 @@ import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColor
 import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColorType
+import ih.tools.readingpad.ui.UIStateViewModel
 
 @Composable
 fun ColorPicker(
     viewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel,
     modifier: Modifier,
     colorType: ThemeColorType
 ) {
@@ -64,8 +66,10 @@ fun ColorPicker(
     val initialColor: Color
     val onColorChange: (ColorEnvelope) -> Unit
 
-    val currentThemeFontColor by viewModel.currentThemeFontColor.observeAsState()
-    val currentThemeBackgroundColor by viewModel.currentThemeBackgroundColor.observeAsState()
+//    val currentThemeFontColor by viewModel.currentThemeFontColor.observeAsState()
+//    val currentThemeBackgroundColor by viewModel.currentThemeBackgroundColor.observeAsState()
+    val currentThemeFontColor by uiStateViewModel.currentThemeFontColor.observeAsState()
+    val currentThemeBackgroundColor by uiStateViewModel.currentThemeBackgroundColor.observeAsState()
 
     val (showDeleteAllDialog, setShowDeleteAllDialog) = remember { mutableStateOf(false) }
     val (showDeleteColorDialog, setShowDeleteColorDialog) = remember { mutableStateOf(false) }
@@ -74,12 +78,12 @@ fun ColorPicker(
     if (colorType == ThemeColorType.FONT) {
         initialColor = Color(currentThemeFontColor!!)
         onColorChange = { colorEnvelope ->
-            viewModel.setCurrentThemeFontColor(colorEnvelope.color.toArgb())
+            uiStateViewModel.setCurrentThemeFontColor(colorEnvelope.color.toArgb())
         }
     } else {
         initialColor = Color(currentThemeBackgroundColor!!)
         onColorChange = { colorEnvelope ->
-            viewModel.setCurrentThemeBackgroundColor(colorEnvelope.color.toArgb())
+            uiStateViewModel.setCurrentThemeBackgroundColor(colorEnvelope.color.toArgb())
         }
     }
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
@@ -122,14 +126,14 @@ fun ColorPicker(
                                     .background(color)
                                     .border(
                                         width = 2.dp,
-                                        color = if (viewModel.currentThemeFontColor.value == colorInt) {
+                                        color = if (currentThemeFontColor == colorInt) {
                                             MaterialTheme.colorScheme.onSurface
                                         } else Color.Transparent,
                                         shape = RoundedCornerShape(10)
                                     )
                                     .clickable {
                                         //this changes the current selected color to show a border around the box
-                                        viewModel.setCurrentThemeFontColor(colorInt)
+                                        uiStateViewModel.setCurrentThemeFontColor(colorInt)
                                     })
 
                             }
@@ -145,14 +149,14 @@ fun ColorPicker(
                                     .background(color)
                                     .border(
                                         width = 2.dp,
-                                        color = if (viewModel.currentThemeBackgroundColor.value == colorInt) {
+                                        color = if (uiStateViewModel.currentThemeBackgroundColor.value == colorInt) {
                                             MaterialTheme.colorScheme.onSurface
                                         } else Color.Transparent,
                                         shape = RoundedCornerShape(10)
                                     )
                                     .clickable {
                                         //this changes the current selected color to show a border around the box
-                                        viewModel.setCurrentThemeBackgroundColor(colorInt)
+                                        uiStateViewModel.setCurrentThemeBackgroundColor(colorInt)
                                     })
 
                             }
@@ -250,13 +254,13 @@ fun ColorPicker(
                                     .background(Color(colorInt))
                                     .border(
                                         width = 2.dp,
-                                        color = if (viewModel.currentThemeFontColor.value == colorInt) {
+                                        color = if (currentThemeFontColor == colorInt) {
                                             MaterialTheme.colorScheme.onSurface
                                         } else Color.Transparent,
                                         shape = RoundedCornerShape(10)
                                     )
                                     .clickable {
-                                        viewModel.setCurrentThemeFontColor(colorInt)
+                                        uiStateViewModel.setCurrentThemeFontColor(colorInt)
                                     },
 
                                 ) {
@@ -290,13 +294,13 @@ fun ColorPicker(
                                     .background(Color(colorInt))
                                     .border(
                                         width = 2.dp,
-                                        color = if (viewModel.currentThemeBackgroundColor.value == colorInt) {
+                                        color = if (uiStateViewModel.currentThemeBackgroundColor.value == colorInt) {
                                             MaterialTheme.colorScheme.onSurface
                                         } else Color.Transparent,
                                         shape = RoundedCornerShape(10)
                                     )
                                     .clickable {
-                                        viewModel.setCurrentThemeBackgroundColor(colorInt)
+                                        uiStateViewModel.setCurrentThemeBackgroundColor(colorInt)
                                     },
 
                                 ) {

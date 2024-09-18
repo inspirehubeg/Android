@@ -49,7 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
+import ih.tools.readingpad.ui.UIStateViewModel
 import ih.tools.readingpad.util.showToast
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -184,9 +184,9 @@ fun SettingsScreen(
 
 @Composable
 fun FontSizeSetting(
-    viewModel: BookContentViewModel
+    uiStateViewModel: UIStateViewModel
 ) {
-    val fontSize by viewModel.fontSize.collectAsState()
+    val fontSize = uiStateViewModel.uiSettings.collectAsState().value.fontSize
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
@@ -198,7 +198,7 @@ fun FontSizeSetting(
         Slider(
             value = fontSize,
             onValueChange = { newFontSize ->
-                viewModel.setFontSize(newFontSize, 0f)
+                uiStateViewModel.setFontSize(newFontSize, 0f)
             },
             valueRange = 12f..42f,
             steps = 24
@@ -209,9 +209,9 @@ fun FontSizeSetting(
 
 @Composable
 fun FontColorSetting(
-    viewModel: BookContentViewModel
+    uiStateViewModel: UIStateViewModel
 ) {
-    val fontColor by viewModel.fontColor.collectAsState()
+    val fontColor = uiStateViewModel.uiSettings.collectAsState().value.fontColor
 
     val availableFontColors = listOf(
         Color.Black,
@@ -236,7 +236,7 @@ fun FontColorSetting(
                     color = color,
                     isSelected = fontColor == color.toArgb(),
                     onClick = {
-                        viewModel.setFontColor(color.toArgb())
+                        uiStateViewModel.setFontColor(color.toArgb())
 
                     }
                 )
@@ -272,9 +272,9 @@ fun ColorOptionButton(
 
 @Composable
 fun BackgroundColorSetting(
-    viewModel: BookContentViewModel
+    uiStateViewModel: UIStateViewModel
 ) {
-    val backgroundColor by viewModel.backgroundColor.collectAsState()
+    val backgroundColor = uiStateViewModel.uiSettings.collectAsState().value.backgroundColor
     val availableBackgroundColors = listOf(
         Color.White, // Classic white background
         Color(0xFFCFCDCD), // Light gray background
@@ -300,7 +300,7 @@ fun BackgroundColorSetting(
                     color = color,
                     isSelected = backgroundColor == color.toArgb(),
                     onClick = {
-                        viewModel.setBackgroundColor(color.toArgb())
+                        uiStateViewModel.setBackgroundColor(color.toArgb())
                     }
                 )
             }
@@ -310,14 +310,16 @@ fun BackgroundColorSetting(
 
 @Composable
 fun FontWeightSetting(
-    viewModel: BookContentViewModel
+    uiStateViewModel: UIStateViewModel
 ) {
     val context = LocalContext.current
-    val savedFontWeight by viewModel.fontWeight.collectAsState()
+    val savedFontWeight = uiStateViewModel.uiSettings.collectAsState().value.fontWeight
     var selectedFontWeight: FontWeight by remember { mutableStateOf(FontWeight(savedFontWeight)) }
-    val fontSize by viewModel.fontSize.collectAsState()
-    val fontColor by viewModel.fontColor.collectAsState()
-    val backgroundColor by viewModel.backgroundColor.collectAsState()
+//    val fontSize by viewModel.fontSize.collectAsState()
+//    val fontColor by viewModel.fontColor.collectAsState()
+    val fontSize = uiStateViewModel.uiSettings.collectAsState().value.fontSize
+    val fontColor = uiStateViewModel.uiSettings.collectAsState().value.fontColor
+    val backgroundColor = uiStateViewModel.uiSettings.collectAsState().value.backgroundColor
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -368,7 +370,7 @@ fun FontWeightSetting(
         // Save button
         Button(
             onClick = {
-                viewModel.setFontWeight(selectedFontWeight.weight)
+                uiStateViewModel.setFontWeight(selectedFontWeight.weight)
                 showToast(context = context, "Font weight saved")
             },
             modifier = Modifier.fillMaxWidth()

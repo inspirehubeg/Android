@@ -5,7 +5,6 @@ import android.os.Build
 import android.view.LayoutInflater
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -34,11 +33,8 @@ fun XMLView(
 ) {
     val book = viewModel.book
     val state by viewModel.state
-    val isDark by viewModel.darkTheme.collectAsState()
     var lastDarkStatus = false
-    val fontColor by viewModel.fontColor.collectAsState()
-    val fontWeight by viewModel.fontWeight.collectAsState()
-    val fontSize by viewModel.fontSize.collectAsState()
+
     val spannableString = remember {
         mutableStateOf(state.spannableContent)
     }

@@ -24,7 +24,7 @@ fun BrightnessDialog(
     uiStateViewModel: UIStateViewModel
 ){
 
-    val sliderValue by uiStateViewModel.brightnessValue.collectAsState()
+    val sliderValue by uiStateViewModel.brightnessLevel.collectAsState()
 
     val window = (LocalContext.current as Activity).window
 

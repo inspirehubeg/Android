@@ -43,6 +43,8 @@ fun NavigationDrawer(
     val screenWidth = configuration.screenWidthDp
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val drawerGesturesEnabled = uiStateViewModel.uiSettings.collectAsState().value.areDrawerGesturesEnabled
+
+
     ModalNavigationDrawer(
         gesturesEnabled = drawerGesturesEnabled,
         drawerContent = {

@@ -73,7 +73,7 @@ fun CustomThemeScreen(
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 ThemePreviewer(
-                    viewModel = viewModel,
+
                     modifier = Modifier
                         .background(
                             MaterialTheme.colorScheme.secondaryContainer,
@@ -92,8 +92,8 @@ fun CustomThemeScreen(
                         .fillMaxWidth()
                 ) {
                     when (selectedTabIndex) {
-                        0 -> BackgroundColorScreen(modifier = Modifier, viewModel)
-                        1 -> FontColorScreen(modifier = Modifier, viewModel)
+                        0 -> BackgroundColorScreen(modifier = Modifier, viewModel, uiStateViewModel)
+                        1 -> FontColorScreen(modifier = Modifier, viewModel, uiStateViewModel)
                     }
                 }
 
@@ -176,13 +176,12 @@ fun CustomThemeScreen(
 
 @Composable
 fun ThemePreviewer(
-    viewModel: BookContentViewModel,
     modifier: Modifier,
     uiStateViewModel: UIStateViewModel
 
 ) {
-    val fontColor by viewModel.currentThemeFontColor.observeAsState()
-    val backgroundColor by viewModel.currentThemeBackgroundColor.observeAsState()
+    val fontColor by uiStateViewModel.currentThemeFontColor.observeAsState()
+    val backgroundColor by uiStateViewModel.currentThemeBackgroundColor.observeAsState()
     //val fontSize by viewModel.fontSize.collectAsState()
 
     Row(
@@ -233,16 +232,18 @@ fun ThemePreviewer(
 
 
 @Composable
-fun FontColorScreen(modifier: Modifier, viewModel: BookContentViewModel) {
-    ColorPickerScreen(modifier = modifier, colorType = ThemeColorType.FONT, viewModel = viewModel)
+fun FontColorScreen(modifier: Modifier, viewModel: BookContentViewModel, uiStateViewModel: UIStateViewModel) {
+    ColorPickerScreen(modifier = modifier, colorType = ThemeColorType.FONT, viewModel = viewModel, uiStateViewModel = uiStateViewModel)
 }
 
 @Composable
-fun BackgroundColorScreen(modifier: Modifier, viewModel: BookContentViewModel) {
+fun BackgroundColorScreen(modifier: Modifier, viewModel: BookContentViewModel,
+                          uiStateViewModel: UIStateViewModel) {
     ColorPickerScreen(
         modifier = modifier,
         colorType = ThemeColorType.BACKGROUND,
         viewModel = viewModel,
+        uiStateViewModel = uiStateViewModel
     )
 }
 
@@ -251,6 +252,7 @@ fun ColorPickerScreen(
     modifier: Modifier,
     colorType: ThemeColorType,
     viewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel
 ) {
     Box(
         modifier = modifier
@@ -265,7 +267,8 @@ fun ColorPickerScreen(
                 ColorPicker(
                     modifier = Modifier,
                     colorType = colorType,
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    uiStateViewModel = uiStateViewModel
                 )
             }
         }

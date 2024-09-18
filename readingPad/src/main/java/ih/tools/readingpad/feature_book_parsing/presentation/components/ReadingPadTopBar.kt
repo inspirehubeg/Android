@@ -2,6 +2,7 @@ package ih.tools.readingpad.feature_book_parsing.presentation.components
 
 import android.app.Activity
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PushPin
@@ -44,6 +46,8 @@ import androidx.navigation.NavController
 import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.ui.UIStateViewModel
+import ih.tools.readingpad.util.createWordDoc
+import java.io.File
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,6 +77,8 @@ fun ReadingPadTopBar(
     val showHighlightsBookmarks = uiSettings.showHighlightsBookmarks
 
     val context = LocalContext.current
+    val internalStoragePath = context.filesDir.absolutePath
+    val externalStoragePath = context.getExternalFilesDir(null)?.absolutePath
     LaunchedEffect(uiStateViewModel) {
 //        viewModel.keepScreenOnEvent.collect { keepScreenOn ->
 //            val window = (context as Activity).window
@@ -155,7 +161,7 @@ fun ReadingPadTopBar(
                     IconButton(onClick = {
                         uiStateViewModel.updateUISettings(
                             uiSettings.copy(
-                                isDrawerOpen = !uiSettings.isDrawerOpen
+                                isDrawerOpen = !isDrawerOpen
                             )
                         )
 //                        if (isDrawerOpen) {
@@ -237,13 +243,49 @@ fun ReadingPadTopBar(
                             }, onClick = {
 
                             })
+                            DropdownMenuItem(text = {
+                                Text(text = "Export Highlights")
+                            }, trailingIcon = {
+                                Icon(Icons.Filled.DocumentScanner, contentDescription = "")
+                            },
+                                onClick = {
+                                    val fileName =
+                                        "${viewModel.state.value.bookTitle} Highlights.docx"
+                                    val text: MutableList<HighlightParagraph> = mutableListOf()
+                                    for (i in viewModel.state.value.bookHighlights) {
+                                        text.add(
+                                            HighlightParagraph(
+                                                chapterName = "Chapter: ${i.chapterNumber}",
+                                                pageNumber = "Page: ${i.pageNumber}",
+                                                highlightText = i.text
+                                            )
+                                        )
+                                    }
+                                    val file = File(externalStoragePath, fileName)
 
+                                    createWordDoc(
+                                        text,
+                                        file.absolutePath,
+                                        bookName = viewModel.state.value.bookTitle
+                                    )
+                                    Toast.makeText(
+                                        context,
+                                        "File saved to ${file.absolutePath}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            )
                         }
                     }
                 }
-
-
             }
         )
     }
 }
+
+data class HighlightParagraph(
+    val chapterName: String,
+    val pageNumber: String,
+    val highlightText: String,
+
+    )

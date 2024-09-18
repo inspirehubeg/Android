@@ -76,18 +76,7 @@ class BookContentViewModel @Inject constructor(
         }
     }
 
-//    private val _imageClicked = MutableStateFlow<ByteArray?>(null)
-//    val imageClicked: StateFlow<ByteArray?> = _imageClicked.asStateFlow()
-//    fun onImageClick(imageData: ByteArray?) {
-//        _imageClicked.value = imageData
-//    }
 
-//    private val _verticalScroll = MutableStateFlow(preferencesManager.isVerticalScroll())
-//    val verticalScroll = _verticalScroll.asStateFlow()
-//    fun setVerticalScroll(isVertical: Boolean) {
-//        preferencesManager.setVerticalScroll(isVertical)
-//        _verticalScroll.value = isVertical
-//    }
 
     private val _oneFingerScroll = MutableStateFlow(true)
     val oneFingerScroll = _oneFingerScroll.asStateFlow()
@@ -96,118 +85,6 @@ class BookContentViewModel @Inject constructor(
         _oneFingerScroll.value = value
     }
 
-//    private val _isDrawerOpen = MutableStateFlow(false)
-//    val isDrawerOpen: StateFlow<Boolean> = _isDrawerOpen.asStateFlow()
-
-//    fun openDrawer() {
-//        _isDrawerOpen.value = true
-//    }
-//
-//    fun closeDrawer() {
-//        _isDrawerOpen.value = false
-//    }
-
-//    private val _drawerGesturesEnabled = MutableStateFlow(true)
-//    val drawerGesturesEnabled: StateFlow<Boolean> = _drawerGesturesEnabled.asStateFlow()
-//    fun setDrawerGesturesEnabled(value: Boolean) {
-//        _drawerGesturesEnabled.value = value
-//    }
-
-//    private val _showUserInputPage = MutableStateFlow(false)
-//    val showUserInputPage = _showUserInputPage.asStateFlow()
-//    fun toggleShowUserInputPage() {
-//        _showUserInputPage.value = !_showUserInputPage.value
-//    }
-
-//    private val _showCustomThemePage = MutableStateFlow(false)
-//    val showCustomThemePage = _showCustomThemePage.asStateFlow()
-//    fun setShowCustomThemePage(open: Boolean) {
-//        _showCustomThemePage.value = open
-//    }
-
-//    private val _showBrightnessDialog = MutableStateFlow(false)
-//    val showBrightnessDialog = _showBrightnessDialog.asStateFlow()
-//    fun setShowBrightnessDialog(open: Boolean) {
-//        _showBrightnessDialog.value = open
-//    }
-
-//    private val _showBookmarkListDialog = MutableStateFlow(false)
-//    val showBookmarkListDialog = _showBookmarkListDialog.asStateFlow()
-//    fun setShowBookmarkListDialog(show: Boolean) {
-//        _showBookmarkListDialog.value = show
-//    }
-
-//    private val _showPageNumberDialog = MutableStateFlow(false)
-//    val showPageNumberDialog = _showPageNumberDialog.asStateFlow()
-//    fun setShowPageNumberDialog(show: Boolean) {
-//        _showPageNumberDialog.value = show
-//    }
-
-//    private val _showPagesSlider = MutableStateFlow(false)
-//    val showPagesSlider = _showPagesSlider.asStateFlow()
-//    fun setShowPagesSlider(show: Boolean) {
-//        _showPagesSlider.value = show
-//    }
-
-//    private val _showHighlightsBookmarks = MutableStateFlow(true)
-//    val showHighlightsBookmarks = _showHighlightsBookmarks.asStateFlow()
-//    fun setShowHighlightsBookmarks(show: Boolean) {
-//        _showHighlightsBookmarks.value = show
-//    }
-
-//    private val _showAddBookmarkDialog = MutableStateFlow(false)
-//    val showAddBookmarkDialog = _showAddBookmarkDialog.asStateFlow()
-//    fun setShowAddBookmarkDialog(show: Boolean) {
-//        _showAddBookmarkDialog.value = show
-//    }
-
-//    private val _showEditBookmarkDialog = MutableStateFlow(false)
-//    val showEditBookmarkDialog = _showEditBookmarkDialog.asStateFlow()
-//    fun setShowEditBookmarkDialog(show: Boolean) {
-//        _showEditBookmarkDialog.value = show
-//    }
-
-//    private val _keepScreenOn = MutableStateFlow(false)
-//    val keepScreenOn = _keepScreenOn.asStateFlow()
-//    fun setKeepScreenOn(keep: Boolean) {
-//        _keepScreenOn.value = keep
-//        viewModelScope.launch {
-//            _keepScreenOnEvent.emit(keep)
-//        }
-//    }
-//    private val _keepScreenOnEvent = MutableSharedFlow<Boolean>()
-//    val keepScreenOnEvent = _keepScreenOnEvent.asSharedFlow()
-
-
-//    private val _showFullScreenImage = MutableStateFlow(false)
-//    val showFullScreenImage = _showFullScreenImage.asStateFlow()
-//    fun setShowFullScreenImage(open: Boolean) {
-//        _showFullScreenImage.value = open
-//    }
-
-//    private val _showThemeSelector = MutableStateFlow(false)
-//    val showThemeSelector: StateFlow<Boolean> = _showThemeSelector.asStateFlow()
-//    fun setShowThemeSelector(show: Boolean) {
-//        _showThemeSelector.value = show
-//    }
-
-//    private val _showFontSlider = MutableStateFlow(false)
-//    val showFontSlider: StateFlow<Boolean> = _showFontSlider.asStateFlow()
-//    fun setShowFontSlider(show: Boolean) {
-//        _showFontSlider.value = show
-//    }
-
-//    private val _showCustomSelectionMenu = MutableStateFlow(false)
-//    val showCustomSelectionMenu: StateFlow<Boolean> = _showCustomSelectionMenu.asStateFlow()
-//    fun setShowCustomSelectionMenu(show: Boolean) {
-//        _showCustomSelectionMenu.value = show
-//    }
-
-//    private val _preferredHighlightColor = MutableStateFlow(HighlightLaserLemon)
-//    val preferredHighlightColor: StateFlow<Color> = _preferredHighlightColor.asStateFlow()
-//    fun setPreferredHighlightColor(color: Color) {
-//        _preferredHighlightColor.value = color
-//    }
 
     private val _selectedSpans = MutableStateFlow<List<IHSpan>>(emptyList())
     val selectedSpans: StateFlow<List<IHSpan>> = _selectedSpans.asStateFlow()
@@ -216,126 +93,27 @@ class BookContentViewModel @Inject constructor(
     }
 
 
-    // clickable bookmark span listener
-//    private val _bookmarkClickEvent = MutableStateFlow<IHBookmarkClickableSpan?>(null)
-//    val bookmarkClickEvent: StateFlow<IHBookmarkClickableSpan?> = _bookmarkClickEvent.asStateFlow()
-//    fun setBookmarkClickEvent(span: IHBookmarkClickableSpan?) {
-//        _bookmarkClickEvent.value = span
-//    }
-
-    // clickable note span listener
-//    private val _noteClickEvent = MutableStateFlow<IHNoteClickableSpan?>(null)
-//    val noteClickEvent: StateFlow<IHNoteClickableSpan?> = _noteClickEvent.asStateFlow()
-//    fun setNoteClickEvent(span: IHNoteClickableSpan?) {
-//        _noteClickEvent.value = span
-//    }
-
-//    private val _editNote = MutableStateFlow(false)
-//    val editNote: StateFlow<Boolean> = _editNote.asStateFlow()
-//    fun setEditNote(edit: Boolean) {
-//        _editNote.value = edit
-//    }
-
-//    private val _noteEnd = MutableStateFlow(0)
-//    val noteEnd: StateFlow<Int> = _noteEnd
-//    fun setNoteEnd(end: Int) {
-//        _noteEnd.value = end
-//    }
-
-//    private val _noteStart = MutableStateFlow(0)
-//    val noteStart: StateFlow<Int> = _noteStart
-//    fun setNoteStart(start: Int) {
-//        _noteStart.value = start
-//    }
-
-//    private val _showAddNoteDialog = MutableStateFlow(false)
-//    val showAddNoteDialog = _showAddNoteDialog.asStateFlow()
-//    fun setShowAddNoteDialog(show: Boolean) {
-//        _showAddNoteDialog.value = show
-//    }
-
-//    private val _showEditNoteDialog = MutableStateFlow(false)
-//    val showEditNoteDialog = _showEditNoteDialog.asStateFlow()
-//    fun setShowEditNoteDialog(show: Boolean) {
-//        _showEditNoteDialog.value = show
-//    }
-
-//    private val _imageRotation = MutableStateFlow(0f)
-//    val imageRotation: StateFlow<Float> = _imageRotation.asStateFlow()
-//    fun setImageRotation(rotation: Float) {
-//        _imageRotation.value = rotation
-//    }
-
-//    private val _editBookmark = MutableStateFlow(false)
-//    val editBookmark: StateFlow<Boolean> = _editBookmark.asStateFlow()
-//    fun setEditBookmark(edit: Boolean) {
-//        _editBookmark.value = edit
-//    }
-
-//    private val _bookmarkEnd = MutableStateFlow(0)
-//    val bookmarkEnd: StateFlow<Int> = _bookmarkEnd
-//    fun setBookmarkEnd(end: Int) {
-//        _bookmarkEnd.value = end
-//    }
-
-//    private val _bookmarkStart = MutableStateFlow(0)
-//    val bookmarkStart: StateFlow<Int> = _bookmarkStart
-//    fun setBookmarkStart(start: Int) {
-//        _bookmarkStart.value = start
-//    }
-
-
-//    private val _bookmarkName = MutableStateFlow("")
-//    val bookmarkName: StateFlow<String> = _bookmarkName
-//    fun setBookmarkName(name: String) {
-//        _bookmarkName.value = name
-//    }
-
-//    private val _bookmarkPageNumber = MutableStateFlow(0)
-//    private val bookmarkPageNumber: StateFlow<Int> = _bookmarkPageNumber
-//    fun setBookmarkPageNumber(pageNumber: Int) {
-//        _bookmarkPageNumber.value = pageNumber
-//    }
-
-//    private val _notePageNumber = MutableStateFlow(0)
-//    private val notePageNumber: StateFlow<Int> = _notePageNumber
-//    fun setNotePageNumber(pageNumber: Int) {
-//        _notePageNumber.value = pageNumber
-//    }
-
     private val _textView = MutableStateFlow<IHTextView?>(null)
     val textView: StateFlow<IHTextView?> = _textView
     fun setTextView(textView: IHTextView) {
         _textView.value = textView
     }
 
-    private val _showTopBar = MutableStateFlow(true)
-    val showTopBar: StateFlow<Boolean> = _showTopBar.asStateFlow()
-    fun setTopBarVisibility(isVisible: Boolean) {
-        _showTopBar.value = isVisible
-    }
 
-    private val _fontColor = MutableStateFlow(preferencesManager.getFontColor())
-    val fontColor = _fontColor
-    fun setFontColor(color: Int) {
-        preferencesManager.setFontColor(color)
-        _fontColor.value = color
-    }
+//    private val _fontColor = MutableStateFlow(preferencesManager.getFontColor())
+//    val fontColor = _fontColor
+//    fun setFontColor(color: Int) {
+//        preferencesManager.setFontColor(color)
+//        _fontColor.value = color
+//    }
 
-    private val _darkTheme = MutableStateFlow(preferencesManager.isDarkTheme())
-    val darkTheme = _darkTheme
-    fun setDarkTheme(isDark: Boolean, textColor: Int, backgroundColor: Int) {
-        preferencesManager.setDarkTheme(isDark)
-        _darkTheme.value = isDark
-        setFontColor(textColor)
-        setBackgroundColor(backgroundColor)
-    }
-
-//    private val _pinnedTopBar = MutableStateFlow(preferencesManager.isPinnedTopBar())
-//    val pinnedTopBar = _pinnedTopBar
-//    fun setPinnedTopBar(isPinned: Boolean) {
-//        preferencesManager.setPinnedTopBar(isPinned)
-//        _pinnedTopBar.value = isPinned
+//    private val _darkTheme = MutableStateFlow(preferencesManager.isDarkTheme())
+//    val darkTheme = _darkTheme
+//    fun setDarkTheme(isDark: Boolean, textColor: Int, backgroundColor: Int) {
+//        preferencesManager.setDarkTheme(isDark)
+//        _darkTheme.value = isDark
+//        setFontColor(textColor)
+//        setBackgroundColor(backgroundColor)
 //    }
 
     private val _pageNumber = mutableIntStateOf(1)
@@ -365,31 +143,31 @@ class BookContentViewModel @Inject constructor(
         return -1
     }
 
-    private val _fontWeight = MutableStateFlow(preferencesManager.getFontWeight())
-    val fontWeight = _fontWeight
-    fun setFontWeight(fontWeight: Int) {
-        preferencesManager.setFontWeight(fontWeight)
-        _fontWeight.value = fontWeight
-    }
+//    private val _fontWeight = MutableStateFlow(preferencesManager.getFontWeight())
+//    val fontWeight = _fontWeight
+//    fun setFontWeight(fontWeight: Int) {
+//        preferencesManager.setFontWeight(fontWeight)
+//        _fontWeight.value = fontWeight
+//    }
 
-    private val _backgroundColor = MutableStateFlow(preferencesManager.getBackgroundColor())
-    val backgroundColor = _backgroundColor
-    fun setBackgroundColor(backgroundColor: Int) {
-        preferencesManager.setBackgroundColor(backgroundColor)
-        _backgroundColor.value = backgroundColor
-    }
+//    private val _backgroundColor = MutableStateFlow(preferencesManager.getBackgroundColor())
+//    val backgroundColor = _backgroundColor
+//    fun setBackgroundColor(backgroundColor: Int) {
+//        preferencesManager.setBackgroundColor(backgroundColor)
+//        _backgroundColor.value = backgroundColor
+//    }
 
-    private val _currentThemeFontColor = MutableLiveData(fontColor.value)
-    val currentThemeFontColor = _currentThemeFontColor
-    fun setCurrentThemeFontColor(colorInt: Int) {
-        _currentThemeFontColor.value = colorInt
-    }
+//    private val _currentThemeFontColor = MutableLiveData(fontColor.value)
+//    val currentThemeFontColor = _currentThemeFontColor
+//    fun setCurrentThemeFontColor(colorInt: Int) {
+//        _currentThemeFontColor.value = colorInt
+//    }
 
-    private val _currentThemeBackgroundColor = MutableLiveData(backgroundColor.value)
-    val currentThemeBackgroundColor = _currentThemeBackgroundColor
-    fun setCurrentThemeBackgroundColor(colorInt: Int) {
-        _currentThemeBackgroundColor.value = colorInt
-    }
+//    private val _currentThemeBackgroundColor = MutableLiveData(backgroundColor.value)
+//    val currentThemeBackgroundColor = _currentThemeBackgroundColor
+//    fun setCurrentThemeBackgroundColor(colorInt: Int) {
+//        _currentThemeBackgroundColor.value = colorInt
+//    }
 
     private val _linkNavigationPage = MutableStateFlow(false)
     val linkNavigationPage: StateFlow<Boolean> = _linkNavigationPage
@@ -397,29 +175,29 @@ class BookContentViewModel @Inject constructor(
         _linkNavigationPage.value = value
     }
 
-    private val _fontSize = MutableStateFlow(preferencesManager.getFontSize())
-    val fontSize: StateFlow<Float> = _fontSize
+//    private val _fontSize = MutableStateFlow(preferencesManager.getFontSize())
+//    val fontSize: StateFlow<Float> = _fontSize
 
-    private val _fontSizeChanged = MutableStateFlow(false)
-    val fontSizeChanged: StateFlow<Boolean> = _fontSizeChanged
-
-    fun setFontSizeChanged(value: Boolean) {
-        _fontSizeChanged.value = value
-    }
-
-    fun setFontSize(fontSize: Float, currentY: Float) {
-        _currentPageIndex.value = lazyListState.firstVisibleItemIndex
-        val fontSizePercentage = fontSize / _fontSize.value
-
-        preferencesManager.setFontSize(fontSize)
-        _fontSize.value = fontSize
-        var y = 0
-        y = lazyListState.firstVisibleItemScrollOffset
-
-        val newY = y * fontSizePercentage * 1.01f
-        scrollToIndex((newY - y))
-        _fontSizeChanged.value = true
-    }
+//    private val _fontSizeChanged = MutableStateFlow(false)
+//    val fontSizeChanged: StateFlow<Boolean> = _fontSizeChanged
+//
+//    fun setFontSizeChanged(value: Boolean) {
+//        _fontSizeChanged.value = value
+//    }
+//
+//    fun setFontSize(fontSize: Float, currentY: Float) {
+//        _currentPageIndex.value = lazyListState.firstVisibleItemIndex
+//        val fontSizePercentage = fontSize / _fontSize.value
+//
+//        preferencesManager.setFontSize(fontSize)
+//        _fontSize.value = fontSize
+//        var y = 0
+//        y = lazyListState.firstVisibleItemScrollOffset
+//
+//        val newY = y * fontSizePercentage * 1.01f
+//        scrollToIndex((newY - y))
+//        _fontSizeChanged.value = true
+//    }
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -444,11 +222,11 @@ class BookContentViewModel @Inject constructor(
     val state: State<BookDetailsState> = _state
 
     var lazyListState = LazyListState()
-    private val _currentPageIndex = MutableStateFlow(0)
-    val currentPageIndex: StateFlow<Int> = _currentPageIndex
-
-    private val _currentChapterIndex = mutableIntStateOf(0)
-    val currentChapterIndex: State<Int> = _currentChapterIndex
+//    private val _currentPageIndex = MutableStateFlow(0)
+//    val currentPageIndex: StateFlow<Int> = _currentPageIndex
+//
+//    private val _currentChapterIndex = mutableIntStateOf(0)
+//    val currentChapterIndex: State<Int> = _currentChapterIndex
 
     //    private val _tokenIndex = MutableStateFlow(0)
 //    val tokenIndex: StateFlow<Int> = _tokenIndex
@@ -832,7 +610,7 @@ class BookContentViewModel @Inject constructor(
                         val targetLine = textView.value?.getYCoordinateForIndex(targetIndex)
                         Log.d("BookContentViewModel", "not current page & targetLine = $targetLine")
                         lazyListState.scrollBy(targetLine!!.toFloat())
-                        _showTopBar.value = false
+
                     }
                 }
             // }

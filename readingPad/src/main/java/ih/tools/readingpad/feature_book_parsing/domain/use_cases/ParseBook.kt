@@ -1,8 +1,10 @@
 package ih.tools.readingpad.feature_book_parsing.domain.use_cases
 
 import android.content.Context
+import android.os.Build
 import android.text.SpannableStringBuilder
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Book
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Encoding
@@ -30,7 +32,8 @@ class ParseBook {
  * @param viewModel The ViewModel associated with the book content.
  * @return A SpannableStringBuilder containing the parsed content with formatting and interactive elements.
  */
-    suspend fun invoke(
+    @RequiresApi(Build.VERSION_CODES.P)
+     fun invoke(
         pageEncodedString: String,
         metadata: Metadata,
         context: Context,
@@ -75,7 +78,7 @@ class ParseBook {
                     // if the parsed tag is a custom font
                     is ParsedElement.Font -> {
                         Log.d("ParseBook", "Font element is ${parsedTag.content}")
-                        pageSpannableStringBuilder = ParseFont().invoke(metadata, parsedTag, pageSpannableStringBuilder)
+                        pageSpannableStringBuilder = ParseFont().invoke(metadata, parsedTag, pageSpannableStringBuilder,context)
 
                     }
 

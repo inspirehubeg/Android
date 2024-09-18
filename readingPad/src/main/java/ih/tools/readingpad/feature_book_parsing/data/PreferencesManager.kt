@@ -138,5 +138,12 @@ class PreferencesManager(context: Context) {
     fun setBackgroundColor(color: Int) {
         sharedPreferences.edit().putInt("background_color", color).apply()
     }
+
+    fun setBrightnessLevel(level: Float){
+        sharedPreferences.edit().putFloat("brightness_level", level).apply()
+    }
+    fun getBrightnessLevel(): Float{
+        return sharedPreferences.getFloat("brightness_level", 0.5f)
+    }
 }
 

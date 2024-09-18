@@ -25,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -36,17 +35,20 @@ import androidx.compose.ui.unit.sp
 import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
+import ih.tools.readingpad.ui.UIStateViewModel
 
 
 /** A custom dialog to show the book bookmarks and allow the user to navigate to any of it*/
 @Composable
 fun BookmarkListDialog(
     viewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel,
     dialogWidth: Dp,
     listState: LazyListState,
 ) {
     val bookmarks = viewModel.state.value.bookBookmarks
-    val fontSize by viewModel.fontSize.collectAsState()
+   // val fontSize by viewModel.fontSize.collectAsState()
+    val fontSize = uiStateViewModel.uiSettings.collectAsState().value.fontSize
     val onDismiss = {
 
     }

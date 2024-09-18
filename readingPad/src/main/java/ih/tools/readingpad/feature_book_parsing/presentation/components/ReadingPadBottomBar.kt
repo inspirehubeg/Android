@@ -37,16 +37,8 @@ fun ReadingPadBottomBar(
     uiStateViewModel: UIStateViewModel = hiltViewModel(),
     navController: NavController
 ) {
-//    val showFontSlider by viewModel.showFontSlider.collectAsState()
-//    val showThemeSelector by viewModel.showThemeSelector.collectAsState()
-//    val showBookmarkListDialog by viewModel.showBookmarkListDialog.collectAsState()
-//    val showBrightnessDialog by viewModel.showBrightnessDialog.collectAsState()
-//    val showPageNumberDialog by viewModel.showPageNumberDialog.collectAsState()
-//    val showPagesSlider by viewModel.showPagesSlider.collectAsState()
 
     val pageNumber by viewModel.pageNumber
-
-
     val showFontSlider = uiStateViewModel.currentDialog.collectAsState()
         .value == UIStateViewModel.DialogType.FontSlider
     val showThemeSelector = uiStateViewModel.currentDialog.collectAsState()
@@ -61,8 +53,6 @@ fun ReadingPadBottomBar(
         .value == UIStateViewModel.DialogType.PagesSlider
     // the list of bottom bar items, they are displayed in the same order
     val itemList: List<NavigationItem> = listOf(
-        // this is just a place holder to be changed later with a working icon
-
 
         NavigationItem(
             title = "Progress",
@@ -75,7 +65,7 @@ fun ReadingPadBottomBar(
                 CircularProgressIndicator(
                     progress = { progress },
                     trackColor = Color.Gray,
-                    strokeWidth = 20.dp, // Adjust stroke width as needed
+                    strokeWidth = 10.dp, // Adjust stroke width as needed
                     color = Green // Customize color as needed
                 )
                 //Icon(Icons.Default.Bookmarks, contentDescription = stringResource(R.string.bookmarks))
@@ -86,6 +76,7 @@ fun ReadingPadBottomBar(
                     if (showPagesSlider) null
                     else UIStateViewModel.DialogType.PagesSlider
                 )
+               // uiStateViewModel.showScreen(null)
 //                viewModel.setShowPagesSlider(!showPagesSlider)
 //                viewModel.setShowThemeSelector(false)
 //                viewModel.setShowFontSlider(false)
@@ -105,6 +96,7 @@ fun ReadingPadBottomBar(
                     if (showBrightnessDialog) null
                     else UIStateViewModel.DialogType.Brightness
                 )
+                //uiStateViewModel.showScreen(null)
 //                viewModel.setShowBrightnessDialog(!showBrightnessDialog)
 //                viewModel.setShowBookmarkListDialog(false)
 //                viewModel.setShowThemeSelector(false)
@@ -141,6 +133,8 @@ fun ReadingPadBottomBar(
                     if (showPageNumberDialog) null
                     else UIStateViewModel.DialogType.PageNumber
                 )
+                //uiStateViewModel.showScreen(null)
+
 //                viewModel.setShowPageNumberDialog(!showPageNumberDialog)
 //                viewModel.setShowBookmarkListDialog(false)
 //                viewModel.setShowThemeSelector(false)
@@ -163,6 +157,7 @@ fun ReadingPadBottomBar(
                     if (showFontSlider) null
                     else UIStateViewModel.DialogType.FontSlider
                 )
+               // uiStateViewModel.showScreen(null)
 //                viewModel.setShowFontSlider(!showFontSlider)
 //                viewModel.setShowThemeSelector(false)
 //                viewModel.setShowBookmarkListDialog(false)
@@ -184,6 +179,7 @@ fun ReadingPadBottomBar(
                     if (showThemeSelector) null
                     else UIStateViewModel.DialogType.ThemeSelector
                 )
+                //uiStateViewModel.showScreen(null)
 //                viewModel.setShowThemeSelector(!showThemeSelector)
 //                viewModel.setShowFontSlider(false)
 //                viewModel.setShowBookmarkListDialog(false)

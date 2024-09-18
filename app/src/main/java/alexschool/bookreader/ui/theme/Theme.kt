@@ -1,6 +1,5 @@
 package alexschool.bookreader.ui.theme
 
-import alexschool.bookreader.R
 import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -12,10 +11,6 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
@@ -49,68 +44,68 @@ val defaultTypography = Typography(
     // ... your default font family settings
 )
 
-val customTypography = Typography(
-    displayLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    ),
-    displayMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    ),
-    displaySmall = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    ),
-    headlineLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    ),
-    headlineMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    ),
-    headlineSmall = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    ),
-    titleLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    ),
-    titleMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    ),
-    titleSmall = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    ),
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    ),
-    bodyMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    ),
-    bodySmall = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    ),
-    labelLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    ),
-    labelMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
-        fontWeight = FontWeight.Normal,
-    )
-)
+//val customTypography = Typography(
+//    displayLarge = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    ),
+//    displayMedium = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    ),
+//    displaySmall = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    ),
+//    headlineLarge = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    ),
+//    headlineMedium = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    ),
+//    headlineSmall = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    ),
+//    titleLarge = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    ),
+//    titleMedium = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    ),
+//    titleSmall = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    ),
+//    bodyLarge = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    ),
+//    bodyMedium = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    ),
+//    bodySmall = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    ),
+//    labelLarge = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    ),
+//    labelMedium = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    ),
+//    labelSmall = TextStyle(
+//        fontFamily = FontFamily(Font(R.font.bookerly_regular, FontWeight.Normal)),
+//        fontWeight = FontWeight.Normal,
+//    )
+//)
 
 @Composable
 fun AlexSchoolTheme(

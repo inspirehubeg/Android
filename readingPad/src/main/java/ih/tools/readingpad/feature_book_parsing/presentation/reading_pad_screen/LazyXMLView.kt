@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -30,9 +29,9 @@ fun XMLViewLazyItem(
     val spannableString = remember {
         mutableStateOf(page.content)
     }
-    val fontSize by viewModel.fontSize.collectAsState()
-    val fontColor by viewModel.fontColor.collectAsState()
-    val fontWeight by viewModel.fontWeight.collectAsState()
+    val fontSize = uiStateViewModel.uiSettings.collectAsState().value.fontSize
+    val fontColor = uiStateViewModel.uiSettings.collectAsState().value.fontColor
+    val fontWeight = uiStateViewModel.uiSettings.collectAsState().value.fontWeight
 
     AndroidView(
         modifier = modifier,

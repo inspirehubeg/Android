@@ -67,6 +67,11 @@ fun ReadingPadScreen(
             drawerState.close()
         }
     }
+    LaunchedEffect (key1 = drawerState.currentValue){
+        if (drawerState.currentValue == DrawerValue.Closed) {
+            uiStateViewModel.setIsDrawerOpen(false)
+        }
+    }
     ReadingPadTheme(isDarkTheme) {
         //val showTopBar by viewModel.showTopBar.collectAsState()
         val showTopBar by uiStateViewModel.showTopBar.collectAsState() // Migrated state observation
@@ -239,7 +244,8 @@ fun ReadingPadScreen(
                         UIStateViewModel.DialogType.BookmarkList -> BookmarkListDialog(
                             viewModel = viewModel,
                             dialogWidth = dialogWidth.dp,
-                            listState = listState
+                            listState = listState,
+                            uiStateViewModel = uiStateViewModel
                         )
 
                         UIStateViewModel.DialogType.PageNumber -> PageSelector(
