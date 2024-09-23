@@ -4,11 +4,13 @@ import android.util.Log
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ih.tools.readingpad.feature_book_parsing.data.PreferencesManager
+import ih.tools.readingpad.feature_book_parsing.presentation.text_view.IHTextView
 import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkClickableSpan
 import ih.tools.readingpad.ui.theme.HighlightLaserLemon
 import ih.tools.readingpad.util.IHNoteClickableSpan
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @HiltViewModel
 class UIStateViewModel @Inject constructor(
@@ -32,6 +35,7 @@ class UIStateViewModel @Inject constructor(
         val showHighlightsBookmarks: Boolean,
         val keepScreenOn: Boolean,
         val pinnedTopBar: Boolean,
+        val showSearchBar: Boolean,
         val darkTheme: Boolean,
         val fontSize: Float,
         val fontWeight: Int,
@@ -48,6 +52,7 @@ class UIStateViewModel @Inject constructor(
             showHighlightsBookmarks = true,
             keepScreenOn = false,
             pinnedTopBar = preferencesManager.isPinnedTopBar(),
+            showSearchBar = false,
             darkTheme = preferencesManager.isDarkTheme(),
             fontSize = preferencesManager.getFontSize(),
             fontWeight = preferencesManager.getFontWeight(),
@@ -57,6 +62,30 @@ class UIStateViewModel @Inject constructor(
     )
     val uiSettings = _uiSettings.asStateFlow()
 
+    private val _topBarHeight = MutableStateFlow(0f)
+    val topBarHeight = _topBarHeight.asStateFlow()
+    fun setTopBarHeight(height: Float) {
+        _topBarHeight.value = height
+    }
+
+    private val _bottomBarHeight = MutableStateFlow(0f)
+    val bottomBarHeight = _bottomBarHeight.asStateFlow()
+    fun setBottomBarHeight(height: Float) {
+        _bottomBarHeight.value = height
+    }
+    private val _screenWidth = MutableStateFlow(0f)
+    val screenWidth = _screenWidth.asStateFlow()
+
+    private val _menuWidth = MutableStateFlow(0f)
+    val menuWidth = _menuWidth.asStateFlow()
+
+    fun setScreenWidth(width: Float) {
+        _screenWidth.value = width
+    }
+
+    fun setMenuWidth(width: Float) {
+        _menuWidth.value = width
+    }
     // Dialogs
     private val _currentDialog = MutableStateFlow<DialogType?>(null)
     val currentDialog = _currentDialog.asStateFlow()
@@ -68,11 +97,6 @@ class UIStateViewModel @Inject constructor(
     // Other UI State
     private val _showTopBar = MutableStateFlow(true)
     val showTopBar = _showTopBar.asStateFlow()
-//    private val _showPageSlider = MutableStateFlow(false)
-//    val showPageSlider = _showPageSlider.asStateFlow()
-//
-//    private val _keepScreenOn = MutableStateFlow(false)
-//    val keepScreenOn = _keepScreenOn.asStateFlow()
 
     private val _imageClicked = MutableStateFlow<ByteArray?>(null)
     val imageClicked = _imageClicked.asStateFlow()
@@ -134,7 +158,7 @@ class UIStateViewModel @Inject constructor(
         viewModelScope.launch {
             _currentDialog.value = dialogType
             _currentScreen.value = null
-            _imageClicked.value= null
+            _imageClicked.value = null
         }
     }
 
@@ -389,6 +413,94 @@ class UIStateViewModel @Inject constructor(
             _uiSettings.value = _uiSettings.value.copy(backgroundColor = backgroundColor)
         }
     }
+
+    private val _textView = MutableStateFlow<IHTextView?>(null)
+    val textView: StateFlow<IHTextView?> = _textView
+    fun setTextView(textView: IHTextView) {
+        _textView.value = textView
+    }
+
+    private val _selectionStart = MutableStateFlow(-1)
+    val selectionStart: StateFlow<Int> = _selectionStart
+    fun setSelectionStart(start: Int) {
+        _selectionStart.value = start
+    }
+
+    fun setSelectionEnd(end: Int) {
+        _selectionEnd.value = end
+    }
+
+    private val _selectionEnd = MutableStateFlow(-1)
+    val selectionEnd: StateFlow<Int> = _selectionEnd
+
+    private val _menuPosition = MutableStateFlow(IntOffset(0, 0))
+    val menuPosition: StateFlow<IntOffset> = _menuPosition
+    fun setMenuPosition(position: IntOffset) {
+        Log.d("SelectionMenu", "setMenuPosition called with position: $position")
+        if (textView.value != null) {
+            val key = textView.value?.itemKey // Access the item key from the TextView
+            Log.d("SelectionMenu", "textView.value is not null, key: $key")
+            val itemIndex = lazyListState.layoutInfo.visibleItemsInfo.indexOfFirst { it.key == key }
+            Log.d("SelectionMenu", "itemIndex: $itemIndex")
+            if (itemIndex != -1) {
+                Log.d("SelectionMenu", "topBar = ${topBarHeight.value.roundToInt()}")
+                val itemInfo = lazyListState.layoutInfo.visibleItemsInfo[itemIndex]
+
+                val itemTop = itemInfo.offset
+
+                val paddingStart = textView.value!!.paddingStart
+                val paddingTop = textView.value!!.paddingTop
+                Log.d("SelectionMenu", "paddingStart: $paddingStart, paddingTop: $paddingTop")
+
+
+                val topBarHeightInt = if (showTopBar.value || uiSettings.value.pinnedTopBar) {
+                    topBarHeight.value.roundToInt()
+                } else {
+                    0 // No top bar height when not pinned
+                }
+
+                val bottomBarHeightInt = if (showTopBar.value || uiSettings.value.pinnedTopBar) {
+                    bottomBarHeight.value.roundToInt()
+                } else {
+                    0 // No bottom bar height when not pinned
+                }
+
+                val selectionY = if (uiSettings.value.pinnedTopBar){
+                    position.y + itemTop
+                } else{
+                    position.y + itemTop - topBarHeight.value.roundToInt()
+                }
+
+                Log.d("SelectionMenu", "selectionY: ${position.y} + $itemTop")
+                //to position in middle of the line
+                //val menuX = (screenWidth.value/2 - (menuWidth.value/2))
+                    //position.x - paddingStart
+
+                //to position in the middle of the selection
+                val menuX = position.x
+                Log.d("SelectionMenu", "screen width = $screenWidth, menuWidth = $menuWidth")
+                val menuY = selectionY + paddingTop + topBarHeightInt - bottomBarHeightInt
+                Log.d(
+                    "SelectionMenu",
+                    "topBarHeight: $topBarHeightInt, bottomBarHeight: $bottomBarHeightInt"
+                )
+
+                val menuPosition = IntOffset(menuX.toInt(), menuY/*+100*/)
+                Log.d("SelectionMenu", "menuPosition: $menuPosition")
+                _menuPosition.value = menuPosition
+            } else {
+                Log.d("SelectionMenu", "itemIndex is -1")
+            }
+        } else {
+            Log.d("SelectionMenu", "textView.value is null")
+        }
+    }
+
+    fun clearSelection() {
+        setSelectionStart(-1)
+        setSelectionEnd(-1)
+    }
+
 
     // Enum classes for dialog and screen types
     enum class DialogType {

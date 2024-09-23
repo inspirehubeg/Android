@@ -98,7 +98,7 @@ fun UserInputsDrawerSheet(
     uiStateViewModel: UIStateViewModel
 ) {
 
-    val lazyListState = viewModel.lazyListState
+    val lazyListState = uiStateViewModel.lazyListState
     var selectedItem by remember { mutableStateOf<String?>(null) }
     var expandedBookmarkMenu by remember { mutableStateOf(false) }
     var expandedHighlightMenu by remember { mutableStateOf(false) }
@@ -134,7 +134,7 @@ fun UserInputsDrawerSheet(
                                 viewModel.scrollToIndexLazy(
                                     targetPageIndex = bookmark.pageNumber - 1,
                                     targetIndex = bookmark.start,
-                                    lazyListState = viewModel.lazyListState
+                                    lazyListState = uiStateViewModel.lazyListState
                                 )
                                 //viewModel.closeDrawer()
                                 uiStateViewModel.setIsDrawerOpen(false)
@@ -218,7 +218,7 @@ fun UserInputsDrawerSheet(
                                 viewModel.scrollToIndexLazy(
                                     targetPageIndex = note.pageNumber - 1,
                                     targetIndex = note.start,
-                                    lazyListState = viewModel.lazyListState
+                                    lazyListState = uiStateViewModel.lazyListState
                                 )
                                 //viewModel.closeDrawer()
                                 uiStateViewModel.setIsDrawerOpen(false)

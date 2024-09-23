@@ -12,16 +12,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.feature_book_parsing.presentation.components.BrightnessDialog
 import ih.tools.readingpad.feature_book_parsing.presentation.components.CustomFontDialog
+import ih.tools.readingpad.feature_book_parsing.presentation.components.CustomMenu
 import ih.tools.readingpad.feature_book_parsing.presentation.components.CustomThemeScreen
 import ih.tools.readingpad.feature_book_parsing.presentation.components.FullScreenImage
 import ih.tools.readingpad.feature_book_parsing.presentation.components.FullScreenImageTopBar
@@ -77,17 +82,6 @@ fun ReadingPadScreen(
         val showTopBar by uiStateViewModel.showTopBar.collectAsState() // Migrated state observation
         // val pinnedTopBar by viewModel.pinnedTopBar.collectAsState()
         val pinnedTopBar = uiSettings.pinnedTopBar // Migrated state observation
-
-        //val showFontSlider by viewModel.showFontSlider.collectAsState()
-        //val showThemeSelector by viewModel.showThemeSelector.collectAsState()
-        // val showBookmarkListDialog by viewModel.showBookmarkListDialog.collectAsState()
-        // val showPageNumberDialog by viewModel.showPageNumberDialog.collectAsState()
-        // val showAddBookmarkDialog by viewModel.showAddBookmarkDialog.collectAsState()
-        // val showEditBookmarkDialog by viewModel.showEditBookmarkDialog.collectAsState()
-        //val showBrightnessDialog by viewModel.showBrightnessDialog.collectAsState()
-        //val showAddNoteDialog by viewModel.showAddNoteDialog.collectAsState()
-        //val showEditNoteDialog by viewModel.showEditNoteDialog.collectAsState()
-        //val imageClicked by viewModel.imageClicked.collectAsState()
         val imageClicked by uiStateViewModel.imageClicked.collectAsState() // Migrated state observation
 
         //val showFullScreenImage by viewModel.showFullScreenImage.collectAsState()
@@ -101,13 +95,32 @@ fun ReadingPadScreen(
         //val openCustomTheme by viewModel.showCustomThemePage.collectAsState()
         //val backgroundColor by viewModel.backgroundColor.collectAsState()
         val backgroundColor = uiSettings.backgroundColor // Migrated state observation
-        val listState = viewModel.lazyListState
+        val listState = uiStateViewModel.lazyListState
+        val configuration = LocalConfiguration.current
+        val density = LocalDensity.current
+        val menuWidth = 200.dp
+        // Get screen width in pixels
+        val screenWidthPx = with(density) { configuration.screenWidthDp.dp.toPx() }
+        uiStateViewModel.setScreenWidth(screenWidthPx)
 
+        // Get menu width in pixels (replace with your actual menu width)
+        val menuWidthPx = with(density) { 200.dp.toPx() }
+        uiStateViewModel.setMenuWidth(menuWidthPx)
 
         // to calculate the height and width of the screen
-        val configuration = LocalConfiguration.current
         val screenWidth = configuration.screenWidthDp
+        val screenHeight = configuration.screenHeightDp
         val dialogWidth = screenWidth * 0.9f
+
+
+        var showMenu by remember { mutableStateOf(false) }
+        val selectionStart by uiStateViewModel.selectionStart.collectAsState()
+        val selectionEnd by uiStateViewModel.selectionEnd.collectAsState()
+        val menuPosition by uiStateViewModel.menuPosition.collectAsState()
+        // Use a LaunchedEffect to listen for selection changes from the ViewModel
+        LaunchedEffect(selectionStart, selectionEnd) {
+            showMenu = uiStateViewModel.selectionStart.value!= -1 && uiStateViewModel.selectionEnd.value != -1
+        }
 
 
         // this happens whenever there is a bookmark span in focus
@@ -362,6 +375,14 @@ fun ReadingPadScreen(
 //                            viewModel.setTopBarVisibility(true)
                         }
 
+
+                    if (showMenu) {
+//                        uiStateViewModel.screenWidth = screenWidth
+//                        uiStateViewModel.screenHeight = screenHeight
+                        CustomMenu(menuPosition, uiStateViewModel, viewModel,menuWidth)
+                    }
+
+
 //                        if (showFullScreenImage) {
 //                            viewModel.setDrawerGesturesEnabled(false)
 //                            FullScreenImage(viewModel = viewModel,
@@ -417,7 +438,6 @@ fun ReadingPadScreen(
         )
     }
 }
-
 
 
 

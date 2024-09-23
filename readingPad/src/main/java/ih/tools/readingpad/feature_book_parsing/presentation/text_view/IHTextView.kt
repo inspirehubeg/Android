@@ -14,6 +14,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.IntOffset
 import androidx.core.text.toSpannable
 import androidx.recyclerview.widget.RecyclerView
 import ih.tools.readingpad.R
@@ -77,7 +78,6 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
             super(context!!, attrs, defStyleAttr) {
         Log.d("IHTextView", "1st constructor is called")
     }
-
     private lateinit var spannableString: Spannable
     private lateinit var viewModel: BookContentViewModel
     private lateinit var uiStateViewModel: UIStateViewModel
@@ -414,6 +414,8 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
     private var initialPointerDistance = 0f
     var pressStart = -1
 
+    var itemKey: Any? = null // Adda property to store the item key
+
     /**
      * Handles touch events on the TextView.
      * This method manages text scaling using pinch gestures and detects span selections.
@@ -431,10 +433,9 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
             viewModel.setTextView(this)
 
             when (event.action and MotionEvent.ACTION_MASK) {
+
                 MotionEvent.ACTION_DOWN -> {
                     pressStart = this.getOffsetForPosition(event.x, event.y)
-                    pressStart = this.getOffsetForPosition(event.x, event.y)
-
                 }
 
                 MotionEvent.ACTION_POINTER_UP -> {
@@ -492,6 +493,10 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
                     val pressEnd = this.getOffsetForPosition(event.x, event.y)
                     val start = minOf(pressStart, pressEnd)
                     val end = maxOf(pressStart, pressEnd)
+
+
+
+
 
                     // Check for a quick tap with no text selection to make the bars appear or disappear
                     if (event.eventTime - event.downTime < 300 && !hasSelection()) {
@@ -695,6 +700,7 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
                 R.menu.custom_selection_menu,
                 menu
             )
+
             return true
         }
 
@@ -710,49 +716,42 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
             mode: ActionMode,
             menu: Menu
         ): Boolean {
+
             uiStateViewModel.toggleTopBar(true)
             uiStateViewModel.setShowCustomSelectionMenu(true)
-//            viewModel.setTopBarVisibility(true)
-//            viewModel.setShowCustomSelectionMenu(true)
             viewModel.setTextView(this@IHTextView)
+            uiStateViewModel.setTextView(this@IHTextView)
+            uiStateViewModel.setSelectionStart(selectionStart)
+            uiStateViewModel.setSelectionEnd( selectionEnd)
 
-            menu.clear()
-            val highLightSpans =
-                viewModel.selectedSpans.value.filterIsInstance<IHBackgroundSpan>()
-            // Show/hide highlight actions based on selection
-            if (highLightSpans.isEmpty()) {
-                menu.findItem(R.id.action_yellow_highlight)?.isVisible = true
-                menu.findItem(R.id.action_remove_highlight)?.isVisible = false
-            } else {
-                menu.findItem(R.id.action_yellow_highlight)?.isVisible = false
-                menu.findItem(R.id.action_remove_highlight)?.isVisible = true
+            if (selectionStart != -1 && selectionEnd != -1) {
+                val midPoint = (selectionStart + selectionEnd) / 2    //the middle of the selected text
+                val horizontalPosition = layout.getPrimaryHorizontal(midPoint) //the horizontal position of the middle of the selected text
+
+                val menuX = if (textDirection == View.TEXT_DIRECTION_RTL) {
+                    //the start of the menu differs in different directions so requires a calculation
+                    ((horizontalPosition - uiStateViewModel.menuWidth.value).toInt()) - paddingStart
+                } else {
+                    ((horizontalPosition - uiStateViewModel.menuWidth.value / 2).toInt()) + paddingStart
+                }
+                 // limiting the menu to the screen borders
+                val menuRightEdge = menuX + uiStateViewModel.menuWidth.value
+                val exceedsRightBound = menuRightEdge > uiStateViewModel.screenWidth.value
+                val exceedsLeftBound = menuX < 0
+
+                val finalMenuX = when {
+                    exceedsRightBound -> (uiStateViewModel.screenWidth.value - uiStateViewModel.menuWidth.value).toInt()
+                    exceedsLeftBound -> 0
+                    else -> menuX
+                }
+
+                val layout = layout
+                val line = layout.getLineForOffset(selectionStart)
+                val y = layout.getLineTop(line)
+                uiStateViewModel.setMenuPosition(IntOffset(finalMenuX, y))
             }
 
-//            // Show/hide bookmark actions based on selection
-//            if (bookmarkSpans.isEmpty()) {
-//                menu.findItem(R.id.action_bookmark)?.isVisible = true
-//                menu.findItem(R.id.action_remove_bookmark)?.isVisible = false
-//            } else {
-//                menu.findItem(R.id.action_bookmark)?.isVisible = false
-//                menu.findItem(R.id.action_remove_bookmark)?.isVisible = true
-//            }
-            // Show/hide note actions based on selection
-//            if (noteSpans.isEmpty()) {
-//                menu.findItem(R.id.action_add_note)?.isVisible = true
-//                menu.findItem(R.id.action_remove_note)?.isVisible = false
-//            } else {
-//                menu.findItem(R.id.action_add_note)?.isVisible = false
-//                menu.findItem(R.id.action_remove_note)?.isVisible = true
-//            }
-
-            // Remove default menu items
-            menu.removeItem(android.R.id.cut)
-            //menu.removeItem(android.R.id.cut)
-            // menu.removeItem(0)
-            menu.removeItem(android.R.id.shareText)
-            menu.removeItem(android.R.id.paste)
-            menu.removeItem(android.R.id.selectAll)
-
+            menu.clear()
             return false
         }
 
@@ -803,11 +802,9 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
          * @param mode The ActionMode that was destroyed.
          */
         override fun onDestroyActionMode(mode: ActionMode?) {
-//            viewModel.setShowCustomSelectionMenu(false)
-//            viewModel.setTopBarVisibility(true)
             uiStateViewModel.toggleTopBar(true)
             uiStateViewModel.setShowCustomSelectionMenu(false)
-
+            uiStateViewModel.clearSelection()
         }
     }
 }

@@ -41,7 +41,7 @@ fun PagesSlider(viewModel: BookContentViewModel, uiStateViewModel: UIStateViewMo
                 number = it
                 viewModel.navigateToPage(
                     number.toInt() - 1,
-                    lazyListState = viewModel.lazyListState
+                    lazyListState = uiStateViewModel.lazyListState
                 )
             },
             valueRange = 1f..5f,

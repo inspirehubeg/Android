@@ -112,26 +112,30 @@ fun PagesScreen(
         state = listState,
         userScrollEnabled = scrollable
     ) {
-        itemsIndexed(itemPages.value, key = { index, page ->
-            "${page.pageNumber}-${showHighlights}"
-        }) { index, page ->
-           val chapterIndex =  viewModel.getCurrentChapterIndex(page.pageNumber)
-            XMLViewLazyItem(
-                page = page,
-                viewModel = viewModel,
-                modifier = Modifier,
-                chapterIndex = chapterIndex,
-                uiStateViewModel = uiStateViewModel
-            )
-            Spacer( //indicates the pages divider
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.outline)
-                    .height(3.dp)
-            )
+        itemsIndexed(itemPages.value,
+            key = { index, page ->
+            "${page.pageNumber}-${showHighlights}-$index"
+         })
+        { index, page ->
+                val chapterIndex = viewModel.getCurrentChapterIndex(page.pageNumber)
+                XMLViewLazyItem(
+                    page = page,
+                    viewModel = viewModel,
+                    modifier = Modifier,
+                    chapterIndex = chapterIndex,
+                    uiStateViewModel = uiStateViewModel,
+                    itemIndex = index
+                )
+                Spacer( //indicates the pages divider
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.outline)
+                        .height(3.dp)
+                )
+            }
         }
     }
-}
+
 //    } else {
 //        LazyRow(
 //            state = listState,
@@ -167,7 +171,6 @@ fun PagesScreen(
 //            }
 //        }
 //    }
-
 
 
 

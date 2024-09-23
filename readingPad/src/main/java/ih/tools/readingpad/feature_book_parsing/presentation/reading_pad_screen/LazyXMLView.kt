@@ -24,6 +24,7 @@ fun XMLViewLazyItem(
     uiStateViewModel: UIStateViewModel,
     modifier: Modifier,
     chapterIndex: Int,
+    itemIndex: Int
 ) {
     // Create a SpannableString from the book content
     val spannableString = remember {
@@ -32,7 +33,8 @@ fun XMLViewLazyItem(
     val fontSize = uiStateViewModel.uiSettings.collectAsState().value.fontSize
     val fontColor = uiStateViewModel.uiSettings.collectAsState().value.fontColor
     val fontWeight = uiStateViewModel.uiSettings.collectAsState().value.fontWeight
-
+    val uiSettings = uiStateViewModel.uiSettings.collectAsState()
+    val showHighlights = uiSettings.value.showHighlightsBookmarks
     AndroidView(
         modifier = modifier,
         factory = { currentContext ->
@@ -49,7 +51,8 @@ fun XMLViewLazyItem(
             if (page.pageNumber == 1) {
                 viewModel.setTextView(textView)
             }
-            Log.d("PagesScreen", "page number = ${textView.pageNumber}")
+            textView.itemKey = "${page.pageNumber}-$showHighlights-$itemIndex" // Set the item key
+
             return@AndroidView view
         },
         update = { view ->

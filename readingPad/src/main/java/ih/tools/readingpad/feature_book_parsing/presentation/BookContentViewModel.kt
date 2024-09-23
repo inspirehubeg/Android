@@ -221,7 +221,7 @@ class BookContentViewModel @Inject constructor(
     private val _state = mutableStateOf(BookDetailsState())
     val state: State<BookDetailsState> = _state
 
-    var lazyListState = LazyListState()
+//    var lazyListState = LazyListState()
 //    private val _currentPageIndex = MutableStateFlow(0)
 //    val currentPageIndex: StateFlow<Int> = _currentPageIndex
 //
@@ -588,11 +588,11 @@ class BookContentViewModel @Inject constructor(
 //        }
 //    }
 
-    private fun scrollToIndex(targetPageIndex: Float) {
-        viewModelScope.launch {
-            lazyListState.scrollBy(targetPageIndex)
-        }
-    }
+//    private fun scrollToIndex(targetPageIndex: Float) {
+//        viewModelScope.launch {
+//            lazyListState.scrollBy(targetPageIndex)
+//        }
+//    }
 
     fun scrollToIndexLazy(targetPageIndex: Int, lazyListState: LazyListState, targetIndex: Int) {
         viewModelScope.launch {

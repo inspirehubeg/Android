@@ -21,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +38,10 @@ fun ReadingPadBottomBar(
     uiStateViewModel: UIStateViewModel = hiltViewModel(),
     navController: NavController
 ) {
+    val density = LocalDensity.current
+    uiStateViewModel.setBottomBarHeight(with(density) { 50.dp.toPx() })
+    val bottomBarHeight by uiStateViewModel.bottomBarHeight.collectAsState()
+    val bottomBarHeightDp = with(density) { bottomBarHeight.toDp() }
 
     val pageNumber by viewModel.pageNumber
     val showFontSlider = uiStateViewModel.currentDialog.collectAsState()
@@ -76,7 +81,7 @@ fun ReadingPadBottomBar(
                     if (showPagesSlider) null
                     else UIStateViewModel.DialogType.PagesSlider
                 )
-               // uiStateViewModel.showScreen(null)
+                // uiStateViewModel.showScreen(null)
 //                viewModel.setShowPagesSlider(!showPagesSlider)
 //                viewModel.setShowThemeSelector(false)
 //                viewModel.setShowFontSlider(false)
@@ -157,7 +162,7 @@ fun ReadingPadBottomBar(
                     if (showFontSlider) null
                     else UIStateViewModel.DialogType.FontSlider
                 )
-               // uiStateViewModel.showScreen(null)
+                // uiStateViewModel.showScreen(null)
 //                viewModel.setShowFontSlider(!showFontSlider)
 //                viewModel.setShowThemeSelector(false)
 //                viewModel.setShowBookmarkListDialog(false)
@@ -193,7 +198,7 @@ fun ReadingPadBottomBar(
 
 
 // the start of the bottom bar, using surface to give it a custom height
-    Surface(modifier = Modifier.height(50.dp)) {
+    Surface(modifier = Modifier.height(bottomBarHeightDp)) {
         NavigationBar(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
