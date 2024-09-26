@@ -1,6 +1,6 @@
 {
-   "encoding":{
-      "tags":{
+   "oldEncoding":{
+      "oldTags":{
          "tagStart":"##",
          "tagEnd":"**",
          "tagLength":2,
@@ -97,7 +97,7 @@
          "tokenName":"token_lkpauvvx"
       }
    ],
-   "targetLinks":[
+   "oldTargetLinks":[
          {
             "key":"A",
             "chapterNumber":1,

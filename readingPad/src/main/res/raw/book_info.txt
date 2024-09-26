@@ -1,7 +1,7 @@
 {
    "name":"Book",
    "description":"description",
-   "author":{
+   "oldAuthor":{
       "name":"Ali",
       "id":"123"
    },

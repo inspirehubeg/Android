@@ -1,6 +1,10 @@
-package ih.tools.readingpad.feature_book_fetching.domain.book_reader
+package alexschool.bookreader.network.model.dto
 
-data class Tags(
+import kotlinx.serialization.Serializable
+
+
+@Serializable
+data class EncodingTags(
     val tagStart: String,
     val tagEnd: String,
     val tagLength: Int,

@@ -3,7 +3,6 @@ package ih.tools.readingpad.feature_book_parsing.domain.use_cases
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
-import android.os.Build
 import android.text.Layout
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -12,16 +11,11 @@ import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
-import android.text.style.TypefaceSpan
 import android.text.style.UnderlineSpan
 import android.util.Log
-import androidx.annotation.RequiresApi
-import androidx.core.content.res.ResourcesCompat
-import book_reader.Font
-import ih.tools.readingpad.R
-import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Metadata
+import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Font
+import ih.tools.readingpad.feature_book_fetching.domain.book_reader.OldMetadata
 import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
-import java.io.File
 
 /**
  * Parses font style elements within a book and applies them to a SpannableStringBuilder.
@@ -30,14 +24,13 @@ class ParseFont {
     /**
      * Applies font customizations to a SpannableStringBuilder based on a parsed font element.
      *
-     * @param metadata Metadata about the book, including encoding and font information.
+     * @param oldMetadata Metadata about the book, including encoding and font information.
      * @param parsedTag The parsed font element containing style information.
      * @param spannedText The SpannableStringBuilder to apply font styles to.
      * @return The SpannableStringBuilder with applied font styles.
      */
-    @RequiresApi(Build.VERSION_CODES.P)
     operator fun invoke(
-        metadata: Metadata,
+        oldMetadata: OldMetadata,
         parsedTag: ParsedElement.Font,
         spannedText: SpannableStringBuilder,
         context: Context
@@ -52,7 +45,7 @@ class ParseFont {
             parsedTag.fontTag,
             start,
             end,
-            metadata.encoding.fonts,
+            oldMetadata.oldEncoding.fonts,
             context
         )
         return spannedText
@@ -67,17 +60,16 @@ class ParseFont {
  * Persistence: Files stored here are persistent and remain even after the app is closed or the device is restarted.
  * Deletion: Files in this directory are deleted when the app is uninstalled
  */
-@RequiresApi(Build.VERSION_CODES.P)
-fun getTypefaceSpan(context: Context, fontFileName: String): TypefaceSpan {
-    val fontFile = File(context.filesDir, fontFileName) // Check internal storage
-    return if (fontFile.exists()) {
-        val typeface = Typeface.createFromFile(fontFile)
-        TypefaceSpan(typeface)
-    } else {
-        // Use default TypefaceSpan
-        TypefaceSpan(Typeface.DEFAULT)
-    }
-}
+//fun getTypefaceSpan(context: Context, fontFileName: String): TypefaceSpan {
+//    val fontFile = File(context.filesDir, fontFileName) // Check internal storage
+//    return if (fontFile.exists()) {
+//        val typeface = Typeface.createFromFile(fontFile)
+//        TypefaceSpan(typeface)
+//    } else {
+//        // Use default TypefaceSpan
+//        TypefaceSpan(Typeface.DEFAULT)
+//    }
+//}
 
 /**
  * Applies font customizations to a SpannableStringBuilder based on a font tag and style information.
@@ -89,7 +81,6 @@ fun getTypefaceSpan(context: Context, fontFileName: String): TypefaceSpan {
  * @param fonts A map of font tags to their corresponding style information.
  */
 
-@RequiresApi(Build.VERSION_CODES.P)
 fun applyFontCustomizations(
     spannable: SpannableStringBuilder,
     fontTag: String,
@@ -100,11 +91,14 @@ fun applyFontCustomizations(
 ) {
 
     val fontStyle = fonts[fontTag] ?: return // Return early if font style is not found
-    val bookerlyNormalTypeface = ResourcesCompat.getFont(context, R.font.bookerly_regular)?.let {
-        TypefaceSpan(it)
-    }
-
-    val customFontTypeface : TypefaceSpan = getTypefaceSpan(context, "bookerly_bold_italic.ttf")
+    /**
+     * managing different font families using this way requires android v 28 and above
+     */
+//    val bookerlyNormalTypeface = ResourcesCompat.getFont(context, R.font.bookerly_regular)?.let {
+//        TypefaceSpan(it)
+//    }
+//
+//    val customFontTypeface : TypefaceSpan = getTypefaceSpan(context, "bookerly_bold_italic.ttf")
 
     if (fontStyle.bold == "1") {
         spannable.setSpan(StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

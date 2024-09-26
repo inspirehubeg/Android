@@ -1,5 +1,6 @@
 package alexschool.bookreader
 
+import alexschool.bookreader.network.NetworkViewModel
 import alexschool.bookreader.ui.HomeScreen
 import alexschool.bookreader.ui.Screens
 import alexschool.bookreader.ui.settings.SettingsScreen
@@ -13,7 +14,7 @@ import androidx.navigation.navArgument
 import ih.tools.readingpad.feature_book_parsing.presentation.reading_pad_screen.ReadingPadScreen
 
 @Composable
-fun Navigation(viewModel: AlexSchoolViewModel) {
+fun Navigation(viewModel: AlexSchoolViewModel, networkViewModel: NetworkViewModel) {
     val navController = rememberNavController()
 
     NavHost(
@@ -24,7 +25,7 @@ fun Navigation(viewModel: AlexSchoolViewModel) {
             route = Screens.HomeScreen.route
         ) {
             viewModel.setCurrentScreen("HomeScreen")
-            HomeScreen(navController = navController)
+            HomeScreen(navController = navController, networkViewModel = networkViewModel)
         }
         composable(
             route = Screens.BookContentScreen.route + "?bookId={bookId}",

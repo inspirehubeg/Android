@@ -5,7 +5,7 @@ import android.text.SpannableStringBuilder
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Book
-import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Metadata
+import ih.tools.readingpad.feature_book_fetching.domain.book_reader.OldMetadata
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Page
 import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
 import ih.tools.readingpad.feature_book_parsing.domain.model.SpannedPage
@@ -21,7 +21,7 @@ class ParsePageLazy {
      * Parses the encoded content of a book page and converts it into a SpannableStringBuilder.
      *
      * @param pageEncodedString The encoded content of the page.
-     * @param metadata Metadata about the book, including encoding information.
+     * @param oldMetadata Metadata about the book, including encoding information.
      * @param context The application context.
      * @param book The book object.
      * @param lazyListState The LazyListState of the LazyColumn displaying the book content.
@@ -30,16 +30,16 @@ class ParsePageLazy {
      */
      fun invoke(
         pageEncodedString: String,
-        metadata: Metadata,
+        oldMetadata: OldMetadata,
         context: Context,
         book: Book,
         lazyListState: LazyListState,
         viewModel: BookContentViewModel,
         uiStateViewModel: UIStateViewModel
     ): SpannableStringBuilder {
-        val encoding = metadata.encoding
-        val tagStart = encoding.tags.tagStart
-        val tagLinkTarget = encoding.tags.internalLinkTarget
+        val encoding = oldMetadata.oldEncoding
+        val tagStart = encoding.oldTags.tagStart
+        val tagLinkTarget = encoding.oldTags.internalLinkTarget
         var pageSpannableStringBuilder = SpannableStringBuilder()
 
         /**
@@ -72,7 +72,7 @@ class ParsePageLazy {
                     is ParsedElement.Font -> {
                         Log.d("ParseBook", "Font element is ${parsedTag.content}")
                         pageSpannableStringBuilder =
-                            ParseFont().invoke(metadata, parsedTag, pageSpannableStringBuilder, context)
+                            ParseFont().invoke(oldMetadata, parsedTag, pageSpannableStringBuilder, context)
                     }
 
                     is ParsedElement.WebLink -> {
@@ -85,7 +85,7 @@ class ParsePageLazy {
                         pageSpannableStringBuilder = ParseInternalLinkLazy().invoke(
                             pageSpannableStringBuilder,
                             parsedTag,
-                            metadata,
+                            oldMetadata,
                             book = book,
                             lazyListState,
                             viewModel
@@ -126,7 +126,7 @@ class ParsePageLazy {
  * This function applies the ParsePageLazy class to each page to parse the content and return a list of SpannedPage objects.
  *
  * @param pages The list of pages to convert.
- * @param metadata Metadata about the book, including encoding information.
+ * @param oldMetadata Metadata about the book, including encoding information.
  * @param context The application context.
  * @param book The book object.
  * @param lazyListState The LazyListState of the LazyColumn displaying the book content.
@@ -135,7 +135,7 @@ class ParsePageLazy {
  */
  fun convertPagesToSpannedPagesLazy(
     pages: List<Page>,
-    metadata: Metadata,
+    oldMetadata: OldMetadata,
     context: Context,
     book: Book,
     lazyListState: LazyListState,
@@ -151,7 +151,7 @@ class ParsePageLazy {
         val decodedSpannedPage =
             parsePageLazy.invoke(
                 pageContent.body.text,
-                metadata,
+                oldMetadata,
                 context,
                 book,
                 lazyListState,

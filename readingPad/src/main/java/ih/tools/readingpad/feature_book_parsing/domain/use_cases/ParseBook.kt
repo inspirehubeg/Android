@@ -1,15 +1,13 @@
 package ih.tools.readingpad.feature_book_parsing.domain.use_cases
 
 import android.content.Context
-import android.os.Build
 import android.text.SpannableStringBuilder
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Book
-import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Encoding
+import ih.tools.readingpad.feature_book_fetching.domain.book_reader.OldEncoding
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.LocalFile
-import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Metadata
+import ih.tools.readingpad.feature_book_fetching.domain.book_reader.OldMetadata
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Page
 import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
 import ih.tools.readingpad.feature_book_parsing.domain.model.SpannedPage
@@ -25,26 +23,25 @@ class ParseBook {
  * Parses the encoded content of a book page and converts it into a SpannableStringBuilder.
  *
  * @param pageEncodedString The encoded content of the page.
- * @param metadata Metadata about the book, including encoding information.
+ * @param oldMetadata Metadata about the book, including encoding information.
  * @param context The application context.
  * @param book The book object.
  * @param recyclerView The RecyclerView used to display the book content.
  * @param viewModel The ViewModel associated with the book content.
  * @return A SpannableStringBuilder containing the parsed content with formatting and interactive elements.
  */
-    @RequiresApi(Build.VERSION_CODES.P)
      fun invoke(
-        pageEncodedString: String,
-        metadata: Metadata,
-        context: Context,
-        book: Book,
-        recyclerView: RecyclerView,
-        viewModel: BookContentViewModel,
-        uiStateViewModel: UIStateViewModel
+    pageEncodedString: String,
+    oldMetadata: OldMetadata,
+    context: Context,
+    book: Book,
+    recyclerView: RecyclerView,
+    viewModel: BookContentViewModel,
+    uiStateViewModel: UIStateViewModel
     ): SpannableStringBuilder {
-        val encoding = metadata.encoding
-        val TAG_START = encoding.tags.tagStart
-        val TAG_LINK_TARGET = encoding.tags.internalLinkTarget
+        val encoding = oldMetadata.oldEncoding
+        val TAG_START = encoding.oldTags.tagStart
+        val TAG_LINK_TARGET = encoding.oldTags.internalLinkTarget
         var pageSpannableStringBuilder = SpannableStringBuilder()
 
         /**
@@ -78,7 +75,7 @@ class ParseBook {
                     // if the parsed tag is a custom font
                     is ParsedElement.Font -> {
                         Log.d("ParseBook", "Font element is ${parsedTag.content}")
-                        pageSpannableStringBuilder = ParseFont().invoke(metadata, parsedTag, pageSpannableStringBuilder,context)
+                        pageSpannableStringBuilder = ParseFont().invoke(oldMetadata, parsedTag, pageSpannableStringBuilder,context)
 
                     }
 
@@ -90,7 +87,7 @@ class ParseBook {
 
                     // if the parsed tag is an internal link
                     is ParsedElement.InternalLinkSource -> {
-                        pageSpannableStringBuilder = ParseInternalLink().invoke(pageSpannableStringBuilder, parsedTag, metadata, book = book , recyclerView, viewModel)
+                        pageSpannableStringBuilder = ParseInternalLink().invoke(pageSpannableStringBuilder, parsedTag, oldMetadata, book = book , recyclerView, viewModel)
                     }
 
                     // if the parsed tag is an image
@@ -122,20 +119,20 @@ class ParseBook {
  * Parses a tag from the book content and returns a ParsedElement representing the tag typeand its content.
  *
  * @param tagContent The content of the tag, including the tag identifier and the actual content.
- * @param encoding The encoding information for the book, used to identify different tag types.
+ * @param oldEncoding The encoding information for the book, used to identify different tag types.
  * @return A ParsedElement representing the parsed tag.
  * @throws IllegalArgumentException If the tag content is invalid or the tag type is unknown.
  */
  fun parseTag(
     tagContent: String,
-    encoding: Encoding,
+    oldEncoding: OldEncoding,
 ): ParsedElement {
     if (tagContent.length <= 1) {
         throw IllegalArgumentException("Invalid tag content: $tagContent")
     }
     val tagStart = tagContent.substring(0, 1)
     val content = tagContent.substring(1)
-    val tags = encoding.tags
+    val tags = oldEncoding.oldTags
     Log.d("parseTag", "Tag: $tagStart, Content: $content")
 
     return when (tagStart) {
@@ -178,7 +175,7 @@ class ParseBook {
  * Converts a list of pages with plain text content to a list of pages with formatted, spanned content.
  *
  * @param pages The list of pages to convert.
- * @param metadata Metadata about the book, including encoding information.
+ * @param oldMetadata Metadata about the book, including encoding information.
  * @param context The application context.
  * @param book The book object.
  * @param recyclerView The RecyclerView used to display the book content.
@@ -187,7 +184,7 @@ class ParseBook {
  */
 suspend fun convertPagesToSpannedPages(
     pages: List<Page>,
-    metadata: Metadata,
+    oldMetadata: OldMetadata,
     context: Context,
     book: Book,
     recyclerView: RecyclerView,

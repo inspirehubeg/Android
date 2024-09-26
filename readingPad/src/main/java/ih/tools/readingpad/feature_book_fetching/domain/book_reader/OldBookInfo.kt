@@ -1,16 +1,15 @@
 package ih.tools.readingpad.feature_book_fetching.domain.book_reader
 
-import book_reader.Author
 import com.google.gson.Gson
 
-class BookInfo : Id {
+class OldBookInfo : Id {
     var name: String
         private set
     var cover: String
         private set
     var description: String
         private set
-    var author: Author
+    var oldAuthor: OldAuthor
         private set
     var pagesNumber: Int
         private set
@@ -28,7 +27,7 @@ class BookInfo : Id {
         name: String,
         cover: String,
         description: String,
-        author: Author,
+        oldAuthor: OldAuthor,
         pagesNumber: Int,
         bookSize: Int,
         chaptersNumber: Int
@@ -37,7 +36,7 @@ class BookInfo : Id {
         this.name = name
         this.cover = cover
         this.description = description
-        this.author = author
+        this.oldAuthor = oldAuthor
         this.pagesNumber = pagesNumber
         this.bookSize = bookSize
         this.chaptersNumber = chaptersNumber
@@ -50,7 +49,7 @@ class BookInfo : Id {
         name: String,
         cover: String,
         description: String,
-        author: Author,
+        oldAuthor: OldAuthor,
         pagesNumber: Int,
         bookSize: Int,
         chaptersNumber: Int
@@ -58,16 +57,16 @@ class BookInfo : Id {
         this.name = name
         this.cover = cover
         this.description = description
-        this.author = author
+        this.oldAuthor = oldAuthor
         this.pagesNumber = pagesNumber
         this.bookSize = bookSize
         this.chaptersNumber = chaptersNumber
     }
 
     companion object {
-        fun instance(content: String): BookInfo {
+        fun instance(content: String): OldBookInfo {
             val gson = Gson()
-            return gson.fromJson(content, BookInfo::class.java)
+            return gson.fromJson(content, OldBookInfo::class.java)
         }
     }
 

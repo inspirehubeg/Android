@@ -1,6 +1,4 @@
-package book_generation.feature.book_creation.security
-
-import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Image
+package ih.tools.readingpad.feature_book_fetching.domain.book_reader
 
 
 class Decryption {

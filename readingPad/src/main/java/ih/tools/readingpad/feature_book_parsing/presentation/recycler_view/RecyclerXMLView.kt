@@ -24,7 +24,6 @@ import ih.tools.readingpad.feature_book_parsing.domain.use_cases.convertPagesToS
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun XMLView(
     context: Context,

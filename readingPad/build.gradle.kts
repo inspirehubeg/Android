@@ -11,9 +11,9 @@ android {
 
     defaultConfig {
         minSdk = 26
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
     }
 
 
@@ -79,7 +79,7 @@ dependencies {
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation (libs.androidx.room.ktx)
     //Coil for image handling
-    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation(libs.coil.compose)
 
     //colorPicker
 
@@ -87,4 +87,12 @@ dependencies {
 
     //Apache POI for word doc
     implementation (libs.poi.ooxml)
+
+    //Ktor for http requests
+//    implementation(libs.ktor.client.core)
+//    implementation(libs.ktor.client.okhttp)
+//    implementation(libs.ktor.client.android)
+//    //implementation(libs.ktor.client.serialization.jvm)
+//    implementation(libs.ktor.client.logging)
+//    implementation (libs.ktor.client.content.negotiation)
 }

@@ -72,11 +72,11 @@ fun ReadingPadScreen(
             drawerState.close()
         }
     }
-    LaunchedEffect (key1 = drawerState.currentValue){
-        if (drawerState.currentValue == DrawerValue.Closed) {
-            uiStateViewModel.setIsDrawerOpen(false)
-        }
-    }
+//    LaunchedEffect (key1 = drawerState.currentValue){
+//        if (drawerState.currentValue == DrawerValue.Closed) {
+//            uiStateViewModel.setIsDrawerOpen(false)
+//        }
+//    }
     ReadingPadTheme(isDarkTheme) {
         //val showTopBar by viewModel.showTopBar.collectAsState()
         val showTopBar by uiStateViewModel.showTopBar.collectAsState() // Migrated state observation
@@ -312,10 +312,7 @@ fun ReadingPadScreen(
                             viewModel = viewModel,
                             imageData = imageClicked!!,
                             onClose = {
-//                                viewModel.setDrawerGesturesEnabled(true)
-//                                viewModel.setImageRotation(0f)
-//                                viewModel.setShowFullScreenImage(false)
-//                                viewModel.onImageClick(null) // Reset the clicked image state
+
                                 uiStateViewModel.showScreen(null)
                                 uiStateViewModel.onImageClick(null)
                                 uiStateViewModel.setAreDrawerGesturesEnabled(true)

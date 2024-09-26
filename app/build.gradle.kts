@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hiltAndroid)
     id("kotlin-kapt")
+    alias(libs.plugins.kotlinx.serialization)
+   // alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -16,6 +18,7 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+       // buildConfigField("String","API_KEY","API_KEY")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -85,11 +88,20 @@ dependencies {
     "kapt"(libs.dagger.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
+    //Coil for image handling
+    implementation(libs.coil.compose)
 
+    //Ktor for http requests
+    implementation(libs.ktor.client.core)
+    //implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.android)
+    implementation (libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.serialization)
+    implementation (libs.ktor.client.content.negotiation)
+  //  implementation(libs.kotlinx.serialization.json)
 
-
-
-//    //Room
+    //Room
 //    implementation(libs.androidx.room.runtime)
 //    implementation(libs.androidx.room.compiler)
 //    kapt (libs.androidx.room.compiler){

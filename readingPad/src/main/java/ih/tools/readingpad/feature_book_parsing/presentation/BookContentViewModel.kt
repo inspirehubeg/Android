@@ -11,9 +11,9 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import book_generation.feature.book_creation.security.Decryption
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ih.tools.readingpad.R
+import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Decryption
 import ih.tools.readingpad.feature_book_fetching.domain.use_cases.fetchBook
 import ih.tools.readingpad.feature_book_fetching.domain.use_cases.getBookInfo
 import ih.tools.readingpad.feature_book_fetching.domain.use_cases.getMetadata
@@ -248,7 +248,7 @@ class BookContentViewModel @Inject constructor(
             val chapter = chapterId?.let { readFileFromRaw(context, it) }
             if (chapter != null) {
                 val decodedText = Decryption.decryption(chapter)
-                book.addChapter(decodedText, metadata.encoding)
+                book.addChapter(decodedText, metadata.oldEncoding)
                 _chapterCount.intValue = book.chapters.size // Update chapter count
             }
         }
@@ -260,13 +260,13 @@ class BookContentViewModel @Inject constructor(
 
         viewModelScope.launch {
             _state.value = state.value.copy(
-                bookId = book.bookInfo.id,
-                bookTitle = book.bookInfo.name,
-                bookAuthor = book.bookInfo.author.name,
+                bookId = book.oldBookInfo.id,
+                bookTitle = book.oldBookInfo.name,
+                bookAuthor = book.oldBookInfo.oldAuthor.name,
                 // bookCategory = book.category,
-                numberOfChapters = book.bookInfo.chaptersNumber,
-                numberOfPages = book.bookInfo.pagesNumber,
-                bookDescription = book.bookInfo.description,
+                numberOfChapters = book.oldBookInfo.chaptersNumber,
+                numberOfPages = book.oldBookInfo.pagesNumber,
+                bookDescription = book.oldBookInfo.description,
 
                 // imageUrl = book.bookInfo.cover,
             )

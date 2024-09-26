@@ -740,8 +740,8 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
                 val exceedsLeftBound = menuX < 0
 
                 val finalMenuX = when {
-                    exceedsRightBound -> (uiStateViewModel.screenWidth.value - uiStateViewModel.menuWidth.value).toInt()
-                    exceedsLeftBound -> 0
+                    exceedsRightBound -> (uiStateViewModel.screenWidth.value - uiStateViewModel.menuWidth.value - 20).toInt()
+                    exceedsLeftBound -> 20
                     else -> menuX
                 }
 

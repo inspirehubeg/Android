@@ -9,7 +9,7 @@ import android.view.View
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.graphics.toArgb
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Book
-import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Metadata
+import ih.tools.readingpad.feature_book_fetching.domain.book_reader.OldMetadata
 import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.feature_book_parsing.presentation.text_view.IHTextView
@@ -25,7 +25,7 @@ class ParseInternalLinkLazy {
      *
      * @param spannedText The SpannableStringBuilder to apply the link to.
      * @param parsedTag The parsed internal link element containing link information.
-     * @param metadata Metadata about the book, including target link information.
+     * @param oldMetadata Metadata about the book, including target link information.
      * @param book The book object.
      * @param lazyListState The LazyListState of the LazyColumn displaying the book content.
      * @param bookContentViewModel The ViewModel associated with the book content.
@@ -34,7 +34,7 @@ class ParseInternalLinkLazy {
      operator fun invoke(
         spannedText: SpannableStringBuilder,
         parsedTag: ParsedElement.InternalLinkSource,
-        metadata: Metadata,
+        oldMetadata: OldMetadata,
         book: Book,
         lazyListState: LazyListState,
         bookContentViewModel: BookContentViewModel,
@@ -46,7 +46,7 @@ class ParseInternalLinkLazy {
             spannable = spannedText,
             start,
             end,
-            metadata,
+            oldMetadata,
             parsedTag.key,
             book,
             lazyListState,
@@ -64,7 +64,7 @@ class ParseInternalLinkLazy {
  * @param spannable The SpannableStringBuilder containing the link.
  * @param start The starting index of the link text.
  * @param end The ending index of the link text.
- * @param metadata Metadata about the book, including target link information.
+ * @param oldMetadata Metadata about the book, including target link information.
  * @param key The key identifying the target link.
  * @param book The book object.
  * @param lazyListState The LazyListState of the LazyColumn displaying the book content.
@@ -74,7 +74,7 @@ fun applyLinkCustomizationsLazy(
     spannable: SpannableStringBuilder,
     start: Int,
     end: Int,
-    metadata: Metadata,
+    oldMetadata: OldMetadata,
     key: String,
     book: Book,
     lazyListState: LazyListState,
@@ -99,7 +99,7 @@ fun applyLinkCustomizationsLazy(
                     return
                 }
             }
-            val targetLink = metadata.targetLinks.find { it.key == key } ?: return
+            val targetLink = oldMetadata.oldTargetLinks.find { it.key == key } ?: return
 
 
             val targetChapterNumber = targetLink.chapterNumber

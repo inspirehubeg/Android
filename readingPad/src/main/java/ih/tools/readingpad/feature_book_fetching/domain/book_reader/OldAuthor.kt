@@ -1,8 +1,6 @@
-package book_reader
+package ih.tools.readingpad.feature_book_fetching.domain.book_reader
 
-import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Id
-
-class Author : Id {
+class OldAuthor : Id {
     var name: String
         private set
 

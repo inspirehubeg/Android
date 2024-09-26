@@ -9,7 +9,7 @@ import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Book
-import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Metadata
+import ih.tools.readingpad.feature_book_fetching.domain.book_reader.OldMetadata
 import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.feature_book_parsing.presentation.recycler_view.IHRecyclerView
@@ -26,7 +26,7 @@ class ParseInternalLink {
      *
      * @param spannedText The SpannableStringBuilder to apply the link to.
      * @param parsedTag The parsed internal link element containing link information.
-     * @param metadata Metadata about the book, including target link information.
+     * @param oldMetadata Metadata about the book, including target link information.
      * @param book The book object.
      * @param recyclerView The RecyclerView displaying the book content.
      * @param bookContentViewModel The ViewModel associated with the book content.
@@ -35,7 +35,7 @@ class ParseInternalLink {
     operator fun invoke(
         spannedText: SpannableStringBuilder,
         parsedTag: ParsedElement.InternalLinkSource,
-        metadata: Metadata,
+        oldMetadata: OldMetadata,
         book: Book,
         recyclerView: RecyclerView,
         bookContentViewModel: BookContentViewModel,
@@ -47,7 +47,7 @@ class ParseInternalLink {
             spannable = spannedText,
             start,
             end,
-            metadata,
+            oldMetadata,
             parsedTag.key,
             book,
             recyclerView,
@@ -66,7 +66,7 @@ class ParseInternalLink {
  * @param spannable The SpannableStringBuilder containing the link.
  * @param start The starting index of the link text.
  * @param end The ending index of the link text.
- * @param metadata Metadata about the book, including target link information.
+ * @param oldMetadata Metadata about the book, including target link information.
  * @param key The key identifying the target link.
  * @param book The book object.
  * @param recyclerView The RecyclerView displaying the book content.
@@ -76,7 +76,7 @@ fun applyLinkCustomizations(
     spannable: SpannableStringBuilder,
     start: Int,
     end: Int,
-    metadata: Metadata,
+    oldMetadata: OldMetadata,
     key: String,
     book: Book,
     recyclerView: RecyclerView,
@@ -91,7 +91,7 @@ fun applyLinkCustomizations(
         }
 
         override fun onClick(p0: View) {
-            val targetLink = metadata.targetLinks.find { it.key == key } ?: return
+            val targetLink = oldMetadata.oldTargetLinks.find { it.key == key } ?: return
             val targetPageNumber = targetLink.pageNumber
             val targetIndex = targetLink.index
             val targetChapterNumber = targetLink.chapterNumber

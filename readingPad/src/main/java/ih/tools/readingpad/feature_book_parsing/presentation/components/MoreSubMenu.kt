@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.ui.UIStateViewModel
+import ih.tools.readingpad.util.PermissionRequester
 import ih.tools.readingpad.util.createWordDoc
 import java.io.File
 
@@ -35,6 +36,7 @@ import java.io.File
 fun MoreSubMenu(
     uiStateViewModel: UIStateViewModel,
     viewModel: BookContentViewModel,
+    permissionRequester: PermissionRequester
 ){
     var subMenuExpanded by remember { mutableStateOf(false) }
 
@@ -115,6 +117,14 @@ fun MoreSubMenu(
                 Icon(Icons.Filled.DocumentScanner, contentDescription = "")
             },
                 onClick = {
+                    permissionRequester.requestStoragePermission { isGranted ->
+                        if (isGranted) {
+                            // Permission granted, proceed with accessing device storage
+                        } else {
+                            // Permission denied, handle accordingly
+                        }
+                    }
+
                     val fileName =
                         "${viewModel.state.value.bookTitle} Highlights.docx"
                     val text: MutableList<HighlightParagraph> = mutableListOf()

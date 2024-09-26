@@ -3,9 +3,9 @@ package ih.tools.readingpad.feature_book_fetching.domain.use_cases
 import android.content.Context
 import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Book
-import ih.tools.readingpad.feature_book_fetching.domain.book_reader.BookInfo
+import ih.tools.readingpad.feature_book_fetching.domain.book_reader.OldBookInfo
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Chapter
-import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Metadata
+import ih.tools.readingpad.feature_book_fetching.domain.book_reader.OldMetadata
 
 //Gets a file from raw directory
 fun readFileFromRaw(context: Context, rawResourceId: Int): String {
@@ -14,24 +14,24 @@ fun readFileFromRaw(context: Context, rawResourceId: Int): String {
 }
 
 //called when the user selects a book to open
-fun fetchBook(bookInfo: BookInfo ): Book {
-    val newBook = getNewBook(bookInfo)
+fun fetchBook(oldBookInfo: OldBookInfo ): Book {
+    val newBook = getNewBook(oldBookInfo)
     // returns an empty book! that needs to get chapters
     return newBook
 }
 
 
-fun getBookInfo(context: Context): BookInfo {
+fun getBookInfo(context: Context): OldBookInfo {
     //this should be changed with a function that fetches from db
     val bookInfoContent = readFileFromRaw(context, R.raw.book_info)
-    val bookInfo = BookInfo.instance(bookInfoContent)
-    return bookInfo
+    val oldBookInfo = OldBookInfo.instance(bookInfoContent)
+    return oldBookInfo
 }
 
-fun getMetadata(context: Context): Metadata {
+fun getMetadata(context: Context): OldMetadata {
     val metadataContent = readFileFromRaw(context, R.raw.metadata)
-    val metadata = Metadata.instance(metadataContent)
-    return metadata
+    val oldMetadata = OldMetadata.instance(metadataContent)
+    return oldMetadata
 }
 
 fun getRawFileByName(context: Context, fileName: String): Int? {
@@ -42,9 +42,9 @@ fun getRawFileByName(context: Context, fileName: String): Int? {
         null
     }
 }
-fun getNewBook(bookInfo: BookInfo): Book {
+fun getNewBook(oldBookInfo: OldBookInfo): Book {
     val bookChapters = mutableListOf<Chapter>()
-    val book = Book(bookInfo, bookChapters)
+    val book = Book(oldBookInfo, bookChapters)
     return book
 }
 

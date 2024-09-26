@@ -1,6 +1,9 @@
-package ih.tools.readingpad.feature_book_fetching.domain.book_reader
+package alexschool.bookreader.network.model.dto
 
-data class Font(
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class EncodingFont(
     val bold: String? = null,
     val italic: String? = null,
     val size: String? = null,

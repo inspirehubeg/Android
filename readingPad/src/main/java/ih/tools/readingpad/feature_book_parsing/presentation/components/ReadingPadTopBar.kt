@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,7 @@ import androidx.navigation.NavController
 import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.ui.UIStateViewModel
+import ih.tools.readingpad.util.PermissionRequester
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +61,8 @@ fun ReadingPadTopBar(
     var searchText by remember { mutableStateOf("") }
     val isDrawerOpen = uiSettings.isDrawerOpen
     val showCustomSelectionMenu by uiStateViewModel.showCustomSelectionMenu.collectAsState()
-
+    val context = LocalContext.current
+    val permissionRequester = remember { context as PermissionRequester }
     Surface(
         modifier = Modifier.height(
             with(density) { topAppBarHeight.toDp() })
@@ -160,7 +163,7 @@ fun ReadingPadTopBar(
                     }) {
                         Icon(Icons.Default.PushPin, contentDescription = "")
                     }
-                    MoreSubMenu(uiStateViewModel = uiStateViewModel, viewModel = viewModel)
+                    MoreSubMenu(uiStateViewModel = uiStateViewModel, viewModel = viewModel, permissionRequester)
 
                 }
             }
