@@ -10,6 +10,8 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -59,7 +61,8 @@ fun ReadingPadTopBar(
         } // Expands the height when the search opens
    )
     var searchText by remember { mutableStateOf("") }
-    val isDrawerOpen = uiSettings.isDrawerOpen
+    val isDrawerOpen by uiStateViewModel.drawerState.collectAsState()
+
     val showCustomSelectionMenu by uiStateViewModel.showCustomSelectionMenu.collectAsState()
     val context = LocalContext.current
     val permissionRequester = remember { context as PermissionRequester }
@@ -133,11 +136,12 @@ fun ReadingPadTopBar(
             navigationIcon = {
                 if (!showSearchBar && !showCustomSelectionMenu) { // Only show actions when search bar is closed
                     IconButton(onClick = {
-                        uiStateViewModel.updateUISettings(
-                            uiSettings.copy(
-                                isDrawerOpen = !isDrawerOpen
-                            )
-                        )
+                        uiStateViewModel.setDrawerState(DrawerState(DrawerValue.Open))
+//                        uiStateViewModel.updateUISettings(
+//                            uiSettings.copy(
+//                                isDrawerOpen = !isDrawerOpen
+//                            )
+//                        )
                     })
                     {
                         Icon(Icons.Filled.Menu, contentDescription = "Menu")

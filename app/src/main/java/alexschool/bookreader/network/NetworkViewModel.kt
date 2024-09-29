@@ -1,20 +1,24 @@
 package alexschool.bookreader.network
 
-import alexschool.bookreader.network.model.dto.BookInfo
-import alexschool.bookreader.network.model.dto.Category
-import alexschool.bookreader.network.model.dto.PostResponse
+import alexschool.bookreader.data.AppRepository
+import alexschool.bookreader.domain.BookInfo
+import alexschool.bookreader.domain.Category
+import alexschool.bookreader.domain.PostResponse
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class NetworkViewModel @Inject constructor(
     private val apiService: ApiService,
+    private val appRepository: AppRepository,
     private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -22,20 +26,20 @@ class NetworkViewModel @Inject constructor(
     private val _postResponses = MutableStateFlow<List<PostResponse>>(emptyList())
     val postResponses = _postResponses.asStateFlow()
 
-    private val _bookInfo = MutableStateFlow<ApiResult<List<BookInfo>>>(ApiResult.Loading())
+    private val _bookInfo = MutableStateFlow<List<BookInfo>>(emptyList())
     val bookInfo = _bookInfo.asStateFlow()
 
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories = _categories.asStateFlow()
 
     init {
-//        fetchBookInfo()
-       fetchCategories()
+        fetchBookInfo()
+        fetchCategories()
         //fetchPostResponses()
     }
 
 
-//    private fun fetchBookInfo() {
+    //    private fun fetchBookInfo() {
 //        viewModelScope.launch {
 //            apiService.getBookInfo()
 //                .flowOn(defaultDispatcher)
@@ -63,10 +67,26 @@ class NetworkViewModel @Inject constructor(
 
         }
     }
+
+    private fun fetchBookInfo(){
+        viewModelScope.launch {
+            appRepository.getBookInfo().catch { e ->
+                // Handle errors, e.g., log the error or update an error state
+                Log.e("NetworkViewModel", "Error fetching book info: ${e.message}")
+        }.collect { bookInfos ->
+            _bookInfo.value = bookInfos
+        }
+        }
+    }
+
     private fun fetchCategories() {
         viewModelScope.launch {
-            _categories.value = apiService.getCategories()
-
+            appRepository.getCategories().catch { e ->
+                    // Handle errors, e.g., log the error or update an error state
+                    Log.e("NetworkViewModel", "Error fetching categories: ${e.message}")
+                }.collect { categories ->
+                    _categories.value = categories
+                }
         }
     }
 }

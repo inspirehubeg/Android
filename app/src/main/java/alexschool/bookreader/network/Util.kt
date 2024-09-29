@@ -6,6 +6,7 @@ object Util {
     const val BASE_URL_TEST="https://jsonplaceholder.typicode.com"
     const val POSTS_URL="$BASE_URL_TEST/posts"
     const val CATEGORIES_URL="http://192.168.1.7:8080/api/v1/categories"
+    const val BOOK_INFO_URL="http://192.168.1.7:8080/api/v1/books?limit=2&offset=0"
 
     const val BOOK_INFO_ENDPOINT="books"
     const val CATEGORIES_ENDPOINT="categories"

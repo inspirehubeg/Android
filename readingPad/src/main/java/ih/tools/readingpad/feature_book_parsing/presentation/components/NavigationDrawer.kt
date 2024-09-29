@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Tab
@@ -33,7 +34,6 @@ import ih.tools.readingpad.ui.theme.Beige
 
 @Composable
 fun NavigationDrawer(
-    drawerState: DrawerState,
     content: @Composable () -> Unit,
     viewModel: BookContentViewModel,
     uiStateViewModel: UIStateViewModel
@@ -43,7 +43,7 @@ fun NavigationDrawer(
     val screenWidth = configuration.screenWidthDp
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val drawerGesturesEnabled = uiStateViewModel.uiSettings.collectAsState().value.areDrawerGesturesEnabled
-
+    val customDrawerState by uiStateViewModel.drawerState.collectAsState()
 
     ModalNavigationDrawer(
         gesturesEnabled = drawerGesturesEnabled,
@@ -80,7 +80,7 @@ fun NavigationDrawer(
                 }
             }
         },
-        drawerState = drawerState,
+        drawerState = customDrawerState,
         content = content
     )
 }
@@ -137,7 +137,8 @@ fun UserInputsDrawerSheet(
                                     lazyListState = uiStateViewModel.lazyListState
                                 )
                                 //viewModel.closeDrawer()
-                                uiStateViewModel.setIsDrawerOpen(false)
+                                uiStateViewModel.setDrawerState(DrawerState(DrawerValue.Closed))
+                                uiStateViewModel.toggleTopBar(false)
                             })
                     }
                 }
@@ -180,7 +181,8 @@ fun UserInputsDrawerSheet(
                                     lazyListState = lazyListState
                                 )
                                 //viewModel.closeDrawer()
-                                uiStateViewModel.setIsDrawerOpen(false)
+                                uiStateViewModel.setDrawerState(DrawerState(DrawerValue.Closed))
+                                uiStateViewModel.toggleTopBar(false)
                             })
                     }
                 }
@@ -221,7 +223,8 @@ fun UserInputsDrawerSheet(
                                     lazyListState = uiStateViewModel.lazyListState
                                 )
                                 //viewModel.closeDrawer()
-                                uiStateViewModel.setIsDrawerOpen(false)
+                                uiStateViewModel.setDrawerState(DrawerState(DrawerValue.Closed))
+                                uiStateViewModel.toggleTopBar(false)
                             })
                     }
                 }

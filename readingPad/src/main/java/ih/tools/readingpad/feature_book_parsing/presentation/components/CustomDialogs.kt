@@ -128,7 +128,7 @@ fun PageSelector(viewModel: BookContentViewModel, listState: LazyListState, uiSt
                     onClick = {
                         viewModel.navigateToPage(number.toInt() - 1, listState)
                         uiStateViewModel.showDialog(null)
-                       // viewModel.setShowPageNumberDialog(false)
+                        uiStateViewModel.toggleTopBar(false)
                     }
                 ) {
                     Text("Go")

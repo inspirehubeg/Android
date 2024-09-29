@@ -2,7 +2,8 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hiltAndroid)
-    id("kotlin-kapt")
+    alias(libs.plugins.compose.compiler)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -13,9 +14,7 @@ android {
         minSdk = 26
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-
     }
-
 
     buildTypes {
         release {
@@ -36,9 +35,9 @@ android {
     buildFeatures {
         compose = true // Add this line!
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
+//    composeOptions {
+//        kotlinCompilerExtensionVersion = "1.5.1"
+//    }
 }
 
 dependencies {
@@ -69,24 +68,28 @@ dependencies {
 
     //Dagger-Hilt
     implementation(libs.dagger.hilt)
-    "kapt"(libs.dagger.hilt.compiler)
+    ksp ("com.google.dagger:hilt-compiler:2.51.1")
     implementation(libs.hilt.navigation.compose)
-//    //Room
+
+    //Room
     implementation(libs.androidx.room.runtime)
-    kapt (libs.androidx.room.compiler){
-        exclude(group = "com.intellij", module = "annotations") // Add this line
-    }
+    //ksp("androidx.room:room-compiler:2.5.0")
+//    kapt (libs.androidx.room.compiler){
+//        exclude(group = "com.intellij", module = "annotations") // Add this line
+//    }
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation (libs.androidx.room.ktx)
     //Coil for image handling
     implementation(libs.coil.compose)
 
     //colorPicker
-
     implementation(libs.compose.colorpicker)
 
     //Apache POI for word doc
     implementation (libs.poi.ooxml)
+//
+//    implementation(libs.kotlin.compose.compiler.plugin.embeddable)
+//    implementation(libs.kotlin.compose.compiler.plugin)
 
     //Ktor for http requests
 //    implementation(libs.ktor.client.core)

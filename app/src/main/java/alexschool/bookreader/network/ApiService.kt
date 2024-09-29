@@ -1,14 +1,14 @@
 package alexschool.bookreader.network
 
-import alexschool.bookreader.network.model.dto.BookInfo
-import alexschool.bookreader.network.model.dto.Category
-import alexschool.bookreader.network.model.dto.PostResponse
+import alexschool.bookreader.data.remote.BookInfoDto
+import alexschool.bookreader.data.remote.CategoryDto
+import alexschool.bookreader.domain.PostResponse
 
 
 interface ApiService {
-    suspend fun getBookInfo(): List<BookInfo>
+    suspend fun getBookInfo(): List<BookInfoDto>
 
-    suspend fun getCategories(): List<Category>
+    suspend fun getCategories(): List<CategoryDto>
 
     suspend fun getPosts(): List<PostResponse>
 }

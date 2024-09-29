@@ -1,0 +1,20 @@
+package alexschool.bookreader.data.mappers
+
+import alexschool.bookreader.data.local.CategoryEntity
+import alexschool.bookreader.data.remote.CategoryDto
+import alexschool.bookreader.domain.Category
+
+fun CategoryDto.toCategoryEntity(): CategoryEntity {
+    return CategoryEntity(
+        name = name,
+        id = id,
+        updatedAt = updated_at
+    )
+}
+
+fun CategoryEntity.toCategory(): Category {
+    return Category(
+        name = name,
+        id = id,
+    )
+}

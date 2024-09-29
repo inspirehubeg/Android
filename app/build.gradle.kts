@@ -3,9 +3,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hiltAndroid)
-    id("kotlin-kapt")
     alias(libs.plugins.kotlinx.serialization)
-   // alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.compose.compiler)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -49,9 +49,9 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
-    }
+//    composeOptions {
+//        kotlinCompilerExtensionVersion = "1.5.1"
+//    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -85,7 +85,8 @@ dependencies {
 
     //Dagger-Hilt
     implementation(libs.dagger.hilt)
-    "kapt"(libs.dagger.hilt.compiler)
+    //"kapt"(libs.dagger.hilt.compiler)
+    ksp ("com.google.dagger:hilt-compiler:2.51.1")
     implementation(libs.hilt.navigation.compose)
 
     //Coil for image handling
@@ -99,15 +100,19 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.serialization)
     implementation (libs.ktor.client.content.negotiation)
-  //  implementation(libs.kotlinx.serialization.json)
 
-    //Room
-//    implementation(libs.androidx.room.runtime)
-//    implementation(libs.androidx.room.compiler)
+
+   // Room
+    implementation(libs.androidx.room.runtime)
+    ksp("androidx.room:room-compiler:2.5.0")
+
+
+   // implementation(libs.androidx.room.compiler) //for kapt not ksp
 //    kapt (libs.androidx.room.compiler){
 //        exclude(group = "com.intellij", module = "annotations") // Add this line
 //    }
-//    // optional - Kotlin Extensions and Coroutines support for Room
-//    implementation (libs.androidx.room.ktx)
+
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation (libs.androidx.room.ktx)
 
 }

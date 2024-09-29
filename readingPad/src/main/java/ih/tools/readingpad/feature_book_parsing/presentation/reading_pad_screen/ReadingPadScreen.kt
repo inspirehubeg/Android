@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,7 +34,6 @@ import ih.tools.readingpad.feature_book_parsing.presentation.components.PagesSli
 import ih.tools.readingpad.feature_book_parsing.presentation.components.ReadingPadBottomBar
 import ih.tools.readingpad.feature_book_parsing.presentation.components.ReadingPadTopBar
 import ih.tools.readingpad.feature_book_parsing.presentation.components.ThemeSelectorMenu
-import ih.tools.readingpad.feature_book_parsing.presentation.components.UserInputScreen
 import ih.tools.readingpad.feature_bookmark.presentation.AddBookmarkDialog
 import ih.tools.readingpad.feature_bookmark.presentation.BookmarkListDialog
 import ih.tools.readingpad.feature_bookmark.presentation.EditBookmarkDialog
@@ -58,20 +55,12 @@ fun ReadingPadScreen(
     val uiSettings by uiStateViewModel.uiSettings.collectAsState()
     val isDarkTheme = uiSettings.darkTheme
 
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
 
     // val isDrawerOpen by viewModel.isDrawerOpen.collectAsState()
-    val isDrawerOpen = uiSettings.isDrawerOpen // Migrated state observation
     val currentDialog by uiStateViewModel.currentDialog.collectAsState()
     val currentScreen by uiStateViewModel.currentScreen.collectAsState()
 
-    LaunchedEffect(key1 = isDrawerOpen) {
-        if (isDrawerOpen) {
-            drawerState.open()
-        } else {
-            drawerState.close()
-        }
-    }
+
 //    LaunchedEffect (key1 = drawerState.currentValue){
 //        if (drawerState.currentValue == DrawerValue.Closed) {
 //            uiStateViewModel.setIsDrawerOpen(false)
@@ -169,17 +158,15 @@ fun ReadingPadScreen(
                 }
             }
             launch {
-                snapshotFlow { listState.isScrollInProgress }.collect { isScrolling ->
+                snapshotFlow { listState.isScrollInProgress}.collect { isScrolling ->
                     if (isScrolling) {
-                        //viewModel.setTopBarVisibility(false)
-                        uiStateViewModel.toggleTopBar(false) // Migrated event triggering
+                        uiStateViewModel.toggleTopBar(false)
                     }
                 }
             }
         }
 
         NavigationDrawer(
-            drawerState = drawerState,
             viewModel = viewModel,
             uiStateViewModel = uiStateViewModel,
             content = {
@@ -233,20 +220,20 @@ fun ReadingPadScreen(
                             uiStateViewModel = uiStateViewModel
                         )
 
-                        // user input screen
-
-                        val height =
-                            if (openUserInputScreen) LocalConfiguration.current.screenHeightDp.dp else 0.dp
-                        val offset =
-                            if (openUserInputScreen) 0.dp else LocalConfiguration.current.screenHeightDp.dp
-
-
-                        UserInputScreen(
-                            viewModel = viewModel,
-                            uiStateViewModel = uiStateViewModel,
-                            height = height,
-                            offset = offset
-                        )
+//                        // user input screen
+//
+//                        val height =
+//                            if (openUserInputScreen) LocalConfiguration.current.screenHeightDp.dp else 0.dp
+//                        val offset =
+//                            if (openUserInputScreen) 0.dp else LocalConfiguration.current.screenHeightDp.dp
+//
+//
+//                        UserInputScreen(
+//                            viewModel = viewModel,
+//                            uiStateViewModel = uiStateViewModel,
+//                            height = height,
+//                            offset = offset
+//                        )
 
                     }
                     when (currentDialog) {
@@ -380,24 +367,6 @@ fun ReadingPadScreen(
                     }
 
 
-//                        if (showFullScreenImage) {
-//                            viewModel.setDrawerGesturesEnabled(false)
-//                            FullScreenImage(viewModel = viewModel,
-//                                imageData = imageClicked!!,
-//                                onClose = {
-//                                    viewModel.setDrawerGesturesEnabled(true)
-//                                    viewModel.setImageRotation(0f)
-//                                    viewModel.setShowFullScreenImage(false)
-//                                    viewModel.onImageClick(null) // Reset the clicked image state
-//                                })
-//                        }
-//                        if (openCustomTheme) {
-//                            // ColorPicker(onColorChange = {}, modifier = Modifier)
-//                            CustomThemeScreen(
-//                                viewModel = viewModel, dialogWidth = dialogWidth.dp
-//                            )
-//                        }
-
                 }
 
                 BackHandler {
@@ -409,27 +378,6 @@ fun ReadingPadScreen(
                         // Let the default back navigation handle this case
                         navController.navigateUp()
                     }
-//                        if (showFontSlider) {
-//                            viewModel.setShowFontSlider(false)
-//                        } else if (showThemeSelector) {
-//                            viewModel.setShowThemeSelector(false)
-//                        } else if (showBookmarkListDialog) {
-//                            viewModel.setShowBookmarkListDialog(false)
-//                        } else if (showPageNumberDialog) {
-//                            viewModel.setShowPageNumberDialog(false)
-//                        } else if (showAddBookmarkDialog) {
-//                            viewModel.setShowAddBookmarkDialog(false)
-//                        } else if (showEditBookmarkDialog) {
-//                            viewModel.setShowEditBookmarkDialog(false)
-//                        } else if (showFullScreenImage) {
-//                            viewModel.setShowFullScreenImage(false)
-//                            viewModel.onImageClick(null)
-//                        } else if (openCustomTheme) {
-//                            viewModel.setShowCustomThemePage(false)
-//                        } else {
-//                            // Let the default back navigation handle this case
-//                            navController.navigateUp()
-//                        }
                 }
             }
         )

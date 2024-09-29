@@ -3,6 +3,8 @@ package ih.tools.readingpad.ui
 import android.util.Log
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.MutableLiveData
@@ -66,6 +68,12 @@ class UIStateViewModel @Inject constructor(
     val topBarHeight = _topBarHeight.asStateFlow()
     fun setTopBarHeight(height: Float) {
         _topBarHeight.value = height
+    }
+
+    private val _drawerState = MutableStateFlow(DrawerState(DrawerValue.Closed))
+    val drawerState = _drawerState.asStateFlow()
+    fun setDrawerState(state: DrawerState) {
+        _drawerState.value = state
     }
 
     private val _bottomBarHeight = MutableStateFlow(0f)
@@ -192,6 +200,7 @@ class UIStateViewModel @Inject constructor(
 
     fun toggleTopBar(value: Boolean) {
         viewModelScope.launch {
+            Log.d("toggleTopBar", "show top bar = $value")
             _showTopBar.value = value
             if (!value && currentDialog.value == DialogType.PagesSlider) {
                 // setShowPagesSlider(false)
@@ -327,11 +336,11 @@ class UIStateViewModel @Inject constructor(
         }
     }
 
-    fun setIsDrawerOpen(isDrawerOpen: Boolean) {
-        viewModelScope.launch {
-            _uiSettings.value = _uiSettings.value.copy(isDrawerOpen = isDrawerOpen)
-        }
-    }
+//    fun setIsDrawerOpen(isDrawerOpen: Boolean) {
+//        viewModelScope.launch {
+//            _uiSettings.value = _uiSettings.value.copy(isDrawerOpen = isDrawerOpen)
+//        }
+//    }
 
     fun setAreDrawerGesturesEnabled(areDrawerGesturesEnabled: Boolean) {
         viewModelScope.launch {
