@@ -6,5 +6,7 @@ import kotlinx.serialization.Serializable
 data class CategoryDto(
     val id: Int,
     val name: String,
-    val updated_at: Int
+    val image: String?,
+    val isDeleted: Boolean?,
 )
+

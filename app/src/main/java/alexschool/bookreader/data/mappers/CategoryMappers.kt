@@ -8,7 +8,7 @@ fun CategoryDto.toCategoryEntity(): CategoryEntity {
     return CategoryEntity(
         name = name,
         id = id,
-        updatedAt = updated_at
+        image = image
     )
 }
 
@@ -16,5 +16,6 @@ fun CategoryEntity.toCategory(): Category {
     return Category(
         name = name,
         id = id,
+        image = image
     )
 }

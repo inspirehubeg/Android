@@ -7,6 +7,7 @@ import alexschool.bookreader.domain.Set
 fun SetDto.toSetEntity(): SetEntity {
     return SetEntity(
         id = id,
+        userId = user_id,
         name = name
     )
 }

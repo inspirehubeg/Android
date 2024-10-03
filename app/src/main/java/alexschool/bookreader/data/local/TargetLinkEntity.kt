@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class TargetLinkEntity(
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey
     val key: String,
     val chapterNumber: Int,
     val bookId: Int,

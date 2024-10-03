@@ -1,12 +1,18 @@
 package alexschool.bookreader.data.local
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import java.time.Instant
 
-@Entity
+@Entity(
+    tableName = "saved_books",
+    primaryKeys = ["userId", "bookId"]
+)
+@TypeConverters(InstantConverter::class)
 data class SavedBookEntity(
-    @PrimaryKey(autoGenerate = false)
     val userId: Int,
     val bookId: Int,
-    val type: String,
+    val type: String, //wishlist, saved for later, etc.
+   // val version: Int,
+    val savedAt: Instant?
 )

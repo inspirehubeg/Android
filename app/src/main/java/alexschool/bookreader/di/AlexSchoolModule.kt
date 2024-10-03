@@ -7,6 +7,7 @@ import alexschool.bookreader.network.ApiService
 import alexschool.bookreader.network.ApiServiceImpl
 import android.content.Context
 import androidx.room.Room
+import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -22,7 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 import javax.inject.Singleton
 
-@dagger.Module
+@Module
 @InstallIn(SingletonComponent::class)
 object AlexSchoolModule {
 

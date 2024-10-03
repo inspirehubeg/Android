@@ -16,10 +16,13 @@ import androidx.room.ForeignKey
 data class TokenEntity(
     val id: Int,
     val bookId: Int,
-    val firstPage: Int,
-    val lastPage: Int,
-    val firstChapter: Int,
-    val lastChapter: Int,
+    val firstPageNumber: Int,
+    val lastPageNumber: Int,
+    val firstChapterNumber: Int,
+    val lastChapterNumber: Int,
     val count: Int,
     val content: String,
+    val size: Double,
+    // val version: Int,
+
 )

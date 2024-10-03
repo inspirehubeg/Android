@@ -1,10 +1,8 @@
 package alexschool.bookreader.domain
 
-import kotlinx.serialization.Serializable
-
 data class Tag(
-    val id: String,
+    val id: Int,
     val name: String,
-    val description: String,
+    //val description: String,
 
     )

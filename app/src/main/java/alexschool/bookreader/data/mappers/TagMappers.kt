@@ -8,7 +8,7 @@ fun TagDto.toTagEntity(): TagEntity {
     return TagEntity(
         id = id,
         name = name,
-        description = description,
+        //description = description,
     )
 }
 
@@ -16,7 +16,7 @@ fun TagEntity.toTag(): Tag {
     return Tag(
         id = id,
         name = name,
-        description = description,
+        //description = description,
     )
 
 }

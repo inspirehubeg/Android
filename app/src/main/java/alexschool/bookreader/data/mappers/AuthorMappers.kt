@@ -8,6 +8,8 @@ fun AuthorDto.toAuthorEntity(): AuthorEntity {
     return AuthorEntity(
         id = id,
         name = name,
+        bio = bio,
+        image = image,
         //description = description
     )
 }
@@ -15,6 +17,9 @@ fun AuthorDto.toAuthorEntity(): AuthorEntity {
 fun AuthorEntity.toAuthor(): Author {
     return Author(
         name = name,
+        id = id,
+        bio = bio,
+        image = image
        // description = description
     )
 }

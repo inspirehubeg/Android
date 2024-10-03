@@ -1,11 +1,14 @@
 package alexschool.bookreader.data.local
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
-@Entity
+@Entity(
+    tableName = "sets",
+    primaryKeys = ["name", "userId"]
+)
 data class SetEntity(
-    @PrimaryKey(autoGenerate = false)
     val id: Int,
+    val userId: Int,
     val name: String,
+    //val version: Int
 )

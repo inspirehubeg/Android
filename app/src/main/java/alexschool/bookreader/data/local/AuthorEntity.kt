@@ -5,8 +5,10 @@ import androidx.room.PrimaryKey
 
 @Entity (tableName = "authors")
 data class AuthorEntity(
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey
     val id: Int,
     val name: String,
-   // val description: String,
+    val bio: String,
+    val image: String?,
+  //  val version: Int
 )

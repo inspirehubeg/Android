@@ -1,9 +1,8 @@
 package alexschool.bookreader.network
 
 import alexschool.bookreader.data.AppRepository
-import alexschool.bookreader.domain.BookInfo
+import alexschool.bookreader.data.TableName
 import alexschool.bookreader.domain.Category
-import alexschool.bookreader.domain.PostResponse
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,19 +22,14 @@ class NetworkViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    private val _postResponses = MutableStateFlow<List<PostResponse>>(emptyList())
-    val postResponses = _postResponses.asStateFlow()
-
-    private val _bookInfo = MutableStateFlow<List<BookInfo>>(emptyList())
-    val bookInfo = _bookInfo.asStateFlow()
-
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories = _categories.asStateFlow()
 
     init {
-        fetchBookInfo()
-        fetchCategories()
-        //fetchPostResponses()
+     //   fetchGeneralChanges()
+//        //fetchBookInfo()
+//        fetchCategories()
+//        //fetchPostResponses()
     }
 
 
@@ -61,32 +55,69 @@ class NetworkViewModel @Inject constructor(
 //                }
 //        }
 //    }
-    private fun fetchPostResponses() {
-        viewModelScope.launch {
-            _postResponses.value = apiService.getPosts()
 
+
+//    private fun fetchBookInfo(){
+//        viewModelScope.launch {
+//            appRepository.getBookInfo().catch { e ->
+//                // Handle errors, e.g., log the error or update an error state
+//                Log.e("NetworkViewModel", "Error fetching book info: ${e.message}")
+//        }.collect { bookInfos ->
+//            _bookInfo.value = bookInfos
+//        }
+//        }
+//    }
+
+    private fun fetchGeneralChanges() {
+        viewModelScope.launch {
+            val generalChanges = appRepository.getGeneralChanges()
+            for (change in generalChanges) {
+                when (change) {
+                    TableName.BOOKS -> fetchBooks()
+                    TableName.CATEGORIES -> fetchCategories()
+                    TableName.TAGS -> fetchTags()
+                    TableName.AUTHORS -> fetchAuthors()
+                    TableName.TRANSLATORS -> fetchTranslators()
+                    TableName.READING_PROGRESS -> fetchReadingProgress()
+                    TableName.SUBSCRIPTIONS -> fetchSubscriptions()
+                    else -> {}
+                }
+            }
         }
     }
 
-    private fun fetchBookInfo(){
-        viewModelScope.launch {
-            appRepository.getBookInfo().catch { e ->
-                // Handle errors, e.g., log the error or update an error state
-                Log.e("NetworkViewModel", "Error fetching book info: ${e.message}")
-        }.collect { bookInfos ->
-            _bookInfo.value = bookInfos
-        }
-        }
+    private fun fetchSubscriptions() {
+        TODO("Not yet implemented")
+    }
+
+    private fun fetchReadingProgress() {
+        TODO("Not yet implemented")
+    }
+
+    private fun fetchTranslators() {
+        TODO("Not yet implemented")
+    }
+
+    private fun fetchAuthors() {
+        TODO("Not yet implemented")
+    }
+
+    private fun fetchTags() {
+        TODO("Not yet implemented")
+    }
+
+    private fun fetchBooks() {
+        TODO("Not yet implemented")
     }
 
     private fun fetchCategories() {
         viewModelScope.launch {
             appRepository.getCategories().catch { e ->
-                    // Handle errors, e.g., log the error or update an error state
-                    Log.e("NetworkViewModel", "Error fetching categories: ${e.message}")
-                }.collect { categories ->
-                    _categories.value = categories
-                }
+                // Handle errors, e.g., log the error or update an error state
+                Log.e("NetworkViewModel", "Error fetching categories: ${e.message}")
+            }.collect { categories ->
+                _categories.value = categories
+            }
         }
     }
 }

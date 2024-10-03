@@ -11,7 +11,7 @@ import androidx.room.Query
 interface CategoryDao {
 
     // all the functions needed to interact with db
-    @Insert (onConflict = OnConflictStrategy.REPLACE)
+    @Insert (entity = CategoryEntity::class, onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCategory(category: CategoryEntity)
 
     @Query ("SELECT * FROM categories")
@@ -23,7 +23,7 @@ interface CategoryDao {
     @Query("SELECT * FROM categories WHERE id = :categoryId")
     suspend fun getCategoryById(categoryId: Int): CategoryEntity?
 
-    @Query("DELETE FROM categories WHERE id IN (:categoryIds)")
-    suspend fun deleteCategoriesByIds(categoryIds: List<Int>)
+    @Query("DELETE FROM categories WHERE id = :categoryId")
+    suspend fun deleteCategoryById(categoryId: Int)
 
 }

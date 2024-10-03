@@ -6,5 +6,7 @@ import kotlinx.serialization.Serializable
 data class AuthorDto(
     val id: Int,
     val name: String,
-    //val description: String,
+    val bio: String,
+    val image: String,
+    val isDeleted: Boolean?
 )

@@ -6,4 +6,7 @@ import kotlinx.serialization.Serializable
 data class SetDto(
     val id: Int,
     val name: String,
+    val user_id: Int,
+    val is_deleted: Boolean?,
+
 )

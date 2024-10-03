@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hiltAndroid)
+    alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.compose.compiler)
     id("com.google.devtools.ksp")
 }
@@ -73,7 +74,7 @@ dependencies {
 
     //Room
     implementation(libs.androidx.room.runtime)
-    //ksp("androidx.room:room-compiler:2.5.0")
+    ksp("androidx.room:room-compiler:2.5.0")
 //    kapt (libs.androidx.room.compiler){
 //        exclude(group = "com.intellij", module = "annotations") // Add this line
 //    }

@@ -6,14 +6,14 @@ import alexschool.bookreader.domain.SetContent
 
 fun SetContentDto.toSetContentEntity(): SetContentEntity {
     return SetContentEntity(
-        id = id,
+        setId = id,
         bookId = book_id,
     )
 }
 
 fun SetContentEntity.toSetContent(): SetContent {
     return SetContent(
-        id = id,
+        id = setId,
         bookId = bookId,
     )
 }

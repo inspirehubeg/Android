@@ -4,10 +4,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 
-@Entity
+@Entity (tableName = "tags")
 data class TagEntity(
-    @PrimaryKey(autoGenerate = false)
-    val id: String,
+    @PrimaryKey
+    val id: Int,
     val name: String,
-    val description: String,
+    //val version: Int,
 )
