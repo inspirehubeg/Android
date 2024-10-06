@@ -85,7 +85,6 @@ dependencies {
 
     //Dagger-Hilt
     implementation(libs.dagger.hilt)
-    //"kapt"(libs.dagger.hilt.compiler)
     ksp ("com.google.dagger:hilt-compiler:2.51.1")
     implementation(libs.hilt.navigation.compose)
 
@@ -94,7 +93,6 @@ dependencies {
 
     //Ktor for http requests
     implementation(libs.ktor.client.core)
-    //implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.android)
     implementation (libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.client.logging)

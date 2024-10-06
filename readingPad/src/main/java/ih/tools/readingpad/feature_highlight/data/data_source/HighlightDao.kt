@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import ih.tools.readingpad.feature_highlight.domain.model.Highlight
+import ih.tools.readingpad.feature_highlight.domain.model.HighlightEntity
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -17,19 +17,19 @@ interface HighlightDao {
      * Inserts a new highlight into the database.
      * If a highlight with the same primary key already exists, it will be replaced.
      *
-     * @param highlight The highlight object to insert.
+     * @param highlightEntity The highlight object to insert.
      * @return The ID of the inserted highlight.
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(highlight: Highlight) : Long
+    suspend fun insert(highlightEntity: HighlightEntity) : Long
 
     /**
      * Deletes a highlight from the database.
      *
-     * @param highlight The highlight object to delete.
+     * @param highlightEntity The highlight object to delete.
      */
     @Delete
-    suspend fun delete(highlight: Highlight)
+    suspend fun delete(highlightEntity: HighlightEntity)
 
     /**
      * Deletes highlights from the database by their IDs.
@@ -47,12 +47,13 @@ interface HighlightDao {
      * @param pageNumber The page number.
      * @return A Flow emitting a list of highlights for the specified page.
      */
-    @Query("SELECT * FROM highlights WHERE bookId = :bookId AND chapterNumber = :chapterNumber AND pageNumber = :pageNumber")
+    @Query("SELECT * FROM highlights WHERE bookId = :bookId AND chapterNumber = :chapterNumber " +
+            "AND pageNumber = :pageNumber AND isDeleted = 0")
     fun getPageHighlights(
         bookId: String,
         chapterNumber: Int,
         pageNumber: Int
-    ): Flow<List<Highlight>>
+    ): Flow<List<HighlightEntity>>
 
 
     /**
@@ -61,6 +62,32 @@ interface HighlightDao {
      * @param bookId The ID of the book.
      * @return A Flow emitting a list of highlights for the book.
      */
-    @Query("SELECT * FROM highlights WHERE bookId = :bookId")
-     fun getHighlightsForBook(bookId: String): Flow<List<Highlight>>
+    @Query("SELECT * FROM highlights WHERE bookId = :bookId AND isDeleted = 0")
+     fun getHighlightsForBook(bookId: String): List<HighlightEntity>
+
+
+     @Query("SELECT * FROM highlights WHERE id = :id")
+     suspend fun getHighlightById(id: Long): HighlightEntity?
+
+
+
+    @Query("SELECT * FROM highlights WHERE serverId = :serverId")
+    suspend fun getHighlightByServerId(serverId: String): HighlightEntity?
+
+    @Query("UPDATE highlights SET serverId = :serverId WHERE id = :localId")
+    suspend fun updateServerId(localId: Long, serverId: String)
+
+    @Query("DELETE FROM highlights WHERE serverId = :serverId")
+    suspend fun deleteHighlightByServerId(serverId: String)
+
+    @Query("SELECT * FROM highlights WHERE serverId IS NULL")
+    suspend fun getHighlightsWithoutServerId(): List<HighlightEntity>
+
+
+    @Query("UPDATE highlights SET isDeleted = 1 WHERE id = :highlightId")
+    suspend fun markHighlightAsDeleted(highlightId: Long)
+
+    @Query("SELECT * FROM highlights WHERE isDeleted = 1")
+    suspend fun getLocallyDeletedHighlights(): List<HighlightEntity>
+
 }

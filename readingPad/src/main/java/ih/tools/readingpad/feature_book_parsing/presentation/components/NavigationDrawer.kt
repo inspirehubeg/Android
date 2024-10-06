@@ -127,7 +127,7 @@ fun UserInputsDrawerSheet(
                         .weight(1f)
                        // .background(Color.Red)
                 ) {
-                    val items = viewModel.state.value.bookBookmarks
+                    val items = viewModel.state.value.bookBookmarkEntities
                     items(items) { bookmark ->
                         Text(text = bookmark.bookmarkTitle,
                             modifier = Modifier.clickable {
@@ -164,7 +164,7 @@ fun UserInputsDrawerSheet(
 
         if (expandedHighlightMenu) {
             MenuContent {
-                val items = viewModel.state.value.bookHighlights
+                val items = viewModel.state.value.bookHighlightEntities
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -213,7 +213,7 @@ fun UserInputsDrawerSheet(
                         .weight(1f)
 
                 ) {
-                    val items = viewModel.state.value.bookNotes
+                    val items = viewModel.state.value.bookNoteEntities
                     items(items) { note ->
                         Text(text = note.text,
                             modifier = Modifier.clickable {

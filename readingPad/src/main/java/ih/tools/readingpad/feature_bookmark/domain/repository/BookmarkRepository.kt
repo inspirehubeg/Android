@@ -2,6 +2,7 @@ package ih.tools.readingpad.feature_bookmark.domain.repository
 
 
 import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
+import ih.tools.readingpad.feature_bookmark.domain.model.BookmarkEntity
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -13,10 +14,10 @@ interface BookmarkRepository {
     /**
      * Inserts a new bookmark.
      *
-     * @param bookmark The bookmark object to insert.
+     * @param bookmarkEntity The bookmark object to insert.
      * @return The ID of the inserted bookmark.
      */
-    suspend fun insertBookmark(bookmark: Bookmark): Long
+    suspend fun insertBookmark(bookmarkEntity: BookmarkEntity): Long
 
     /**
      * Removes a bookmark by its ID.
@@ -39,7 +40,7 @@ interface BookmarkRepository {
      * @param bookId The ID of the book.
      * @return A Flow emitting a list of bookmarks for the book.
      */
-    fun getBookmarksForBook(bookId: String): Flow<List<Bookmark>>
+    suspend fun getBookmarksForBook(bookId: String): Flow<List<Bookmark>>
 
     /**
      * Checks if a bookmark with the given ID exists.

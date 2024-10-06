@@ -1,10 +1,11 @@
 package ih.tools.readingpad.feature_note.domain.repository
 
 import ih.tools.readingpad.feature_note.domain.model.Note
+import ih.tools.readingpad.feature_note.domain.model.NoteEntity
 import kotlinx.coroutines.flow.Flow
 
 interface NoteRepository {
-    suspend fun insertNote(note: Note): Long
+    suspend fun insertNote(noteEntity: NoteEntity): Long
 
     suspend fun deleteNoteById(id: Long)
 
@@ -12,8 +13,8 @@ interface NoteRepository {
         bookId: String,
         chapterNumber: Int,
         pageNumber: Int
-    ): Flow<List<Note>>
+    ): Flow<List<NoteEntity>>
 
-    fun getNotesForBook(bookId: String): Flow<List<Note>>
-   suspend fun updateNoteText(noteId: Long, newText: String)
+    suspend fun getNotesForBook(bookId: String): Flow<List<Note>>
+    suspend fun updateNoteText(noteId: Long, newText: String)
 }

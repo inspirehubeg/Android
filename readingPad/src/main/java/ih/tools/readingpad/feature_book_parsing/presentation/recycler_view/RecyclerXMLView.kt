@@ -1,14 +1,11 @@
 package ih.tools.readingpad.feature_book_parsing.presentation.recycler_view
 
 import android.content.Context
-import android.os.Build
 import android.view.LayoutInflater
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -34,9 +31,7 @@ fun XMLView(
     val state by viewModel.state
     var lastDarkStatus = false
 
-    val spannableString = remember {
-        mutableStateOf(state.spannableContent)
-    }
+
     val recyclerPages = remember { mutableStateListOf<SpannedPage>() }
     val pages = mutableListOf<Page>()
     val metadata = getMetadata(context)

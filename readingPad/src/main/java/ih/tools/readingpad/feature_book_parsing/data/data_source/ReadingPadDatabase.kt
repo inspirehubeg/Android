@@ -3,11 +3,11 @@ package ih.tools.readingpad.feature_book_parsing.data.data_source
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import ih.tools.readingpad.feature_bookmark.data.data_source.BookmarkDao
-import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
+import ih.tools.readingpad.feature_bookmark.domain.model.BookmarkEntity
 import ih.tools.readingpad.feature_highlight.data.data_source.HighlightDao
-import ih.tools.readingpad.feature_highlight.domain.model.Highlight
+import ih.tools.readingpad.feature_highlight.domain.model.HighlightEntity
 import ih.tools.readingpad.feature_note.data.data_source.NoteDao
-import ih.tools.readingpad.feature_note.domain.model.Note
+import ih.tools.readingpad.feature_note.domain.model.NoteEntity
 import ih.tools.readingpad.feature_theme_color.data.data_source.ThemeColorDao
 import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColor
 
@@ -17,10 +17,10 @@ import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColor
  */
 @Database(
     entities = [
-        Bookmark::class,
-        Highlight::class,
+        BookmarkEntity::class,
+        HighlightEntity::class,
         ThemeColor::class,
-        Note::class
+        NoteEntity::class
     ],
     version = 1,
     exportSchema = false

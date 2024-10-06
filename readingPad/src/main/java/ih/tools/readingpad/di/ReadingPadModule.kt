@@ -52,6 +52,10 @@ import ih.tools.readingpad.feature_theme_color.domain.use_case.DeleteAllThemeCol
 import ih.tools.readingpad.feature_theme_color.domain.use_case.DeleteThemeColorUseCase
 import ih.tools.readingpad.feature_theme_color.domain.use_case.GetThemeColorsUseCase
 import ih.tools.readingpad.feature_theme_color.domain.use_case.ThemeColorUseCases
+import ih.tools.readingpad.network.BookInputApi
+import ih.tools.readingpad.network.BookInputApiImpl
+import io.ktor.client.HttpClient
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Singleton
 
 
@@ -105,8 +109,16 @@ object ReadingPadModule {
      */
     @Provides
     @Singleton
-    fun provideHighlightRepository(database: ReadingPadDatabase): HighlightRepository {
-        return HighlightRepositoryImpl(database.highlightDao)
+    fun provideHighlightRepository(
+        database: ReadingPadDatabase,
+        defaultDispatcher: CoroutineDispatcher,
+        inputApi: BookInputApi
+    ): HighlightRepository {
+        return HighlightRepositoryImpl(
+            database.highlightDao,
+            defaultDispatcher = defaultDispatcher,
+            inputApi = inputApi
+        )
     }
 
     /**
@@ -129,8 +141,16 @@ object ReadingPadModule {
      */
     @Provides
     @Singleton
-    fun provideBookmarkRepository(database: ReadingPadDatabase): BookmarkRepository {
-        return BookmarkRepositoryImpl(database.bookmarkDao)
+    fun provideBookmarkRepository(
+        database: ReadingPadDatabase,
+        defaultDispatcher: CoroutineDispatcher,
+        inputApi: BookInputApi
+    ): BookmarkRepository {
+        return BookmarkRepositoryImpl(
+            database.bookmarkDao,
+            defaultDispatcher = defaultDispatcher,
+            inputApi = inputApi
+        )
     }
 
     /**
@@ -256,8 +276,17 @@ object ReadingPadModule {
 
     @Provides
     @Singleton
-    fun provideNoteRepository(database: ReadingPadDatabase): NoteRepository {
-        return NoteRepositoryImpl(database.noteDao)
+    fun provideNoteRepository(
+        database: ReadingPadDatabase,
+        inputApi: BookInputApi,
+        defaultDispatcher: CoroutineDispatcher
+    ): NoteRepository {
+        return NoteRepositoryImpl(database.noteDao, inputApi, defaultDispatcher)
     }
+
+
+    @Singleton
+    @Provides
+    fun provideBookInputApi(httpClient: HttpClient): BookInputApi = BookInputApiImpl(httpClient)
 
 }

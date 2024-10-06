@@ -1,6 +1,6 @@
 package ih.tools.readingpad.feature_bookmark.domain.use_cases
 
-import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
+import ih.tools.readingpad.feature_bookmark.domain.model.BookmarkEntity
 import ih.tools.readingpad.feature_bookmark.domain.repository.BookmarkRepository
 
 /**
@@ -14,11 +14,11 @@ class AddBookmark (
     /**
      * Adds a new bookmark to the repository.
      *
-     * @param bookmark The bookmark object to add.
+     * @param bookmarkEntity The bookmark object to add.
      * @return The ID of the inserted bookmark.
      */
-    suspend operator fun invoke(bookmark: Bookmark) : Long {
-        val bookmarkId = repository.insertBookmark(bookmark)
+    suspend operator fun invoke(bookmarkEntity: BookmarkEntity) : Long {
+        val bookmarkId = repository.insertBookmark(bookmarkEntity)
        return bookmarkId
     }
 }

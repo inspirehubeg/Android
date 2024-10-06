@@ -1,6 +1,7 @@
 package ih.tools.readingpad.feature_highlight.domain.repository
 
 import ih.tools.readingpad.feature_highlight.domain.model.Highlight
+import ih.tools.readingpad.feature_highlight.domain.model.HighlightEntity
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -10,10 +11,10 @@ import kotlinx.coroutines.flow.Flow
 interface HighlightRepository {
     /**
      * Inserts a new highlight.*
-     * @param highlight The highlight object to insert.
+     * @param highlightEntity The highlight object to insert.
      * @return The ID of the inserted highlight.
      */
-    suspend fun insertHighlight(highlight: Highlight): Long
+    suspend fun insertHighlight(highlightEntity: HighlightEntity): Long
     /**
      * Deletes a highlight by its ID.
      *
@@ -32,7 +33,7 @@ interface HighlightRepository {
         bookId: String,
         chapterNumber: Int,
         pageNumber: Int
-    ): Flow<List<Highlight>>
+    ): Flow<List<HighlightEntity>>
 
-    fun getHighlightsForBook(bookId: String): Flow<List<Highlight>>
+   suspend fun getHighlightsForBook(bookId: String): Flow<List<Highlight>>
 }

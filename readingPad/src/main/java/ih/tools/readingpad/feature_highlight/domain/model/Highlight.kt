@@ -1,12 +1,12 @@
-package alexschool.bookreader.data.remote
+package ih.tools.readingpad.feature_highlight.domain.model
 
-data class HighlightDto(
-    val id: Long ,
+data class Highlight(
+    val id: Long? ,
     val bookId: String,
     val chapterNumber: Int,
     val pageNumber: Int,
-    val text: String,
     val start: Int,
     val end: Int,
+    val text: String,
     val color: Int
 )

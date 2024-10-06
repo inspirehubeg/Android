@@ -46,7 +46,7 @@ fun BookmarkListDialog(
     dialogWidth: Dp,
     listState: LazyListState,
 ) {
-    val bookmarks = viewModel.state.value.bookBookmarks
+    val bookmarks = viewModel.state.value.bookBookmarkEntities
    // val fontSize by viewModel.fontSize.collectAsState()
     val fontSize = uiStateViewModel.uiSettings.collectAsState().value.fontSize
     val onDismiss = {
@@ -210,7 +210,7 @@ fun BookmarkListItem(
                     .weight(1f)
                     .padding(end = 8.dp),
                 onClick = {
-                    viewModel.removeBookmarkById(bookmark.id)
+                    viewModel.removeBookmarkById(bookmark.id!!)
                 },
                 colors = androidx.compose.material3.IconButtonDefaults.filledIconButtonColors(
                     //containerColor = MaterialTheme.colorScheme.secondaryContainer,

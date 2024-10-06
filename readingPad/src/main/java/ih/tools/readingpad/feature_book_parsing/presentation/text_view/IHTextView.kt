@@ -226,14 +226,14 @@ class IHTextView : AppCompatTextView, View.OnClickListener, View.OnTouchListener
     /**
      * Draws all highlights from the provided list.
      *
-     * @param highlights The list of highlights to draw.
+     * @param highlightEntities The list of highlights to draw.
      */
-    fun drawAllHighlights(highlights: List<Highlight>) {
-        highlights.forEach { highlight ->
+    fun drawAllHighlights(highlightEntities: List<Highlight>) {
+        highlightEntities.forEach { highlight ->
             Log.d("IHTextView", "highlight = $highlight")
             Log.d("IHTextView", "highlight.pageNumber = ${highlight.pageNumber}")
             drawSingleHighlight(
-                highlight.id,
+                highlight.id!!,
                 highlight.start,
                 highlight.end,
                 false,

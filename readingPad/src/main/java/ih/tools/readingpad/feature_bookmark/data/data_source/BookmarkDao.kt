@@ -3,8 +3,7 @@ package ih.tools.readingpad.feature_bookmark.data.data_source
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
-import kotlinx.coroutines.flow.Flow
+import ih.tools.readingpad.feature_bookmark.domain.model.BookmarkEntity
 
 /**
  * Data Access Object (DAO) for interacting with the `bookmarks` table in the database.
@@ -14,11 +13,11 @@ interface BookmarkDao {
 
     /*** Inserts a new bookmark into the database.
      *
-     * @param bookmark The bookmark object to insert.
+     * @param bookmarkEntity The bookmark object to insert.
      * @return The ID of the inserted bookmark.
      */
     @Insert
-    suspend fun insertBookmark(bookmark: Bookmark): Long
+    suspend fun insertBookmark(bookmarkEntity: BookmarkEntity): Long
 
     /**
      * Removes a bookmark from the database by its ID.
@@ -34,8 +33,8 @@ interface BookmarkDao {
      * @param bookId The ID of the book.
      * @return A Flow emitting a list of bookmarks for the book.
      */
-    @Query("SELECT * FROM bookmarks WHERE bookId = :bookId")
-    fun getBookmarksForBook(bookId: String): Flow<List<Bookmark>>
+    @Query("SELECT * FROM bookmarks WHERE bookId = :bookId AND isDeleted = 0")
+    fun getBookmarksForBook(bookId: String): List<BookmarkEntity>
 
     /**
      * Updates the title of a bookmark.
@@ -53,5 +52,26 @@ interface BookmarkDao {
      * @return The bookmark object if found, null otherwise.
      */
     @Query("SELECT * FROM bookmarks WHERE id = :id")
-    suspend fun getBookmarkById(id: Long): Bookmark?
+    suspend fun getBookmarkById(id: Long): BookmarkEntity?
+
+
+
+    @Query("SELECT * FROM bookmarks WHERE serverId = :serverId")
+    suspend fun getBookmarkByServerId(serverId: String): BookmarkEntity?
+
+    @Query("UPDATE bookmarks SET serverId = :serverId WHERE id = :localId")
+    suspend fun updateServerId(localId: Long, serverId: String)
+
+    @Query("UPDATE bookmarks SET isDeleted = 1 WHERE id = :bookmarkId")
+    suspend fun markBookmarkAsDeleted(bookmarkId: Long)
+
+    @Query("DELETE FROM bookmarks WHERE serverId = :serverId")
+    suspend fun deleteBookmarkByServerId(serverId: String)
+
+    @Query("SELECT * FROM bookmarks WHERE isDeleted = 1")
+    suspend fun getLocallyDeletedBookmarks(): List<BookmarkEntity>
+
+    // You might also need a method to get all bookmarks without a serverId for initial sync
+    @Query("SELECT * FROM bookmarks WHERE serverId IS NULL")
+    suspend fun getBookmarksWithoutServerId(): List<BookmarkEntity>
 }

@@ -1,6 +1,6 @@
 package ih.tools.readingpad.feature_note.domain.use_cases
 
-import ih.tools.readingpad.feature_note.domain.model.Note
+import ih.tools.readingpad.feature_note.domain.model.NoteEntity
 import ih.tools.readingpad.feature_note.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
 
@@ -18,7 +18,7 @@ class GetPageNotes (private val repository: NoteRepository
         bookId: String,
         chapterNumber: Int,
         pageNumber: Int
-    ): Flow<List<Note>> {
+    ): Flow<List<NoteEntity>> {
         return repository.getPageNotes(bookId, chapterNumber, pageNumber)
     }
 }

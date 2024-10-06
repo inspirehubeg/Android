@@ -16,13 +16,16 @@ import androidx.room.PrimaryKey
  */
 @Entity(tableName = "highlights")
 
-data class Highlight(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+data class HighlightEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long? = null,
+    val serverId: String? = null,
     val bookId: String,
     val chapterNumber: Int,
     val pageNumber: Int,
     val start: Int,
     val end: Int,
     val text: String,
-    val color: Int
+    val color: Int,
+    val isDeleted: Boolean = false
 )

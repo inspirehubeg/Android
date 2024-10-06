@@ -88,15 +88,13 @@ dependencies {
 
     //Apache POI for word doc
     implementation (libs.poi.ooxml)
-//
-//    implementation(libs.kotlin.compose.compiler.plugin.embeddable)
-//    implementation(libs.kotlin.compose.compiler.plugin)
 
     //Ktor for http requests
-//    implementation(libs.ktor.client.core)
-//    implementation(libs.ktor.client.okhttp)
-//    implementation(libs.ktor.client.android)
-//    //implementation(libs.ktor.client.serialization.jvm)
-//    implementation(libs.ktor.client.logging)
-//    implementation (libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.android)
+    implementation (libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.serialization)
+    implementation (libs.ktor.client.content.negotiation)
+
 }

@@ -2,8 +2,14 @@ package ih.tools.readingpad.feature_bookmark.data.repository
 
 import ih.tools.readingpad.feature_bookmark.data.data_source.BookmarkDao
 import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
+import ih.tools.readingpad.feature_bookmark.domain.model.BookmarkEntity
 import ih.tools.readingpad.feature_bookmark.domain.repository.BookmarkRepository
+import ih.tools.readingpad.mappers.toBookmark
+import ih.tools.readingpad.network.BookInputApi
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 
 /**
  * Concrete implementation of the BookmarkRepository interface.
@@ -12,17 +18,20 @@ import kotlinx.coroutines.flow.Flow
  * @property dao The BookmarkDao used to access and manipulate bookmark data in the database.
  */
 class BookmarkRepositoryImpl(
-    private val dao: BookmarkDao
+    private val dao: BookmarkDao,
+    private val inputApi: BookInputApi,
+    private val defaultDispatcher: CoroutineDispatcher
+
 ) : BookmarkRepository {
 
     /**
      * Inserts a new bookmark into the database using the dao.
      *
-     * @param bookmark The bookmark object to insert.
+     * @param bookmarkEntity The bookmark object to insert.
      * @return The ID of the inserted bookmark.
      */
-    override suspend fun insertBookmark(bookmark: Bookmark): Long {
-        return dao.insertBookmark(bookmark)
+    override suspend fun insertBookmark(bookmarkEntity: BookmarkEntity): Long {
+        return dao.insertBookmark(bookmarkEntity)
     }
 
     /**
@@ -50,8 +59,32 @@ class BookmarkRepositoryImpl(
      * @param bookId The ID of the book.
      * @return A Flow emitting a list of bookmarks for the book.
      */
-    override fun getBookmarksForBook(bookId: String): Flow<List<Bookmark>> {
-        return dao.getBookmarksForBook(bookId)
+    override suspend fun getBookmarksForBook(bookId: String): Flow<List<Bookmark>> = flow {
+        val localBookmarksForBook = withContext(defaultDispatcher)
+        {
+            dao.getBookmarksForBook(bookId)
+        }
+        emit(localBookmarksForBook.map { it.toBookmark() })
+//        try {
+//            val dtoBookmarksForBook = withContext(defaultDispatcher)
+//            {
+//                inputApi.getBookmarks(bookId)
+//            }
+//            val updatedBookmarksForBook = dtoBookmarksForBook.map { dtoBookmark ->
+//                val localBookmark = dao.getBookmarkById(dtoBookmark.id)
+//                if (dtoBookmark.is_deleted == true) {
+//                    if (localBookmark != null) {
+//                        dao.removeBookmarkById(dtoBookmark.id)
+//                    }
+//                } else {
+//                    dao.insertBookmark(dtoBookmark.toBookmarkEntity())
+//                }
+//                dtoBookmark.toBookmarkEntity().toBookmark()
+//            }
+//            emit(updatedBookmarksForBook)
+//        } catch (e: Exception) {
+//            emit(emptyList())
+//        }
     }
 
     /**

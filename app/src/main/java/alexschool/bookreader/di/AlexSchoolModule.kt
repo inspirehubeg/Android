@@ -97,6 +97,7 @@ object AlexSchoolModule {
     @Provides
     fun provideApiService(httpClient: HttpClient): ApiService = ApiServiceImpl(httpClient)
 
+    @Singleton
     @Provides
     fun provideDispatcher(): CoroutineDispatcher = Dispatchers.Default
 }

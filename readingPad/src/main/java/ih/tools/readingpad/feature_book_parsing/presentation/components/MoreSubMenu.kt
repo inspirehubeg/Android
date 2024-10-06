@@ -128,7 +128,7 @@ fun MoreSubMenu(
                     val fileName =
                         "${viewModel.state.value.bookTitle} Highlights.docx"
                     val text: MutableList<HighlightParagraph> = mutableListOf()
-                    for (i in viewModel.state.value.bookHighlights) {
+                    for (i in viewModel.state.value.bookHighlightEntities) {
                         text.add(
                             HighlightParagraph(
                                 chapterName = "Chapter: ${i.chapterNumber}",

@@ -1,6 +1,6 @@
 package ih.tools.readingpad.feature_highlight.domain.use_cases
 
-import ih.tools.readingpad.feature_highlight.domain.model.Highlight
+import ih.tools.readingpad.feature_highlight.domain.model.HighlightEntity
 import ih.tools.readingpad.feature_highlight.domain.repository.HighlightRepository
 import kotlinx.coroutines.flow.Flow
 
@@ -24,7 +24,7 @@ class GetPageHighlights(
         bookId: String,
         chapterNumber: Int,
         pageNumber: Int
-    ): Flow<List<Highlight>> {
+    ): Flow<List<HighlightEntity>> {
         return repository.getPageHighlights(bookId, chapterNumber, pageNumber)
     }
 }
