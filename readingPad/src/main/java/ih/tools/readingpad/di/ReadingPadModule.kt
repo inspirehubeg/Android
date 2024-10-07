@@ -11,10 +11,8 @@ import dagger.hilt.components.SingletonComponent
 import ih.tools.readingpad.feature_book_parsing.data.PreferencesManager
 import ih.tools.readingpad.feature_book_parsing.data.data_source.ReadingPadDatabase
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.BookParserUseCases
-import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseBook
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseFont
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseImage
-import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseInternalLink
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseInternalLinkLazy
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParsePageLazy
 import ih.tools.readingpad.feature_book_parsing.domain.use_cases.ParseRegularText
@@ -222,10 +220,10 @@ object ReadingPadModule {
         return BookParserUseCases(
             parseImage = ParseImage(),
             parseFont = ParseFont(),
-            parseInternalLink = ParseInternalLink(),
+
             parseWebLink = ParseWebLink(),
             parseRegularText = ParseRegularText(),
-            parseBook = ParseBook(),
+
             parsePageLazy = ParsePageLazy(),
             parseInternalLinkLazy = ParseInternalLinkLazy(),
         )
@@ -288,5 +286,7 @@ object ReadingPadModule {
     @Singleton
     @Provides
     fun provideBookInputApi(httpClient: HttpClient): BookInputApi = BookInputApiImpl(httpClient)
+
+
 
 }

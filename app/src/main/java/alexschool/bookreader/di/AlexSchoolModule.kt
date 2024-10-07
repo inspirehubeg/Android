@@ -46,28 +46,6 @@ object AlexSchoolModule {
         }
     }
 
-//    @Singleton
-//    @Provides
-//    fun provideCategoryDao(alexSchoolDatabase: AlexSchoolDatabase): CategoryDao {
-//        return alexSchoolDatabase.categoryDao
-//    }
-//
-//    @Singleton
-//    @Provides
-//    fun provideBookInfoDao(alexSchoolDatabase: AlexSchoolDatabase): BookInfoDao {
-//        return alexSchoolDatabase.bookInfoDao
-//    }
-//    @Singleton
-//    @Provides
-//    fun provideBookDao(alexSchoolDatabase: AlexSchoolDatabase): BookDao {
-//        return alexSchoolDatabase.bookDao
-//    }
-//
-//    @Singleton
-//    @Provides
-//    fun provideAuthorDao(alexSchoolDatabase: AlexSchoolDatabase): AuthorDao {
-//        return alexSchoolDatabase.authorDao
-//    }
 
     @Singleton
     @Provides

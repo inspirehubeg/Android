@@ -23,11 +23,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.feature_book_parsing.presentation.components.BrightnessDialog
-import ih.tools.readingpad.feature_book_parsing.presentation.components.CustomFontDialog
-import ih.tools.readingpad.feature_book_parsing.presentation.components.CustomMenu
 import ih.tools.readingpad.feature_book_parsing.presentation.components.CustomThemeScreen
+import ih.tools.readingpad.feature_book_parsing.presentation.components.FontSizeSlider
 import ih.tools.readingpad.feature_book_parsing.presentation.components.FullScreenImage
 import ih.tools.readingpad.feature_book_parsing.presentation.components.FullScreenImageTopBar
+import ih.tools.readingpad.feature_book_parsing.presentation.components.InlineSelectionMenu
 import ih.tools.readingpad.feature_book_parsing.presentation.components.NavigationDrawer
 import ih.tools.readingpad.feature_book_parsing.presentation.components.PageSelector
 import ih.tools.readingpad.feature_book_parsing.presentation.components.PagesSlider
@@ -51,12 +51,9 @@ fun ReadingPadScreen(
     uiStateViewModel: UIStateViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    //val isDarkTheme = viewModel.darkTheme.collectAsState().value
     val uiSettings by uiStateViewModel.uiSettings.collectAsState()
     val isDarkTheme = uiSettings.darkTheme
 
-
-    // val isDrawerOpen by viewModel.isDrawerOpen.collectAsState()
     val currentDialog by uiStateViewModel.currentDialog.collectAsState()
     val currentScreen by uiStateViewModel.currentScreen.collectAsState()
 
@@ -67,23 +64,13 @@ fun ReadingPadScreen(
 //        }
 //    }
     ReadingPadTheme(isDarkTheme) {
-        //val showTopBar by viewModel.showTopBar.collectAsState()
-        val showTopBar by uiStateViewModel.showTopBar.collectAsState() // Migrated state observation
-        // val pinnedTopBar by viewModel.pinnedTopBar.collectAsState()
-        val pinnedTopBar = uiSettings.pinnedTopBar // Migrated state observation
-        val imageClicked by uiStateViewModel.imageClicked.collectAsState() // Migrated state observation
+        val showTopBar by uiStateViewModel.showTopBar.collectAsState()
+        val pinnedTopBar = uiSettings.pinnedTopBar
+        val imageClicked by uiStateViewModel.imageClicked.collectAsState()
 
-        //val showFullScreenImage by viewModel.showFullScreenImage.collectAsState()
         val showFullScreenImage = uiStateViewModel.currentScreen.collectAsState()
-            .value == UIStateViewModel.ScreenType.FullScreenImage // Migrated state observation
-
-        //val openUserInputScreen by viewModel.showUserInputPage.collectAsState()
-        val openUserInputScreen = uiStateViewModel.currentScreen.collectAsState()
-            .value == UIStateViewModel.ScreenType.UserInput // Migrated state observation
-
-        //val openCustomTheme by viewModel.showCustomThemePage.collectAsState()
-        //val backgroundColor by viewModel.backgroundColor.collectAsState()
-        val backgroundColor = uiSettings.backgroundColor // Migrated state observation
+            .value == UIStateViewModel.ScreenType.FullScreenImage
+        val backgroundColor = uiSettings.backgroundColor
         val listState = uiStateViewModel.lazyListState
         val configuration = LocalConfiguration.current
         val density = LocalDensity.current
@@ -98,7 +85,6 @@ fun ReadingPadScreen(
 
         // to calculate the height and width of the screen
         val screenWidth = configuration.screenWidthDp
-        val screenHeight = configuration.screenHeightDp
         val dialogWidth = screenWidth * 0.9f
 
 
@@ -108,87 +94,82 @@ fun ReadingPadScreen(
         val menuPosition by uiStateViewModel.menuPosition.collectAsState()
         // Use a LaunchedEffect to listen for selection changes from the ViewModel
         LaunchedEffect(selectionStart, selectionEnd) {
-            showMenu = uiStateViewModel.selectionStart.value!= -1 && uiStateViewModel.selectionEnd.value != -1
+            showMenu =
+                uiStateViewModel.selectionStart.value != -1 && uiStateViewModel.selectionEnd.value != -1
         }
 
 
         // this happens whenever there is a bookmark span in focus
         LaunchedEffect(key1 = viewModel, key2 = listState) {
             launch {
-                //viewModel.bookmarkClickEvent.collect
                 uiStateViewModel.bookmarkClickEvent.collect { span ->
                     uiStateViewModel.setBookmarkClickEvent(span)
                     if (span != null) {
                         //check if it's a new bookmark or an existing one to determine which dialog to open
                         if (
-                        //viewModel.editBookmark.value
                             uiStateViewModel.editBookmark.value
                         ) {
-//                            viewModel.setShowEditBookmarkDialog(true)
-//                            viewModel.setEditBookmark(false)
-                            uiStateViewModel.showDialog(UIStateViewModel.DialogType.EditBookmark) // Migrated event triggering
+                            uiStateViewModel.showDialog(UIStateViewModel.DialogType.EditBookmark)
                             uiStateViewModel.setEditBookmark(false)
                         } else {
-                            //viewModel.setShowAddBookmarkDialog(true)
-                            uiStateViewModel.showDialog(UIStateViewModel.DialogType.AddBookmark) // Migrated event triggering}
+                            uiStateViewModel.showDialog(UIStateViewModel.DialogType.AddBookmark)
                         }
                     }
                 }
             }
             launch {
-                //viewModel.noteClickEvent.collect
                 uiStateViewModel.noteClickEvent.collect { span ->
-                    //viewModel.setNoteClickEvent(span)
                     uiStateViewModel.setNoteClickEvent(span)
                     if (span != null) {
                         //check if it's a new note or an existing one to determine which dialog to open
                         if (
                             uiStateViewModel.editNote.value
-                        // viewModel.editNote.value
                         ) {
-//                            viewModel.setShowEditNoteDialog(true)
-//                            viewModel.setEditNote(false)
-                            uiStateViewModel.showDialog(UIStateViewModel.DialogType.EditNote) // Migrated event triggering
+                            uiStateViewModel.showDialog(UIStateViewModel.DialogType.EditNote)
                             uiStateViewModel.setEditNote(false)
                         } else {
-                            // viewModel.setShowAddNoteDialog(true)
-                            uiStateViewModel.showDialog(UIStateViewModel.DialogType.AddNote) // Migrated event triggering
+                            uiStateViewModel.showDialog(UIStateViewModel.DialogType.AddNote)
                         }
                     }
                 }
             }
             launch {
-                snapshotFlow { listState.isScrollInProgress}.collect { isScrolling ->
+                snapshotFlow { listState.isScrollInProgress }.collect { isScrolling ->
                     if (isScrolling) {
                         uiStateViewModel.toggleTopBar(false)
                     }
                 }
             }
         }
-
         NavigationDrawer(
             viewModel = viewModel,
             uiStateViewModel = uiStateViewModel,
             content = {
                 // Screen content
-                Scaffold(containerColor = Color(backgroundColor), topBar = {
-                    //the showTopBar changes with the single tap on screen to show or hide the bars
-                    // and emulates full screen effect
-                    if (pinnedTopBar || showTopBar) {
-                        ReadingPadTopBar(
-                            navController = navController,
-                            viewModel = viewModel,
-                            uiStateViewModel = uiStateViewModel
-                        )
+                Scaffold(
+                    containerColor = Color(backgroundColor),
+                    topBar = {
+                        //the showTopBar changes with the single tap on screen to show or hide the bars
+                        // and emulates full screen effect
+                        if (pinnedTopBar || showTopBar) {
+                            ReadingPadTopBar(
+                                navController = navController,
+                                viewModel = viewModel,
+                                uiStateViewModel = uiStateViewModel
+                            )
+                        }
+                        if (showFullScreenImage) {
+                            FullScreenImageTopBar(viewModel = viewModel, uiStateViewModel)
+                        }
+                    }, bottomBar = {
+                        if (pinnedTopBar || showTopBar) {
+                            ReadingPadBottomBar(
+                                viewModel = viewModel,
+                                uiStateViewModel,
+                                navController
+                            )
+                        }
                     }
-                    if (showFullScreenImage) {
-                        FullScreenImageTopBar(viewModel = viewModel, uiStateViewModel)
-                    }
-                }, bottomBar = {
-                    if (pinnedTopBar || showTopBar) {
-                        ReadingPadBottomBar(viewModel = viewModel, uiStateViewModel, navController)
-                    }
-                }
 
                 ) { values ->
                     // passing the values to the lazyColumn or to the Box doesn't allow the topBar to be above the page
@@ -204,37 +185,22 @@ fun ReadingPadScreen(
                                 .systemBarsPadding() // this allows the bars to appear above the page to give the full screen behavior
                         }
                     ) {
-/*                this comment for using the recycler view instead of lazy column
-//                XMLView(
-//                    context = LocalContext.current, viewModel,
-//                    modifier = Modifier
-//                        .padding(values)
-//
-                )
-*/
-
-
+                  // Column (modifier = Modifier.fillMaxSize()){
                         PagesScreen(
                             viewModel = viewModel,
                             listState = listState,
-                            uiStateViewModel = uiStateViewModel
+                            uiStateViewModel = uiStateViewModel,
+                            modifier = Modifier
                         )
+//                            Spacer(modifier = Modifier.height(4.dp))
+//                            PagesScreen(
+//                                viewModel = viewModel,
+//                                uiStateViewModel = uiStateViewModel,
+//                                listState = listState,
+//                                modifier = Modifier.weight(1f)
+//                            )
 
-//                        // user input screen
-//
-//                        val height =
-//                            if (openUserInputScreen) LocalConfiguration.current.screenHeightDp.dp else 0.dp
-//                        val offset =
-//                            if (openUserInputScreen) 0.dp else LocalConfiguration.current.screenHeightDp.dp
-//
-//
-//                        UserInputScreen(
-//                            viewModel = viewModel,
-//                            uiStateViewModel = uiStateViewModel,
-//                            height = height,
-//                            offset = offset
-//                        )
-
+                     //   }
                     }
                     when (currentDialog) {
                         UIStateViewModel.DialogType.Brightness -> BrightnessDialog(
@@ -279,7 +245,7 @@ fun ReadingPadScreen(
                             uiStateViewModel
                         )
 
-                        UIStateViewModel.DialogType.FontSlider -> CustomFontDialog(
+                        UIStateViewModel.DialogType.FontSlider -> FontSizeSlider(
                             viewModel,
                             uiStateViewModel
                         )
@@ -316,54 +282,14 @@ fun ReadingPadScreen(
                         null -> {}
                     }
 
-//                        if (showFontSlider) {
-//                            CustomFontDialog(viewModel)
-//                        }
-//
-//                        if (showThemeSelector) {
-//                            ThemeSelectorMenu(viewModel)
-//                        }
-//                        if (showEditBookmarkDialog) {
-//                            EditBookmarkDialog(viewModel)
-//                        }
 
-//                        if (showAddBookmarkDialog) {
-//                            AddBookmarkDialog(viewModel)
-//                        }
-//                        if (showBrightnessDialog) {
-//                            BrightnessDialog(viewModel)
-//                        }
-//                        if (showAddNoteDialog) {
-//                            AddNoteDialog(viewModel = viewModel)
-//                        }
-//                        if (showEditNoteDialog) {
-//                            EditNoteDialog(viewModel = viewModel)
-//                        }
-
-//                        if (showBookmarkListDialog) {
-//                            BookmarkListDialog(
-//                                viewModel,
-//                                backgroundHeight = bookmarkDialogHeight.dp,
-//                                dialogWidth.dp,
-//                                listState
-//                            )
-//                        }
-
-//                        if (showPageNumberDialog) {
-//                            PageSelector(viewModel, listState)
-//                        }
-
-                        if (imageClicked != null) {
-                            uiStateViewModel.showScreen(UIStateViewModel.ScreenType.FullScreenImage)
-//                            viewModel.setShowFullScreenImage(true)
-//                            viewModel.setTopBarVisibility(true)
-                        }
+                    if (imageClicked != null) {
+                        uiStateViewModel.showScreen(UIStateViewModel.ScreenType.FullScreenImage)
+                    }
 
 
                     if (showMenu) {
-//                        uiStateViewModel.screenWidth = screenWidth
-//                        uiStateViewModel.screenHeight = screenHeight
-                        CustomMenu(menuPosition, uiStateViewModel, viewModel,menuWidth)
+                        InlineSelectionMenu(menuPosition, uiStateViewModel, viewModel, menuWidth)
                     }
 
 
@@ -379,11 +305,11 @@ fun ReadingPadScreen(
                         navController.navigateUp()
                     }
                 }
+
             }
         )
     }
 }
 
 
-
-
+//

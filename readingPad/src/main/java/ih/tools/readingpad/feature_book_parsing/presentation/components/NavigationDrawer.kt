@@ -15,8 +15,6 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -42,7 +40,8 @@ fun NavigationDrawer(
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val drawerGesturesEnabled = uiStateViewModel.uiSettings.collectAsState().value.areDrawerGesturesEnabled
+    val drawerGesturesEnabled =
+        uiStateViewModel.uiSettings.collectAsState().value.areDrawerGesturesEnabled
     val customDrawerState by uiStateViewModel.drawerState.collectAsState()
 
     ModalNavigationDrawer(
@@ -53,30 +52,30 @@ fun NavigationDrawer(
                     .fillMaxHeight()
                     .width((screenWidth * .65f).dp)
             ) {
-                TabRow(selectedTabIndex = selectedTabIndex) {
-                    Tab(selected = selectedTabIndex == 0, onClick = {
-                        selectedTabIndex = 0
-                    }) {
-                        Text(text = "Book Index")
-                    }
-                    Tab(selected = selectedTabIndex == 1, onClick = {
-                        selectedTabIndex = 1
-                    }) {
-                        Text(text = "User Inputs")
-                    }
-                }
+//                TabRow(selectedTabIndex = selectedTabIndex) {
+//                    Tab(selected = selectedTabIndex == 0, onClick = {
+//                        selectedTabIndex = 0
+//                    }) {
+//                        Text(text = "Book Index")
+//                    }
+//                    Tab(selected = selectedTabIndex == 1, onClick = {
+//                        selectedTabIndex = 1
+//                    }) {
+//                        Text(text = "User Inputs")
+//                    }
+//                }
                 // Drawer content with the same background color as the top bar
                 Box(
                     modifier = Modifier
-                        .background(Beige)
                         .fillMaxSize()
-
+                        .background(Beige)
                 ) {
-                    Column {
-                        if (selectedTabIndex == 0) {
-                            BookIndexDrawerSheet(viewModel)
-                        } else UserInputsDrawerSheet(viewModel, uiStateViewModel)
-                    }
+                    UserInputsDrawerSheet(viewModel, uiStateViewModel)
+//                    Column {
+//                        if (selectedTabIndex == 0) {
+//                            BookIndexDrawerSheet(viewModel)
+//                        } else UserInputsDrawerSheet(viewModel, uiStateViewModel)
+//                    }
                 }
             }
         },
@@ -125,7 +124,7 @@ fun UserInputsDrawerSheet(
                         .fillMaxWidth()
                         .padding(start = 16.dp, top = 2.dp, bottom = 2.dp, end = 16.dp)
                         .weight(1f)
-                       // .background(Color.Red)
+                    // .background(Color.Red)
                 ) {
                     val items = viewModel.state.value.bookBookmarkEntities
                     items(items) { bookmark ->
@@ -170,7 +169,7 @@ fun UserInputsDrawerSheet(
                         .fillMaxWidth()
                         .weight(1f)
                         .padding(start = 16.dp, top = 2.dp, bottom = 2.dp, end = 16.dp)
-                      //  .background(Color.Blue)
+                    //  .background(Color.Blue)
                 ) {
                     items(items) { highlight ->
                         Text(text = highlight.text,

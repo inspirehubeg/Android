@@ -46,7 +46,7 @@ import ih.tools.readingpad.util.IHBackgroundSpan
 import ih.tools.readingpad.util.IHNoteSpan
 
 @Composable
-fun CustomSelectionMenu(
+fun TopBarSelectionMenu(
     viewModel: BookContentViewModel,
     uiStateViewModel: UIStateViewModel
 ) {

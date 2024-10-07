@@ -60,7 +60,6 @@ class ApiServiceImpl @Inject constructor(private val httpClient: HttpClient) : A
 
 
     override suspend fun getBooks(): List<BookDto>
-
     {
         return try {
             Log.d("ApiResponse", "bookInfo Api called: ${Util.BOOK_INFO_URL}")
@@ -136,10 +135,27 @@ class ApiServiceImpl @Inject constructor(private val httpClient: HttpClient) : A
         TODO("Not yet implemented")
     }
 
-
-    override suspend fun getTokens(): List<TokenDto> {
-        TODO("Not yet implemented")
+    override suspend fun getTokens(bookId: Int): List<TokenDto> {
+        return try {
+            httpClient.get(Util.TOKEN_URL).body()
+        } catch (e: RedirectResponseException) {
+            //3xx - responses
+            Log.d("ApiResponse", "3xx Error: ${e.response.status.description}")
+            emptyList()
+        } catch (e: ClientRequestException) {
+            //4xx - responses
+            Log.d("ApiResponse", "4xx Error: ${e.response.status.description}")
+            emptyList()
+        } catch (e: ServerResponseException) {
+            //5xx - responses
+            Log.d("ApiResponse", "5xx Error: ${e.response.status.description}")
+            emptyList()
+        } catch (e: Exception) {
+            Log.d("ApiResponse", "Error: ${e.message}")
+            emptyList()
+        }
     }
+
 
     override suspend fun getSubscriptions(): List<SubscriptionDto> {
         TODO("Not yet implemented")

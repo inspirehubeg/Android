@@ -2,7 +2,10 @@ package alexschool.bookreader.network
 
 import alexschool.bookreader.data.AppRepository
 import alexschool.bookreader.data.TableName
+import alexschool.bookreader.data.local.BookEntity
 import alexschool.bookreader.domain.Category
+import alexschool.bookreader.domain.DetailedBookInfo
+import alexschool.bookreader.domain.Token
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,12 +27,15 @@ class NetworkViewModel @Inject constructor(
 
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories = _categories.asStateFlow()
+    private val _books = MutableStateFlow<List<BookEntity>>(emptyList())
+    val books = _books.asStateFlow()
+    private val _bookTokens = MutableStateFlow<List<Token>>(emptyList())
+    val bookTokens = _bookTokens.asStateFlow()
+    var detailedBookInfo: DetailedBookInfo? = null
 
     init {
-     //   fetchGeneralChanges()
-//        //fetchBookInfo()
-//        fetchCategories()
-//        //fetchPostResponses()
+        fetchCategories()
+        fetchBooks()
     }
 
 
@@ -106,8 +112,32 @@ class NetworkViewModel @Inject constructor(
         TODO("Not yet implemented")
     }
 
+    private fun fetchTokens(bookId: Int) {
+        viewModelScope.launch {
+            appRepository.getTokens(bookId).catch { e ->
+                // Handle errors, e.g., log the error or update an error state
+                Log.e("NetworkViewModel", "Error fetching tokens: ${e.message}")
+            }.collect { tokens ->
+                _bookTokens.value = tokens
+            }
+        }
+    }
+
     private fun fetchBooks() {
-        TODO("Not yet implemented")
+        viewModelScope.launch {
+            appRepository.getRemoteBooks().catch { e ->
+                // Handle errors, e.g., log the error or update an error state
+                Log.e("NetworkViewModel", "Error fetching books: ${e.message}")
+            }.collect { books ->
+                _books.value = books
+            }
+        }
+    }
+
+    private fun fetchDetailedBookInfo(bookId: Int) {
+        viewModelScope.launch {
+            detailedBookInfo = appRepository.getDetailedBookInfo(bookId)
+        }
     }
 
     private fun fetchCategories() {

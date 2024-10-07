@@ -36,7 +36,7 @@ import androidx.room.RoomDatabase
         SubscriptionEntity::class
 
 
-       // EncodingEntity::class
+        // EncodingEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -51,4 +51,5 @@ abstract class AlexSchoolDatabase : RoomDatabase() {
     abstract fun tagDao(): TagDao
     abstract fun inputDao(): InputDao
     abstract fun subscriptionDao(): SubscriptionDao
+
 }

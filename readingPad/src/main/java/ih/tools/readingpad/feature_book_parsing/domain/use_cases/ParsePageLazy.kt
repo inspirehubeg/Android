@@ -9,6 +9,7 @@ import ih.tools.readingpad.feature_book_fetching.domain.book_reader.OldMetadata
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Page
 import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
 import ih.tools.readingpad.feature_book_parsing.domain.model.SpannedPage
+import ih.tools.readingpad.feature_book_parsing.domain.parseTag
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.ui.UIStateViewModel
 
@@ -28,7 +29,7 @@ class ParsePageLazy {
      * @param viewModel The ViewModel associated with the book content.
      * @return A SpannableStringBuilder containing the parsed content with formatting and interactive elements.
      */
-     fun invoke(
+    fun invoke(
         pageEncodedString: String,
         oldMetadata: OldMetadata,
         context: Context,
@@ -72,7 +73,12 @@ class ParsePageLazy {
                     is ParsedElement.Font -> {
                         Log.d("ParseBook", "Font element is ${parsedTag.content}")
                         pageSpannableStringBuilder =
-                            ParseFont().invoke(oldMetadata, parsedTag, pageSpannableStringBuilder, context)
+                            ParseFont().invoke(
+                                oldMetadata,
+                                parsedTag,
+                                pageSpannableStringBuilder,
+                                context
+                            )
                     }
 
                     is ParsedElement.WebLink -> {
@@ -133,7 +139,7 @@ class ParsePageLazy {
  * @param bookContentViewModel The ViewModel associated with the book content.
  * @return A list of SpannedPage objects, where each page has its content formatted as a SpannableStringBuilder.
  */
- fun convertPagesToSpannedPagesLazy(
+fun convertPagesToSpannedPagesLazy(
     pages: List<Page>,
     oldMetadata: OldMetadata,
     context: Context,

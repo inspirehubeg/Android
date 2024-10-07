@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class TagDto(
     val id: Int,
     val name: String,
-    val isDeleted: Boolean?,
+    val is_deleted: Boolean?,
+    val last_updated: Int,
     //val description: String,
 )

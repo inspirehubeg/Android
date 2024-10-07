@@ -8,5 +8,6 @@ data class AuthorDto(
     val name: String,
     val bio: String,
     val image: String,
-    val isDeleted: Boolean?
+    val is_deleted: Boolean?,
+    val last_updated: Int
 )

@@ -23,6 +23,7 @@ data class BookDto(
     val book_rating: Double?,
     val release_date: String?,
     val is_deleted: Boolean?,
+    val last_updated: Int,
 )
 
 

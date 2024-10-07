@@ -5,8 +5,6 @@ import alexschool.bookreader.network.NetworkViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -16,8 +14,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -43,15 +39,16 @@ fun HomeScreen(
             .background(MaterialTheme.colorScheme.surface),
         //contentAlignment = Alignment.Center
     ) {
+        BookListScreen(networkViewModel = networkViewModel)
         IconButton(
             modifier = Modifier.align(Alignment.BottomStart),
             onClick = {
-            navController.navigate(Screens.SettingsScreen.route)
-        }) {
+                navController.navigate(Screens.SettingsScreen.route)
+            }) {
             Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
         }
         Button(
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier.align(Alignment.BottomCenter),
             colors = ButtonDefaults.buttonColors().copy(
                 containerColor = Beige,
                 contentColor = Brown
@@ -62,22 +59,17 @@ fun HomeScreen(
             Text(text = stringResource(R.string.book_content))
         }
 
-       // BookListScreen(viewModel = networkViewModel)
+
     }
 
 
 }
 
 @Composable
-fun BookListScreen(viewModel: NetworkViewModel) {
-     val category by viewModel.categories.collectAsState()
+fun BookListScreen(networkViewModel: NetworkViewModel) {
 
-    if (category.isNotEmpty()){
-        LazyColumn {
-            items(category) { category ->
-                Text(text = category.name)
-            }
-        }
+    Box() {
+        CategoriesRow(networkViewModel = networkViewModel)
     }
 //    if (postResponse.isNotEmpty()) {
 //        LazyColumn {

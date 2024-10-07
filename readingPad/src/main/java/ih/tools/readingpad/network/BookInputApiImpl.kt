@@ -8,6 +8,8 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import javax.inject.Inject
 
+
+
 class BookInputApiImpl @Inject constructor(private val httpClient: HttpClient) : BookInputApi {
     override suspend fun getHighlights(bookId: String): List<HighlightDto> {
         return httpClient.get("/books/$bookId/highlights").body()
@@ -44,5 +46,6 @@ class BookInputApiImpl @Inject constructor(private val httpClient: HttpClient) :
     override suspend fun deleteNote(noteDto: NoteDto) {
         TODO("Not yet implemented")
     }
+
 
 }

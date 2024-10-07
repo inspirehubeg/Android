@@ -8,5 +8,6 @@ data class SetDto(
     val name: String,
     val user_id: Int,
     val is_deleted: Boolean?,
+    val last_updated: Int
 
 )

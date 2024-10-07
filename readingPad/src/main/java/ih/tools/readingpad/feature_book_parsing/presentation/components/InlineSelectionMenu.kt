@@ -44,7 +44,7 @@ import ih.tools.readingpad.util.IHBackgroundSpan
 import ih.tools.readingpad.util.IHNoteSpan
 
 @Composable
-fun CustomMenu(
+fun InlineSelectionMenu(
     menuPosition: IntOffset,
     uiStateViewModel: UIStateViewModel,
     viewModel: BookContentViewModel,

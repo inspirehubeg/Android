@@ -7,6 +7,7 @@ data class CategoryDto(
     val id: Int,
     val name: String,
     val image: String?,
-    val isDeleted: Boolean?,
+    val is_deleted: Boolean?,
+    val last_updated: Int
 )
 

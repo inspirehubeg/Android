@@ -19,7 +19,6 @@ interface AppRepository {
 
     suspend fun getCategories(): Flow<List<Category>>
     //suspend fun getBooksInfo(): Flow<List<BookDto>>
-    suspend fun getToken() : Flow<Token>
     suspend fun getRemoteBooks(): Flow<List<BookEntity>>
     suspend fun getGeneralBooksInfo(): Flow<List<GeneralBookInfo>>
     suspend fun getDetailedBookInfo(bookId: Int): DetailedBookInfo?
@@ -38,6 +37,7 @@ interface AppRepository {
     suspend fun getSavedBooks(userId: Int) : Flow<List<SavedBook>>
 
 
+    suspend fun getTokens(bookId: Int) : Flow<List<Token>>
 
 
 

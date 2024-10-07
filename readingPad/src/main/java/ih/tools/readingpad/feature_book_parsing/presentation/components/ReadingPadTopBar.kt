@@ -127,7 +127,7 @@ fun ReadingPadTopBar(
                         },
                     )
                 } else if (showCustomSelectionMenu) {
-                    CustomSelectionMenu(viewModel = viewModel, uiStateViewModel = uiStateViewModel)
+                    TopBarSelectionMenu(viewModel = viewModel, uiStateViewModel = uiStateViewModel)
                 } else {
                     Text(text = "") // Or maybe chapter name
                 }

@@ -1,11 +1,9 @@
 package alexschool.bookreader.data.mappers
 
-import alexschool.bookreader.data.local.TokenEntity
-import alexschool.bookreader.data.remote.TokenDto
 import alexschool.bookreader.domain.Token
 
-fun TokenDto.toTokenEntity(): TokenEntity {
-    return TokenEntity(
+fun alexschool.bookreader.data.remote.TokenDto.toTokenEntity(): alexschool.bookreader.data.local.TokenEntity {
+    return alexschool.bookreader.data.local.TokenEntity(
         id = id,
         firstPageNumber = first_page_number,
         lastPageNumber = last_page_number,
@@ -18,7 +16,7 @@ fun TokenDto.toTokenEntity(): TokenEntity {
     )
 }
 
-fun TokenEntity.toToken(): Token {
+fun alexschool.bookreader.data.local.TokenEntity.toToken(): Token {
     return Token(
         id = id,
         firstPageNumber = firstPageNumber,

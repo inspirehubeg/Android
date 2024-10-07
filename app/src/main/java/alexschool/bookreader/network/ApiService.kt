@@ -46,7 +46,7 @@ interface ApiService {
     //this is called when there is changes in saved_book table
     suspend fun getSavedBooksByUserId(userId: Int) : List<SavedBookDto>
 
-    suspend fun getTokens() : List<TokenDto>
+    suspend fun getTokens(bookId: Int) : List<TokenDto>
 
     suspend fun getSubscriptions() : List<SubscriptionDto>
 

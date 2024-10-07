@@ -19,4 +19,5 @@ interface BookInputApi {
     suspend fun getNotes(bookId: String): List<NoteDto>
     suspend fun addNote(noteDto: NoteDto)
     suspend fun deleteNote(noteDto: NoteDto)
+
 }

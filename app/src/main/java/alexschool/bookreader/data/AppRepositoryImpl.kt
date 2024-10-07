@@ -19,6 +19,8 @@ import alexschool.bookreader.data.mappers.toSubscription
 import alexschool.bookreader.data.mappers.toSubscriptionEntity
 import alexschool.bookreader.data.mappers.toTag
 import alexschool.bookreader.data.mappers.toTagEntity
+import alexschool.bookreader.data.mappers.toToken
+import alexschool.bookreader.data.mappers.toTokenEntity
 import alexschool.bookreader.data.mappers.toTranslator
 import alexschool.bookreader.data.mappers.toTranslatorEntity
 import alexschool.bookreader.domain.Author
@@ -59,7 +61,7 @@ class AppRepositoryImpl @Inject constructor(
             }
             val updatedCategories = dtoCategories.map { dtoCategory ->
                 val localCategory = appDatabase.categoryDao().getCategoryById(dtoCategory.id)
-                if (dtoCategory.isDeleted == true) {
+                if (dtoCategory.is_deleted == true) {
                     if (localCategory != null) {
                         appDatabase.categoryDao().deleteCategoryById(dtoCategory.id)
                     }
@@ -87,7 +89,7 @@ class AppRepositoryImpl @Inject constructor(
             }
             val updatedTags = dtoTags.map { dtoTag ->
                 val localTag = appDatabase.tagDao().getTagById(dtoTag.id)
-                if (dtoTag.isDeleted == true) {
+                if (dtoTag.is_deleted == true) {
                     if (localTag != null) {
                         appDatabase.tagDao().deleteTagById(dtoTag.id)
                     }
@@ -113,7 +115,7 @@ class AppRepositoryImpl @Inject constructor(
             }
             val updatedAuthors = dtoAuthors.map { dtoAuthor ->
                 val localAuthor = appDatabase.authorDao().getAuthorById(dtoAuthor.id)
-                if (dtoAuthor.isDeleted == true) {
+                if (dtoAuthor.is_deleted == true) {
                     if (localAuthor != null) {
                         appDatabase.authorDao().deleteAuthorById(dtoAuthor.id)
                     }
@@ -313,7 +315,36 @@ class AppRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getToken(): Flow<Token> {
-        TODO("Not yet implemented")
+    override suspend fun getTokens(bookId: Int): Flow<List<Token>> = flow {
+
+        val localTokensForBook = withContext(defaultDispatcher)
+        {
+            appDatabase.tokenDao().getAllTokensForBook(bookId)
+        }
+        emit(localTokensForBook.map { it.toToken() })
+        try {
+            val dtoTokensForBook = withContext(defaultDispatcher)
+            {
+                apiService.getTokens(bookId)
+            }
+            val updatedTokensForBook = dtoTokensForBook.map { dtoToken ->
+                val localToken =
+                    appDatabase.tokenDao().getTokenById(bookId = bookId, tokenId = dtoToken.id)
+                if (dtoToken.is_deleted == true) {
+                    if (localToken != null) {
+                        appDatabase.tokenDao()
+                            .deleteTokenById(bookId = bookId, tokenId = dtoToken.id)
+                    }
+                } else {
+                    appDatabase.tokenDao().insertToken(dtoToken.toTokenEntity())
+                }
+                dtoToken.toTokenEntity().toToken()
+            }
+            emit(updatedTokensForBook)
+        } catch (e: Exception) {
+            emit(emptyList())
+        }
+
     }
 }
+

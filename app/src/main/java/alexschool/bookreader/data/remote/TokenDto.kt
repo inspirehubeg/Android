@@ -12,5 +12,7 @@ data class TokenDto(
     val book_id: Int,
     val count: Int,
     val content: String,
-    val size: Double
+    val size: Double,
+    val last_updated: Int,
+    val is_deleted: Boolean?
 )

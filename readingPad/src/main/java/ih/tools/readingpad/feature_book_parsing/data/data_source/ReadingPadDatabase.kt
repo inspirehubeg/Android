@@ -20,7 +20,7 @@ import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColor
         BookmarkEntity::class,
         HighlightEntity::class,
         ThemeColor::class,
-        NoteEntity::class
+        NoteEntity::class,
     ],
     version = 1,
     exportSchema = false

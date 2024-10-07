@@ -33,6 +33,7 @@ fun PagesScreen(
     viewModel: BookContentViewModel,
     uiStateViewModel: UIStateViewModel,
     listState: LazyListState,
+    modifier: Modifier
 ) {
     val context = LocalContext.current
     val book = viewModel.book
@@ -110,7 +111,8 @@ fun PagesScreen(
 //    } else {
     LazyColumn(
         state = listState,
-        userScrollEnabled = scrollable
+        userScrollEnabled = scrollable,
+        modifier = modifier
     ) {
         itemsIndexed(itemPages.value,
             key = { index, page ->

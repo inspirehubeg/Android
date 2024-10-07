@@ -5,8 +5,11 @@ object Util {
     const val BASE_URL="http://localhost:3000/api/v1/categories"
     const val BASE_URL_TEST="https://jsonplaceholder.typicode.com"
     const val POSTS_URL="$BASE_URL_TEST/posts"
-    const val CATEGORIES_URL="http://192.168.1.7:8080/api/v1/categories"
-    const val BOOK_INFO_URL="http://192.168.1.7:8080/api/v1/books?limit=2&offset=0"
+    const val CATEGORIES_URL="http://192.168.240.241:8080/api/v1/categories?since=0"
+    const val BOOK_INFO_URL="http://192.168.1.47:8080/api/v1/users/1/books?limit=2&offset=0"
+    const val TOKEN_URL= "http://192.168.1.47:8080/api/v1/books/1/tokens/0"
+
+    //const val BOOK_URL= "http://192.168.1.47:8080/api/v1/books/1"
 
     const val BOOK_INFO_ENDPOINT="books"
     const val CATEGORIES_ENDPOINT="categories"

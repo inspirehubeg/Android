@@ -13,12 +13,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,45 +30,7 @@ import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewMode
 import ih.tools.readingpad.ui.UIStateViewModel
 
 
-/** The font size slider */
 
-@Composable
-fun CustomFontDialog(
-    viewModel: BookContentViewModel,
-    uiStateViewModel: UIStateViewModel
-) {
-    val fontSize = uiStateViewModel.uiSettings.collectAsState().value.fontSize
-    //outer transparent box to allow the custom positioning of the slider
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 40.dp)
-            .clickable(onClick = {
-                uiStateViewModel.showDialog(null)
-            })
-    ) {
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .background(
-                    MaterialTheme.colorScheme.secondaryContainer,
-                    shape = RoundedCornerShape(16.dp)
-                )
-                .align(Alignment.BottomCenter)
-        ) {
-            Slider(
-                value = fontSize,
-                onValueChange = { newSize ->
-                    uiStateViewModel.setFontSize(newSize, 0f)
-                },
-                valueRange = 12f..32f,
-                steps = 24
-            )
-        }
-    }
-}
 
 @Composable
 fun PageSelector(viewModel: BookContentViewModel, listState: LazyListState, uiStateViewModel: UIStateViewModel) {
