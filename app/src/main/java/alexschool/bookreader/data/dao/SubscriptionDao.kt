@@ -1,6 +1,6 @@
 package alexschool.bookreader.data.dao
 
-import alexschool.bookreader.data.local.SubscriptionEntity
+import alexSchool.network.entities.SubscriptionEntity
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy

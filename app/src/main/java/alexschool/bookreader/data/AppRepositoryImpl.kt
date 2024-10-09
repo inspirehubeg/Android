@@ -1,10 +1,23 @@
 package alexschool.bookreader.data
 
+import alexSchool.network.NetworkModule
+import alexschool.bookreader.data.domain.Author
+import alexschool.bookreader.data.domain.BookInfo
+import alexschool.bookreader.data.domain.Category
+import alexschool.bookreader.data.domain.DetailedBookInfo
+import alexschool.bookreader.data.domain.GeneralBookInfo
+import alexschool.bookreader.data.domain.ReadingProgress
+import alexschool.bookreader.data.domain.SavedBook
+import alexschool.bookreader.data.domain.Set
+import alexschool.bookreader.data.domain.SetContent
+import alexschool.bookreader.data.domain.Subscription
+import alexschool.bookreader.data.domain.Tag
+import alexschool.bookreader.data.domain.Translator
 import alexschool.bookreader.data.local.AlexSchoolDatabase
-import alexschool.bookreader.data.local.BookEntity
 import alexschool.bookreader.data.mappers.toAuthor
 import alexschool.bookreader.data.mappers.toAuthorEntity
-import alexschool.bookreader.data.mappers.toBookEntity
+import alexschool.bookreader.data.mappers.toBookInfo
+import alexschool.bookreader.data.mappers.toBookInfoEntity
 import alexschool.bookreader.data.mappers.toCategory
 import alexschool.bookreader.data.mappers.toCategoryEntity
 import alexschool.bookreader.data.mappers.toDetailedBookInfo
@@ -19,23 +32,8 @@ import alexschool.bookreader.data.mappers.toSubscription
 import alexschool.bookreader.data.mappers.toSubscriptionEntity
 import alexschool.bookreader.data.mappers.toTag
 import alexschool.bookreader.data.mappers.toTagEntity
-import alexschool.bookreader.data.mappers.toToken
-import alexschool.bookreader.data.mappers.toTokenEntity
 import alexschool.bookreader.data.mappers.toTranslator
 import alexschool.bookreader.data.mappers.toTranslatorEntity
-import alexschool.bookreader.domain.Author
-import alexschool.bookreader.domain.Category
-import alexschool.bookreader.domain.DetailedBookInfo
-import alexschool.bookreader.domain.GeneralBookInfo
-import alexschool.bookreader.domain.ReadingProgress
-import alexschool.bookreader.domain.SavedBook
-import alexschool.bookreader.domain.Set
-import alexschool.bookreader.domain.SetContent
-import alexschool.bookreader.domain.Subscription
-import alexschool.bookreader.domain.Tag
-import alexschool.bookreader.domain.Token
-import alexschool.bookreader.domain.Translator
-import alexschool.bookreader.network.ApiService
 import android.util.Log
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -46,10 +44,11 @@ import javax.inject.Inject
 
 class AppRepositoryImpl @Inject constructor(
     private val appDatabase: AlexSchoolDatabase,
-    private val apiService: ApiService,
-    private val defaultDispatcher: CoroutineDispatcher
+    //private val apiService: ApiService,
 ) : AppRepository {
 
+    private val defaultDispatcher: CoroutineDispatcher = NetworkModule.provideDispatcher()
+    private val apiService = NetworkModule.provideApiService()
     override suspend fun getCategories(): Flow<List<Category>> = flow {
         val localCategories = appDatabase.categoryDao().getAllCategories()
         // Emit cached categories first
@@ -131,21 +130,22 @@ class AppRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRemoteBooks(): Flow<List<BookEntity>> = flow {
+    override suspend fun getRemoteBooks(): Flow<List<BookInfo>> = flow {
         try {
             val dtoBooks = withContext(defaultDispatcher) {
                 apiService.getBooks()
             }
             val remoteBooks = dtoBooks.map { bookDto ->
-                val localBook = appDatabase.bookDao().getBookById(bookDto.id)
-                if (bookDto.is_deleted == true) {
+                val localBook = appDatabase.bookDao().getBookById(bookDto.book.id)
+                if (bookDto.book.is_deleted == true) {
                     if (localBook != null) {
-                        appDatabase.bookDao().deleteBookById(bookDto.id)
+                        appDatabase.bookDao().deleteBookById(bookDto.book.id)
                     }
                 } else {
-                    appDatabase.bookDao().insertBook(bookDto.toBookEntity())
+                    // add bookInfo to its table in db
+                    appDatabase.bookDao().insertBook(bookDto.toBookInfoEntity())
                 }
-                bookDto.toBookEntity()
+                bookDto.toBookInfoEntity().toBookInfo()
                 //then reload the ui with the new data?
             }
             emit(remoteBooks)
@@ -169,7 +169,7 @@ class AppRepositoryImpl @Inject constructor(
             return flow {
                 emit(localBooks.map { book ->
                     val bookWithDetails = appDatabase.bookDao().getBookWithDetails(book.id)
-                    book.toGeneralBookInfo(bookWithDetails!!)
+                    book.toBookInfo().toGeneralBookInfo(bookWithDetails!!)
                 })
             }
         }
@@ -315,36 +315,8 @@ class AppRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getTokens(bookId: Int): Flow<List<Token>> = flow {
 
-        val localTokensForBook = withContext(defaultDispatcher)
-        {
-            appDatabase.tokenDao().getAllTokensForBook(bookId)
-        }
-        emit(localTokensForBook.map { it.toToken() })
-        try {
-            val dtoTokensForBook = withContext(defaultDispatcher)
-            {
-                apiService.getTokens(bookId)
-            }
-            val updatedTokensForBook = dtoTokensForBook.map { dtoToken ->
-                val localToken =
-                    appDatabase.tokenDao().getTokenById(bookId = bookId, tokenId = dtoToken.id)
-                if (dtoToken.is_deleted == true) {
-                    if (localToken != null) {
-                        appDatabase.tokenDao()
-                            .deleteTokenById(bookId = bookId, tokenId = dtoToken.id)
-                    }
-                } else {
-                    appDatabase.tokenDao().insertToken(dtoToken.toTokenEntity())
-                }
-                dtoToken.toTokenEntity().toToken()
-            }
-            emit(updatedTokensForBook)
-        } catch (e: Exception) {
-            emit(emptyList())
-        }
 
-    }
+
 }
 

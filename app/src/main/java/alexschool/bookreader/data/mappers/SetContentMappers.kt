@@ -1,8 +1,8 @@
 package alexschool.bookreader.data.mappers
 
-import alexschool.bookreader.data.local.SetContentEntity
-import alexschool.bookreader.data.remote.SetContentDto
-import alexschool.bookreader.domain.SetContent
+import alexschool.bookreader.data.domain.SetContent
+import alexSchool.network.dtos.SetContentDto
+import alexSchool.network.entities.SetContentEntity
 
 fun SetContentDto.toSetContentEntity(): SetContentEntity {
     return SetContentEntity(

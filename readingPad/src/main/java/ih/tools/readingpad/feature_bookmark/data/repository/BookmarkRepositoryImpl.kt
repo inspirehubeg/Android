@@ -1,11 +1,13 @@
 package ih.tools.readingpad.feature_bookmark.data.repository
 
+import alexSchool.network.NetworkModule
+import ih.tools.readingpad.feature_bookmark.data.data_source.Bookmark
 import ih.tools.readingpad.feature_bookmark.data.data_source.BookmarkDao
-import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
-import ih.tools.readingpad.feature_bookmark.domain.model.BookmarkEntity
+import ih.tools.readingpad.feature_bookmark.data.data_source.BookmarkEntity
+
 import ih.tools.readingpad.feature_bookmark.domain.repository.BookmarkRepository
 import ih.tools.readingpad.mappers.toBookmark
-import ih.tools.readingpad.network.BookInputApi
+import ih.tools.readingpad.mappers.toBookmarkEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -19,10 +21,10 @@ import kotlinx.coroutines.withContext
  */
 class BookmarkRepositoryImpl(
     private val dao: BookmarkDao,
-    private val inputApi: BookInputApi,
-    private val defaultDispatcher: CoroutineDispatcher
 
-) : BookmarkRepository {
+    ) : BookmarkRepository {
+    private val apiService = NetworkModule.provideApiService()
+    private val defaultDispatcher: CoroutineDispatcher = NetworkModule.provideDispatcher()
 
     /**
      * Inserts a new bookmark into the database using the dao.
@@ -65,26 +67,26 @@ class BookmarkRepositoryImpl(
             dao.getBookmarksForBook(bookId)
         }
         emit(localBookmarksForBook.map { it.toBookmark() })
-//        try {
-//            val dtoBookmarksForBook = withContext(defaultDispatcher)
-//            {
-//                inputApi.getBookmarks(bookId)
-//            }
-//            val updatedBookmarksForBook = dtoBookmarksForBook.map { dtoBookmark ->
-//                val localBookmark = dao.getBookmarkById(dtoBookmark.id)
-//                if (dtoBookmark.is_deleted == true) {
-//                    if (localBookmark != null) {
-//                        dao.removeBookmarkById(dtoBookmark.id)
-//                    }
-//                } else {
-//                    dao.insertBookmark(dtoBookmark.toBookmarkEntity())
-//                }
-//                dtoBookmark.toBookmarkEntity().toBookmark()
-//            }
-//            emit(updatedBookmarksForBook)
-//        } catch (e: Exception) {
-//            emit(emptyList())
-//        }
+        try {
+            val dtoBookmarksForBook = withContext(defaultDispatcher)
+            {
+                apiService.getBookmarks(bookId)
+            }
+            val updatedBookmarksForBook = dtoBookmarksForBook.map { dtoBookmark ->
+                val localBookmark = dtoBookmark.id?.let { dao.getBookmarkById(it) }
+                if (dtoBookmark.is_deleted == true) {
+                    if (localBookmark != null) {
+                        dao.removeBookmarkById(dtoBookmark.id!!)
+                    }
+                } else {
+                    dao.insertBookmark(dtoBookmark.toBookmarkEntity())
+                }
+                dtoBookmark.toBookmarkEntity().toBookmark()
+            }
+            emit(updatedBookmarksForBook)
+        } catch (e: Exception) {
+            emit(emptyList())
+        }
     }
 
     /**

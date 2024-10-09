@@ -40,11 +40,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_18
+        targetCompatibility = JavaVersion.VERSION_18
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "18"
     }
     buildFeatures {
         compose = true
@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(project(":readingPad"))
+    implementation(project(":network"))
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.work.runtime)
     implementation(libs.androidx.appcompat)
@@ -102,7 +103,7 @@ dependencies {
 
    // Room
     implementation(libs.androidx.room.runtime)
-    ksp("androidx.room:room-compiler:2.5.0")
+    ksp("androidx.room:room-compiler:2.6.1")
 
 
    // implementation(libs.androidx.room.compiler) //for kapt not ksp

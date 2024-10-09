@@ -1,8 +1,8 @@
 package alexschool.bookreader.data.mappers
 
-import alexschool.bookreader.data.local.TranslatorEntity
-import alexschool.bookreader.data.remote.TranslatorDto
-import alexschool.bookreader.domain.Translator
+import alexschool.bookreader.data.domain.Translator
+import alexSchool.network.dtos.TranslatorDto
+import alexSchool.network.entities.TranslatorEntity
 
 fun TranslatorDto.toTranslatorEntity(): TranslatorEntity {
     return TranslatorEntity(

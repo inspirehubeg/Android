@@ -4,6 +4,7 @@ import alexschool.bookreader.R
 import alexschool.bookreader.network.NetworkViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
@@ -39,7 +40,7 @@ fun HomeScreen(
             .background(MaterialTheme.colorScheme.surface),
         //contentAlignment = Alignment.Center
     ) {
-        BookListScreen(networkViewModel = networkViewModel)
+        BookListScreen(networkViewModel = networkViewModel, navController)
         IconButton(
             modifier = Modifier.align(Alignment.BottomStart),
             onClick = {
@@ -66,10 +67,11 @@ fun HomeScreen(
 }
 
 @Composable
-fun BookListScreen(networkViewModel: NetworkViewModel) {
+fun BookListScreen(networkViewModel: NetworkViewModel, navController: NavController) {
 
-    Box() {
+    Column() {
         CategoriesRow(networkViewModel = networkViewModel)
+        BooksRow(networkViewModel = networkViewModel, navController)
     }
 //    if (postResponse.isNotEmpty()) {
 //        LazyColumn {

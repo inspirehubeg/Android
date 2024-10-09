@@ -1,8 +1,8 @@
 package alexschool.bookreader.data.mappers
 
-import alexschool.bookreader.data.local.TagEntity
-import alexschool.bookreader.data.remote.TagDto
-import alexschool.bookreader.domain.Tag
+import alexschool.bookreader.data.domain.Tag
+import alexSchool.network.dtos.TagDto
+import alexSchool.network.entities.TagEntity
 
 fun TagDto.toTagEntity(): TagEntity {
     return TagEntity(

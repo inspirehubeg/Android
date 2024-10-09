@@ -1,8 +1,8 @@
 package ih.tools.readingpad.mappers
 
-import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
-import ih.tools.readingpad.feature_bookmark.domain.model.BookmarkEntity
-import ih.tools.readingpad.remote.BookmarkDto
+import alexSchool.network.dtos.BookmarkDto
+import ih.tools.readingpad.feature_bookmark.data.data_source.Bookmark
+import ih.tools.readingpad.feature_bookmark.data.data_source.BookmarkEntity
 
 fun BookmarkDto.toBookmarkEntity(): BookmarkEntity {
     return BookmarkEntity(

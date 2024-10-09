@@ -1,6 +1,6 @@
 package ih.tools.readingpad.feature_note.domain.use_cases
 
-import ih.tools.readingpad.feature_note.domain.model.Note
+import ih.tools.readingpad.feature_note.data.data_source.Note
 import ih.tools.readingpad.feature_note.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
 

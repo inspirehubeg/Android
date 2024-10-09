@@ -1,9 +1,10 @@
 package alexschool.bookreader.data.dao
 
-import alexschool.bookreader.data.local.BookEntity
-import alexschool.bookreader.data.local.BookWithDetails
-import alexschool.bookreader.data.local.ReadingProgressEntity
-import alexschool.bookreader.data.local.SavedBookEntity
+
+import alexSchool.network.entities.BookInfoEntity
+import alexSchool.network.entities.ReadingProgressEntity
+import alexSchool.network.entities.SavedBookEntity
+import alexSchool.network.entities.cross_tables.BookWithDetails
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -13,21 +14,21 @@ import androidx.room.Transaction
 @Dao
 interface BookDao {
 
-    @Insert(entity = BookEntity::class, onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBook(book: BookEntity)
+    @Insert(entity = BookInfoEntity::class, onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBook(book: BookInfoEntity)
 
-    @Query("SELECT * FROM books WHERE id = :bookId")
-    suspend fun getBookById(bookId: Int): BookEntity?
+    @Query("SELECT * FROM bookinfo WHERE id = :bookId")
+    suspend fun getBookById(bookId: Int): BookInfoEntity?
 
-    @Query("DELETE FROM books WHERE id = :bookId")
+    @Query("DELETE FROM bookInfo WHERE id = :bookId")
     suspend fun deleteBookById(bookId: Int)
 
-    @Query("SELECT * FROM books")
-    suspend fun getAllBooks(): List<BookEntity>
+    @Query("SELECT * FROM bookInfo")
+    suspend fun getAllBooks(): List<BookInfoEntity>
 
     @Transaction
-    @Query("SELECT * FROM books WHERE id = :bookId")
-    fun getBookWithDetails(bookId: Int): BookWithDetails?
+    @Query("SELECT * FROM bookInfo WHERE id = :bookId")
+   suspend fun getBookWithDetails(bookId: Int): BookWithDetails?
 
 
 
@@ -42,6 +43,7 @@ interface BookDao {
         bookId: Int,
         userId: Int
     ): ReadingProgressEntity?
+
 
 
 

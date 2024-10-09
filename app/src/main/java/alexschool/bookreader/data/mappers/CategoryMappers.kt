@@ -1,8 +1,8 @@
 package alexschool.bookreader.data.mappers
 
-import alexschool.bookreader.data.local.CategoryEntity
-import alexschool.bookreader.data.remote.CategoryDto
-import alexschool.bookreader.domain.Category
+import alexschool.bookreader.data.domain.Category
+import alexSchool.network.dtos.CategoryDto
+import alexSchool.network.entities.CategoryEntity
 
 fun CategoryDto.toCategoryEntity(): CategoryEntity {
     return CategoryEntity(

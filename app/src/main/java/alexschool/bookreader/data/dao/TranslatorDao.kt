@@ -1,6 +1,6 @@
 package alexschool.bookreader.data.dao
 
-import alexschool.bookreader.data.local.TranslatorEntity
+import alexSchool.network.entities.TranslatorEntity
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy

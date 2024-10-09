@@ -1,8 +1,8 @@
 package alexschool.bookreader.data.mappers
 
-import alexschool.bookreader.data.local.SavedBookEntity
-import alexschool.bookreader.data.remote.SavedBookDto
-import alexschool.bookreader.domain.SavedBook
+import alexschool.bookreader.data.domain.SavedBook
+import alexSchool.network.dtos.SavedBookDto
+import alexSchool.network.entities.SavedBookEntity
 
 fun SavedBookDto.toSavedBookEntity(): SavedBookEntity {
     return SavedBookEntity(

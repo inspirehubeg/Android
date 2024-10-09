@@ -1,8 +1,9 @@
 package ih.tools.readingpad.feature_bookmark.domain.repository
 
 
-import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
-import ih.tools.readingpad.feature_bookmark.domain.model.BookmarkEntity
+
+import ih.tools.readingpad.feature_bookmark.data.data_source.Bookmark
+import ih.tools.readingpad.feature_bookmark.data.data_source.BookmarkEntity
 import kotlinx.coroutines.flow.Flow
 
 /**

@@ -1,8 +1,8 @@
 package alexschool.bookreader.data.mappers
 
-import alexschool.bookreader.data.local.PublisherEntity
-import alexschool.bookreader.data.remote.PublisherDto
-import alexschool.bookreader.domain.Publisher
+import alexschool.bookreader.data.domain.Publisher
+import alexSchool.network.dtos.PublisherDto
+import alexSchool.network.entities.PublisherEntity
 
 
 fun PublisherDto.toPublisherEntity(): PublisherEntity {

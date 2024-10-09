@@ -21,7 +21,7 @@ import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
 import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkClickableSpan
 import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkSpan
-import ih.tools.readingpad.feature_highlight.domain.model.Highlight
+import ih.tools.readingpad.feature_highlight.data.data_source.Highlight
 import ih.tools.readingpad.ui.UIStateViewModel
 import ih.tools.readingpad.util.BOOKMARK_ICON
 import ih.tools.readingpad.util.IHBackgroundSpan

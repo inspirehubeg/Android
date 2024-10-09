@@ -1,6 +1,6 @@
 package ih.tools.readingpad.feature_bookmark.domain.use_cases
 
-import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
+import ih.tools.readingpad.feature_bookmark.data.data_source.Bookmark
 import ih.tools.readingpad.feature_bookmark.domain.repository.BookmarkRepository
 import kotlinx.coroutines.flow.Flow
 

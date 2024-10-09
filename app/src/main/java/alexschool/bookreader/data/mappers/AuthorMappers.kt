@@ -1,8 +1,8 @@
 package alexschool.bookreader.data.mappers
 
-import alexschool.bookreader.data.local.AuthorEntity
-import alexschool.bookreader.data.remote.AuthorDto
-import alexschool.bookreader.domain.Author
+import alexschool.bookreader.data.domain.Author
+import alexSchool.network.dtos.AuthorDto
+import alexSchool.network.entities.AuthorEntity
 
 fun AuthorDto.toAuthorEntity(): AuthorEntity {
     return AuthorEntity(
@@ -20,6 +20,6 @@ fun AuthorEntity.toAuthor(): Author {
         id = id,
         bio = bio,
         image = image
-       // description = description
+        // description = description
     )
 }

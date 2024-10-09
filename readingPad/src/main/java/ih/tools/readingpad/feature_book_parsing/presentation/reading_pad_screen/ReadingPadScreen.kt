@@ -47,10 +47,11 @@ import kotlinx.coroutines.launch
  *  the pages content and all the dialogs ars displayed*/
 @Composable
 fun ReadingPadScreen(
-    viewModel: BookContentViewModel = hiltViewModel(),
-    uiStateViewModel: UIStateViewModel = hiltViewModel(),
+    bookId: Int,
     navController: NavController
 ) {
+    val viewModel: BookContentViewModel = hiltViewModel()
+    val uiStateViewModel: UIStateViewModel = hiltViewModel()
     val uiSettings by uiStateViewModel.uiSettings.collectAsState()
     val isDarkTheme = uiSettings.darkTheme
 
@@ -58,11 +59,10 @@ fun ReadingPadScreen(
     val currentScreen by uiStateViewModel.currentScreen.collectAsState()
 
 
-//    LaunchedEffect (key1 = drawerState.currentValue){
-//        if (drawerState.currentValue == DrawerValue.Closed) {
-//            uiStateViewModel.setIsDrawerOpen(false)
-//        }
-//    }
+    LaunchedEffect(key1 = bookId) {
+        viewModel.loadBookData(bookId)
+    }
+
     ReadingPadTheme(isDarkTheme) {
         val showTopBar by uiStateViewModel.showTopBar.collectAsState()
         val pinnedTopBar = uiSettings.pinnedTopBar
@@ -185,7 +185,7 @@ fun ReadingPadScreen(
                                 .systemBarsPadding() // this allows the bars to appear above the page to give the full screen behavior
                         }
                     ) {
-                  // Column (modifier = Modifier.fillMaxSize()){
+                        // Column (modifier = Modifier.fillMaxSize()){
                         PagesScreen(
                             viewModel = viewModel,
                             listState = listState,
@@ -200,7 +200,7 @@ fun ReadingPadScreen(
 //                                modifier = Modifier.weight(1f)
 //                            )
 
-                     //   }
+                        //   }
                     }
                     when (currentDialog) {
                         UIStateViewModel.DialogType.Brightness -> BrightnessDialog(

@@ -1,8 +1,9 @@
 package ih.tools.readingpad.feature_book_parsing.domain.model
 
-import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
-import ih.tools.readingpad.feature_highlight.domain.model.Highlight
-import ih.tools.readingpad.feature_note.domain.model.Note
+import ih.tools.readingpad.feature_bookmark.data.data_source.Bookmark
+import ih.tools.readingpad.feature_highlight.data.data_source.Highlight
+import ih.tools.readingpad.feature_note.data.data_source.Note
+
 
 /**
  * Data class representing the state of book details.

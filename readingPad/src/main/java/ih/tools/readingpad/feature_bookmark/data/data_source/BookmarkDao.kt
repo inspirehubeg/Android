@@ -3,7 +3,6 @@ package ih.tools.readingpad.feature_bookmark.data.data_source
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import ih.tools.readingpad.feature_bookmark.domain.model.BookmarkEntity
 
 /**
  * Data Access Object (DAO) for interacting with the `bookmarks` table in the database.

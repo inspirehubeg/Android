@@ -1,8 +1,8 @@
 package ih.tools.readingpad.mappers
 
-import ih.tools.readingpad.feature_note.domain.model.Note
-import ih.tools.readingpad.feature_note.domain.model.NoteEntity
-import ih.tools.readingpad.remote.NoteDto
+import alexSchool.network.dtos.NoteDto
+import ih.tools.readingpad.feature_note.data.data_source.Note
+import ih.tools.readingpad.feature_note.data.data_source.NoteEntity
 
 fun NoteDto.toNoteEntity(): NoteEntity {
     return NoteEntity(

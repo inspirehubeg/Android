@@ -1,6 +1,6 @@
 package ih.tools.readingpad.feature_highlight.domain.use_cases
 
-import ih.tools.readingpad.feature_highlight.domain.model.HighlightEntity
+import ih.tools.readingpad.feature_highlight.data.data_source.HighlightEntity
 import ih.tools.readingpad.feature_highlight.domain.repository.HighlightRepository
 
 /**

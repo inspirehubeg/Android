@@ -48,7 +48,7 @@ fun PagesScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     //to be changed when a bigger book is available for use
     val currentChapterIndex = 0
-    val currentChapter = book.chapters[currentChapterIndex]
+    //val currentChapter = book.chapters[currentChapterIndex]
     val chapterSpannedPages = remember { mutableStateListOf<SpannedPage>() }
 
 //    LaunchedEffect(key1 = currentChapterIndex) {

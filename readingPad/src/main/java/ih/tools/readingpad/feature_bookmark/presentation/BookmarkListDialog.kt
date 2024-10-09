@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ih.tools.readingpad.R
 import ih.tools.readingpad.feature_book_parsing.presentation.BookContentViewModel
-import ih.tools.readingpad.feature_bookmark.domain.model.Bookmark
+import ih.tools.readingpad.feature_bookmark.data.data_source.Bookmark
 import ih.tools.readingpad.ui.UIStateViewModel
 
 

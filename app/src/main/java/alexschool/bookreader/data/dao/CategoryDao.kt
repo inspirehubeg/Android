@@ -1,11 +1,10 @@
 package alexschool.bookreader.data.dao
 
-import alexschool.bookreader.data.local.CategoryEntity
+import alexSchool.network.entities.CategoryEntity
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-
 
 @Dao
 interface CategoryDao {

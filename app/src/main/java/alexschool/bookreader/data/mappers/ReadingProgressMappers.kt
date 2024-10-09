@@ -1,10 +1,10 @@
 package alexschool.bookreader.data.mappers
 
-import alexschool.bookreader.data.local.ReadingProgressEntity
-import alexschool.bookreader.data.remote.ReadingProgressDto
-import alexschool.bookreader.domain.ReadingProgress
+import alexschool.bookreader.data.domain.ReadingProgress
+import alexSchool.network.dtos.ReadingProgressDto
+import alexSchool.network.entities.ReadingProgressEntity
 
-fun ReadingProgressDto.toReadingProgressEntity(): ReadingProgressEntity{
+fun ReadingProgressDto.toReadingProgressEntity(): ReadingProgressEntity {
     return ReadingProgressEntity(
         bookId = book_id,
         userId = user_id,

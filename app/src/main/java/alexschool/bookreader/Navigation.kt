@@ -39,7 +39,8 @@ fun Navigation(viewModel: AlexSchoolViewModel, networkViewModel: NetworkViewMode
             )
         ) {
             viewModel.setCurrentScreen("ReadingPadScreen")
-            ReadingPadScreen(navController = navController)
+            it.arguments?.getInt("bookId")
+                ?.let { id -> ReadingPadScreen(navController = navController, bookId = id) }
         }
 //        composable(
 //            route = Screen.BookmarksScreen.route

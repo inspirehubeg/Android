@@ -1,11 +1,12 @@
 package ih.tools.readingpad.feature_highlight.data.repository
 
+import alexSchool.network.NetworkModule
+import ih.tools.readingpad.feature_highlight.data.data_source.Highlight
 import ih.tools.readingpad.feature_highlight.data.data_source.HighlightDao
-import ih.tools.readingpad.feature_highlight.domain.model.Highlight
-import ih.tools.readingpad.feature_highlight.domain.model.HighlightEntity
+import ih.tools.readingpad.feature_highlight.data.data_source.HighlightEntity
 import ih.tools.readingpad.feature_highlight.domain.repository.HighlightRepository
 import ih.tools.readingpad.mappers.toHighlight
-import ih.tools.readingpad.network.BookInputApi
+import ih.tools.readingpad.mappers.toHighlightEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -19,9 +20,9 @@ import kotlinx.coroutines.withContext
  */
 class HighlightRepositoryImpl(
     private val highlightDao: HighlightDao,
-    private val inputApi: BookInputApi,
-    private val defaultDispatcher: CoroutineDispatcher
 ) : HighlightRepository {
+    private val apiService = NetworkModule.provideApiService()
+    private val defaultDispatcher: CoroutineDispatcher = NetworkModule.provideDispatcher()
 
     /**
      * Inserts a new highlight into the database using the highlightDao.
@@ -65,28 +66,29 @@ class HighlightRepositoryImpl(
         }
         emit(localHighlightsForBook.map { it.toHighlight() })
 
-//        try {
-//            val dtoHighlightsForBook = withContext(defaultDispatcher) {
-//                inputApi.getHighlights(bookId)
-//            }
-        // Check if the server response is valid and complete
-       // if (dtoHighlightsForBook.isNotEmpty() && /* Add any other validation checks */) {
-//            val updatedHighlightsForBook = dtoHighlightsForBook.map { dtoHighlight ->
-//                val localHighlight = highlightDao.getHighlightById(dtoHighlight.id)
-//                if (dtoHighlight.is_deleted == true) {
-//                    if (localHighlight != null) {
-//                        highlightDao.deleteByIds(dtoHighlight.id)
-//                    }
-//                } else {
-//                    highlightDao.insert(dtoHighlight.toHighlightEntity())
-//                }
-//                dtoHighlight.toHighlightEntity().toHighlight()
-//            }
-//            emit(updatedHighlightsForBook)
-//        } catch (e: Exception) {
-//            //handle api errors, but don't emit anything
-//
-//        }
+        try {
+            val dtoHighlightsForBook = withContext(defaultDispatcher) {
+                apiService.getHighlights(bookId)
+            }
+            //    Check if the server response is valid and complete
+            if (dtoHighlightsForBook.isNotEmpty()  /* Add any other validation checks */) {
+                val updatedHighlightsForBook = dtoHighlightsForBook.map { dtoHighlight ->
+                    val localHighlight = dtoHighlight.id?.let { highlightDao.getHighlightById(it) }
+                    if (dtoHighlight.is_deleted == true) {
+                        if (localHighlight != null) {
+                            highlightDao.deleteByIds(dtoHighlight.id!!)
+                        }
+                    } else {
+                        highlightDao.insert(dtoHighlight.toHighlightEntity())
+                    }
+                    dtoHighlight.toHighlightEntity().toHighlight()
+                }
+                emit(updatedHighlightsForBook)
+            }
+        } catch (e: Exception) {
+            //handle api errors, but don't emit anything
+
+        }
     }
 
 }

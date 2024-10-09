@@ -3,8 +3,6 @@ package alexschool.bookreader.di
 import alexschool.bookreader.data.AppRepository
 import alexschool.bookreader.data.AppRepositoryImpl
 import alexschool.bookreader.data.local.AlexSchoolDatabase
-import alexschool.bookreader.network.ApiService
-import alexschool.bookreader.network.ApiServiceImpl
 import android.content.Context
 import androidx.room.Room
 import dagger.Module
@@ -18,8 +16,6 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 import javax.inject.Singleton
 
@@ -60,22 +56,20 @@ object AlexSchoolModule {
     @Provides
     @Singleton
     fun provideAppRepository(
-        apiService: ApiService,
+        //apiService: ApiService,
         appDatabase: AlexSchoolDatabase,
-        defaultDispatcher: CoroutineDispatcher
     ): AppRepository {
         return AppRepositoryImpl(
             appDatabase,
-            apiService,
-            defaultDispatcher
+           // apiService,
         )
     }
 
-    @Singleton
-    @Provides
-    fun provideApiService(httpClient: HttpClient): ApiService = ApiServiceImpl(httpClient)
+//    @Singleton
+//    @Provides
+//    fun provideApiService(httpClient: HttpClient): ApiService = ApiServiceImpl(httpClient)
 
-    @Singleton
-    @Provides
-    fun provideDispatcher(): CoroutineDispatcher = Dispatchers.Default
+//    @Singleton
+//    @Provides
+//    fun provideDispatcher(): CoroutineDispatcher = Dispatchers.Default
 }

@@ -1,5 +1,6 @@
 package ih.tools.readingpad.feature_book_parsing.presentation
 
+import alexSchool.network.data.Token
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.gestures.scrollBy
@@ -23,17 +24,18 @@ import ih.tools.readingpad.feature_book_parsing.data.PreferencesManager
 import ih.tools.readingpad.feature_book_parsing.domain.model.BookDetailsState
 import ih.tools.readingpad.feature_book_parsing.domain.model.SpannedPage
 import ih.tools.readingpad.feature_book_parsing.presentation.text_view.IHTextView
-import ih.tools.readingpad.feature_bookmark.domain.model.BookmarkEntity
+import ih.tools.readingpad.feature_bookmark.data.data_source.BookmarkEntity
 import ih.tools.readingpad.feature_bookmark.domain.use_cases.BookmarkUseCases
 import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkClickableSpan
 import ih.tools.readingpad.feature_bookmark.presentation.IHBookmarkSpan
-import ih.tools.readingpad.feature_highlight.domain.model.HighlightEntity
+import ih.tools.readingpad.feature_highlight.data.data_source.HighlightEntity
 import ih.tools.readingpad.feature_highlight.domain.use_cases.HighlightUseCases
-import ih.tools.readingpad.feature_note.domain.model.NoteEntity
+import ih.tools.readingpad.feature_note.data.data_source.NoteEntity
 import ih.tools.readingpad.feature_note.domain.use_cases.NoteUseCases
 import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColor
 import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColorType
 import ih.tools.readingpad.feature_theme_color.domain.use_case.ThemeColorUseCases
+import ih.tools.readingpad.remote.BookContentRepository
 import ih.tools.readingpad.util.IHNoteClickableSpan
 import ih.tools.readingpad.util.IHNoteSpan
 import ih.tools.readingpad.util.IHSpan
@@ -43,6 +45,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
@@ -57,9 +60,12 @@ class BookContentViewModel @Inject constructor(
     private val preferencesManager: PreferencesManager,
     private val themeColorUseCases: ThemeColorUseCases,
     private val noteUseCases: NoteUseCases,
+    private val bookContentRepository: BookContentRepository,
     private val context: Context
 ) : ViewModel() {
 
+    private val _bookTokens = MutableStateFlow<List<Token>>(emptyList())
+    val bookTokens = _bookTokens.asStateFlow()
     private val _savedFontColors = MutableLiveData<List<ThemeColor>>()
     val savedFontColors = _savedFontColors
 
@@ -96,6 +102,16 @@ class BookContentViewModel @Inject constructor(
         getCurrentChapterIndex(number)
     }
 
+    fun loadBookData(bookId: Int) {
+        //fetchMetadata(bookId)
+        //fetchTokens(bookId, 0)
+    }
+
+    private fun fetchMetadata(bookId: Int) {
+        viewModelScope.launch {
+            bookContentRepository.getMetadata(bookId)
+        }
+    }
 
     fun getCurrentChapterIndex(pageNumber: Int): Int {
         if (book.chapters.isEmpty()) {
@@ -161,17 +177,20 @@ class BookContentViewModel @Inject constructor(
             Log.d("PagesScreen", " tokenName = $tokenName")
             val chapterId = getRawFileByName(context, tokenName)
             val chapter = chapterId?.let { readFileFromRaw(context, it) }
+            //val chapter = bookTokens.value.firstOrNull { it.id == 1 }?.content
             if (chapter != null) {
                 val decodedText = Decryption.decryption(chapter)
                 book.addChapter(decodedText, metadata.oldEncoding)
                 _chapterCount.intValue = book.chapters.size // Update chapter count
+            } else {
+                Log.d("PagesScreen", "chapter is null")
             }
         }
     }
 
     init {
         // this part is temporary, it fetches the book from Raw but it should be replaced by fetching the book by id in the init{}
-        fetchNextChapter()
+          fetchNextChapter()
 
         viewModelScope.launch {
             _state.value = state.value.copy(
@@ -193,6 +212,18 @@ class BookContentViewModel @Inject constructor(
         getSavedColors()
     }
 
+    private fun fetchTokens(bookId: Int, tokenNum: Int) {
+        Log.d("PagesScreen", "fetchTokens is called")
+        viewModelScope.launch {
+            bookContentRepository.getTokens(bookId, tokenNum).catch { e ->
+                // Handle errors, e.g., log the error or update an error state
+                Log.e("PagesScreen", "Error fetching tokens: ${e.message}")
+            }.collect { tokens ->
+                _bookTokens.value = tokens
+            }
+            fetchNextChapter()
+        }
+    }
 
     fun addHighlight(
         pageNumber: Int,

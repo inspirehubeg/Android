@@ -1,10 +1,10 @@
 package alexschool.bookreader.data.mappers
 
-import alexschool.bookreader.data.local.SubscriptionEntity
-import alexschool.bookreader.data.remote.SubscriptionDto
-import alexschool.bookreader.domain.Subscription
+import alexschool.bookreader.data.domain.Subscription
+import alexSchool.network.dtos.SubscriptionDto
+import alexSchool.network.entities.SubscriptionEntity
 
-fun SubscriptionDto.toSubscriptionEntity(): SubscriptionEntity{
+fun SubscriptionDto.toSubscriptionEntity(): SubscriptionEntity {
     return SubscriptionEntity(
         id = id,
         name = name,

@@ -1,10 +1,10 @@
 package ih.tools.readingpad.mappers
 
-import ih.tools.readingpad.feature_highlight.domain.model.Highlight
-import ih.tools.readingpad.feature_highlight.domain.model.HighlightEntity
-import ih.tools.readingpad.remote.HighlightDto
+import alexSchool.network.dtos.HighlightDto
+import ih.tools.readingpad.feature_highlight.data.data_source.Highlight
+import ih.tools.readingpad.feature_highlight.data.data_source.HighlightEntity
 
-fun HighlightDto.toHighlightEntity(): HighlightEntity{
+fun HighlightDto.toHighlightEntity(): HighlightEntity {
     return HighlightEntity(
         id = id,
         bookId = book_id,
@@ -17,7 +17,7 @@ fun HighlightDto.toHighlightEntity(): HighlightEntity{
     )
 }
 
-fun HighlightEntity.toHighlight(): Highlight{
+fun HighlightEntity.toHighlight(): Highlight {
     return Highlight(
         id = id,
         bookId = bookId,
