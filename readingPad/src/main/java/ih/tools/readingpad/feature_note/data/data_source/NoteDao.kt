@@ -21,13 +21,13 @@ interface NoteDao {
     @Query("SELECT * FROM note WHERE bookId = :bookId AND chapterNumber = :chapterNumber " +
             "AND pageNumber = :pageNumber AND isDeleted = 0")
     fun getPageNotes(
-        bookId: String,
+        bookId: Int,
         chapterNumber: Int,
         pageNumber: Int
     ): Flow<List<NoteEntity>>
 
     @Query("SELECT * FROM note WHERE bookId = :bookId AND isDeleted = 0")
-    fun getNotesForBook(bookId: String): List<NoteEntity>
+    fun getNotesForBook(bookId: Int): List<NoteEntity>
 
     @Query("UPDATE note SET text = :newText WHERE id = :id")
     suspend fun updateNoteText(id: Long, newText: String)

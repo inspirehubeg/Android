@@ -10,7 +10,7 @@ import ih.tools.readingpad.feature_note.data.data_source.Note
  * This class is used to hold and manage information about a book, such as its title, author, content, and associatedbookmarks and highlights.
  */
 data class BookDetailsState (
-    val bookId: String= "",
+    val bookId: Int= -1,
     val bookTitle : String = "",
     val bookAuthor: String = "",
     val imageUrl: String = "",

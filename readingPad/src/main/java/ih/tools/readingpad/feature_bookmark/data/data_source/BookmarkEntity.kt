@@ -19,7 +19,7 @@ data class BookmarkEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long? = null,
     val serverId: String? = null,
-    val bookId: String,
+    val bookId: Int,
     val chapterNumber: Int,
     val pageNumber: Int,
     val bookmarkTitle: String,

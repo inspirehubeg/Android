@@ -1,8 +1,8 @@
 package alexschool.bookreader.di
 
+import alexSchool.network.data.AlexSchoolDatabase
 import alexschool.bookreader.data.AppRepository
 import alexschool.bookreader.data.AppRepositoryImpl
-import alexschool.bookreader.data.local.AlexSchoolDatabase
 import android.content.Context
 import androidx.room.Room
 import dagger.Module

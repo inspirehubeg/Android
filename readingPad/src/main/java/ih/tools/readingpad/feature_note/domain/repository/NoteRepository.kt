@@ -11,11 +11,11 @@ interface NoteRepository {
     suspend fun deleteNoteById(id: Long)
 
     suspend fun getPageNotes(
-        bookId: String,
+        bookId: Int,
         chapterNumber: Int,
         pageNumber: Int
     ): Flow<List<NoteEntity>>
 
-    suspend fun getNotesForBook(bookId: String): Flow<List<Note>>
+    suspend fun getNotesForBook(bookId: Int): Flow<List<Note>>
     suspend fun updateNoteText(noteId: Long, newText: String)
 }

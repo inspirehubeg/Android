@@ -21,7 +21,7 @@ class GetPageHighlights(
      * @return A Flow emitting a list of highlights for the specified page.
      */
     suspend operator fun invoke(
-        bookId: String,
+        bookId: Int,
         chapterNumber: Int,
         pageNumber: Int
     ): Flow<List<HighlightEntity>> {

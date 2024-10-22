@@ -5,27 +5,23 @@ plugins {
     alias(libs.plugins.hiltAndroid)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.compose.compiler)
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "alexschool.bookreader"
     compileSdk = 34
-
     defaultConfig {
         applicationId = "alexschool.bookreader"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-       // buildConfigField("String","API_KEY","API_KEY")
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
     }
-
     androidResources {
         generateLocaleConfig = true
     }
@@ -49,9 +45,6 @@ android {
     buildFeatures {
         compose = true
     }
-//    composeOptions {
-//        kotlinCompilerExtensionVersion = "1.5.1"
-//    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -60,7 +53,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -81,8 +73,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
     implementation (libs.gson)
+
+
+    //Room
+    implementation(libs.androidx.room.runtime)
 
     //Dagger-Hilt
     implementation(libs.dagger.hilt)
@@ -99,19 +94,5 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.serialization)
     implementation (libs.ktor.client.content.negotiation)
-
-
-   // Room
-    implementation(libs.androidx.room.runtime)
-    ksp("androidx.room:room-compiler:2.6.1")
-
-
-   // implementation(libs.androidx.room.compiler) //for kapt not ksp
-//    kapt (libs.androidx.room.compiler){
-//        exclude(group = "com.intellij", module = "annotations") // Add this line
-//    }
-
-    // optional - Kotlin Extensions and Coroutines support for Room
-    implementation (libs.androidx.room.ktx)
 
 }

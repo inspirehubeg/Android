@@ -1,7 +1,11 @@
 package alexSchool.network.entities
 
+import alexSchool.network.domain.Encoding
+import alexSchool.network.domain.TargetLink
+import alexSchool.network.dtos.ChapterDto
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.TypeConverters
 
 @Entity(
     tableName = "metadata",
@@ -15,9 +19,10 @@ import androidx.room.ForeignKey
         )
     ]
 )
+@TypeConverters(Converters::class)
 data class MetadataEntity(
     val bookId: Int,
-    val encoding: String,
-    val targetLinks: String,
-    val index: String
+    val encoding: Encoding,
+    val targetLinks: List<TargetLink>,
+    val index: List<ChapterDto>
 )

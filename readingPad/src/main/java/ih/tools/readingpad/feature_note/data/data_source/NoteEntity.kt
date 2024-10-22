@@ -9,7 +9,7 @@ data class NoteEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long? = null,
     val serverId: String? = null,
-    val bookId: String,
+    val bookId: Int,
     val chapterNumber: Int,
     val pageNumber: Int,
     val start: Int,

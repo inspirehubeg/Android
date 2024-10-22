@@ -53,14 +53,14 @@ class HighlightRepositoryImpl(
      * @return A Flow emitting a list of highlights for the specified page.
      */
     override suspend fun getPageHighlights(
-        bookId: String,
+        bookId: Int,
         chapterNumber: Int,
         pageNumber: Int
     ): Flow<List<HighlightEntity>> {
         return highlightDao.getPageHighlights(bookId, chapterNumber, pageNumber)
     }
 
-    override suspend fun getHighlightsForBook(bookId: String): Flow<List<Highlight>> = flow {
+    override suspend fun getHighlightsForBook(bookId: Int): Flow<List<Highlight>> = flow {
         val localHighlightsForBook = withContext(defaultDispatcher) {
             highlightDao.getHighlightsForBook(bookId)
         }

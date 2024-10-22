@@ -2,23 +2,24 @@ package alexschool.bookreader.network
 
 import alexSchool.network.NetworkModule
 import alexSchool.network.TableName
+import alexSchool.network.domain.BookInfo
+import alexSchool.network.domain.Category
+import alexSchool.network.domain.DetailedBookInfo
 import alexschool.bookreader.data.AppRepository
-import alexschool.bookreader.data.domain.BookInfo
-import alexschool.bookreader.data.domain.Category
-import alexschool.bookreader.data.domain.DetailedBookInfo
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class NetworkViewModel @Inject constructor(
-   // private val apiService: ApiService,
     private val appRepository: AppRepository,
 ) : ViewModel() {
     private val apiService = NetworkModule.provideApiService()
@@ -28,15 +29,37 @@ class NetworkViewModel @Inject constructor(
     private val _books = MutableStateFlow<List<BookInfo>>(emptyList())
     val books = _books.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _error = MutableStateFlow<AppError?>(null)
+    val error: StateFlow<AppError?> = _error.asStateFlow()
+
     var detailedBookInfo: DetailedBookInfo? = null
 
     init {
-        fetchCategories()
-        fetchBooks()
-        fetchDetailedBookInfo(1)
+        fetchData()
+//        fetchCategories()
+//        fetchBooks()
+//        fetchDetailedBookInfo(1)
     }
 
-
+    private fun fetchData() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            combine(
+                appRepository.getCategories(),
+                appRepository.getRemoteBooks()
+            ) { categories, books ->
+                _categories.value = categories
+                _books.value = books
+            }.catch { e ->
+                _error.value = AppError.NetworkError(e as Exception) // Or other error type
+            }.collect {
+                _isLoading.value = false
+            }
+        }
+    }
     //    private fun fetchBookInfo() {
 //        viewModelScope.launch {
 //            apiService.getBookInfo()

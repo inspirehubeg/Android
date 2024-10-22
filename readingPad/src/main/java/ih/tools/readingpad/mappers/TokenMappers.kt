@@ -1,6 +1,6 @@
 package ih.tools.readingpad.mappers
 
-import alexSchool.network.data.Token
+import alexSchool.network.domain.Token
 import alexSchool.network.dtos.TokenDto
 import alexSchool.network.entities.TokenEntity
 

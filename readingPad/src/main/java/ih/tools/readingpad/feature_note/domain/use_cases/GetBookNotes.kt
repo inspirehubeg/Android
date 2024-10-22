@@ -13,7 +13,7 @@ class GetBookNotes(
      * @param bookId The ID of the book.
      * @return A Flow emitting a list of notes for the book.
      */
-    suspend operator fun invoke(bookId: String): Flow<List<Note>> {
+    suspend operator fun invoke(bookId: Int): Flow<List<Note>> {
         return repository.getNotesForBook(bookId)
     }
 }

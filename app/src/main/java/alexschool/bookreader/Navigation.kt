@@ -5,7 +5,6 @@ import alexschool.bookreader.ui.HomeScreen
 import alexschool.bookreader.ui.Screens
 import alexschool.bookreader.ui.settings.SettingsScreen
 import androidx.compose.runtime.Composable
-
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,18 +29,28 @@ fun Navigation(viewModel: AlexSchoolViewModel, networkViewModel: NetworkViewMode
         composable(
             route = Screens.BookContentScreen.route + "?bookId={bookId}",
             arguments = listOf(
-                navArgument(
-                    name = "bookId"
-                ) {
-                    type = NavType.IntType
-                    defaultValue = -1
-                }
+                navArgument("bookId") { type = NavType.IntType }
             )
-        ) {
+        ) { backStackEntry ->
             viewModel.setCurrentScreen("ReadingPadScreen")
-            it.arguments?.getInt("bookId")
-                ?.let { id -> ReadingPadScreen(navController = navController, bookId = id) }
+            val bookId = backStackEntry.arguments?.getInt("bookId") ?: -1
+            ReadingPadScreen(navController = navController, bookId = bookId)
         }
+//        composable(
+//            route = Screens.BookContentScreen.route + "?bookId={bookId}",
+//            arguments = listOf(
+//                navArgument(
+//                    name = "bookId"
+//                ) {
+//                    type = NavType.IntType
+//                    defaultValue = -1
+//                }
+//            )
+//        ) {
+//            viewModel.setCurrentScreen("ReadingPadScreen")
+//            it.arguments?.getInt("bookId")
+//                ?.let { id -> ReadingPadScreen(navController = navController, bookId = id) }
+//        }
 //        composable(
 //            route = Screen.BookmarksScreen.route
 //        ) {

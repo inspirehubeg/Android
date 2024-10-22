@@ -29,14 +29,14 @@ class NoteRepositoryImpl(
     }
 
     override suspend fun getPageNotes(
-        bookId: String,
+        bookId: Int,
         chapterNumber: Int,
         pageNumber: Int
     ): Flow<List<NoteEntity>> {
         return noteDao.getPageNotes(bookId, chapterNumber, pageNumber)
     }
 
-    override suspend fun getNotesForBook(bookId: String): Flow<List<Note>> = flow {
+    override suspend fun getNotesForBook(bookId: Int): Flow<List<Note>> = flow {
         val localNotesForBook = withContext(defaultDispatcher) {
             noteDao.getNotesForBook(bookId)
         }

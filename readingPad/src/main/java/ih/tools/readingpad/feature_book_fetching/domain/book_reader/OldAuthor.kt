@@ -14,7 +14,7 @@ class OldAuthor : Id {
     /**
      * this fun will be used when get author obj from database
      */
-    constructor(id: String, name: String) {
+    constructor(id: Int, name: String) {
         this.id = id
         this.name = name
     }

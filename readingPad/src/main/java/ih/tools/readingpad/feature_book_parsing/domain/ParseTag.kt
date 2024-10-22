@@ -1,5 +1,6 @@
 package ih.tools.readingpad.feature_book_parsing.domain
 
+import alexSchool.network.domain.Encoding
 import android.util.Log
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.LocalFile
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.OldEncoding
@@ -54,9 +55,56 @@ fun parseTag(
             ParsedElement.Image(
                 content = decodedImage1,
                 alignment = imageAlign,
-                ratio = imageRatio.toIntOrNull() ?: 0 // Handle potential NumberFormatException
+                ratio = imageRatio.toIntOrNull() ?: 50 // Handle potential NumberFormatException
             )
         }
         else -> ParsedElement.Font(content, tagStart)
+    }
+}
+fun parseTag(
+    tagContent: String,
+    encoding: Encoding,
+): ParsedElement {
+    if (tagContent.length <= encoding.tags.tagLength) {
+        throw IllegalArgumentException("Invalid tag content: $tagContent")
+    }
+    val tagSymbol = tagContent.substring(0, encoding.tags.tagLength)
+    val content = tagContent.substring(encoding.tags.tagLength)
+    val tags = encoding.tags
+    Log.d("parseTag", "Tag: $tagSymbol, Content: $content")
+
+    return when (tagSymbol) {
+        tags.webLink -> ParsedElement.WebLink(content)
+        tags.internalLink -> {
+            if (content.length <= tags.linkKeyLength) {
+                throw IllegalArgumentException("Invalid internal link content: $content")
+            }
+            val linkKey = content.substring(0, tags.linkKeyLength)
+            val linkContent = content.substring(tags.linkKeyLength)
+            ParsedElement.InternalLinkSource(linkContent, linkKey)
+        }
+
+        tags.image -> {
+            val sub = content.split(':')
+            if (sub.size != 3) {
+                throw IllegalArgumentException("Invalid image content: $content")
+            }
+            val imageData = sub[0] //image data byte array
+            val imageRatio = sub[1] //image ratio
+            val imageAlign = sub[2] //image alignment
+
+            val localFile = LocalFile.instance()
+            val decodedImage1 = localFile.decode(imageData)
+            Log.d("imageParser", "Image: $imageRatio")
+            Log.d("imageParser", "Image: $imageAlign")
+
+
+            ParsedElement.Image(
+                content = decodedImage1,
+                alignment = imageAlign,
+                ratio = imageRatio.toIntOrNull() ?: 0 // Handle potential NumberFormatException
+            )
+        }
+        else -> ParsedElement.Font(content, tagSymbol)
     }
 }

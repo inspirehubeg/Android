@@ -37,7 +37,8 @@ fun PagesScreen(
 ) {
     val context = LocalContext.current
     val book = viewModel.book
-
+    val newBook = viewModel.newBook.collectAsState()
+    val newMetadata = viewModel.newMetadata.collectAsState()
     val firstVisibleItemIndex = remember { derivedStateOf { listState.firstVisibleItemIndex } }
     viewModel.setPageNumber(firstVisibleItemIndex.value + 1)
 
@@ -83,23 +84,46 @@ fun PagesScreen(
 //        bookContentViewModel.loadPreviousChapter()
 //    }
     LaunchedEffect(key1 = viewModel.chapterCount.value) { // Launch a coroutine when 'chapter' changes
-        val pages = book.chapters[book.chapters.size - 1].pages
-        Log.d("PagesScreen", "chapters size = ${book.chapters.size}")
-        val spannedPages = convertPagesToSpannedPagesLazy(
-            pages,
-            metadata,
-            context,
-            book,
-            listState,
-            viewModel,
-            uiStateViewModel
-        )
-        //itemPages.clear()
-        if (spannedPages.isNotEmpty()) {
-            itemPages.value += spannedPages
-            Log.d("PagesScreen", "item pages size = ${itemPages.value.size}")
-        } else Log.d("PagesScreen", "spanned pages is empty")
+        if (viewModel.count.value != 0) {
+            if (viewModel.bookId.value == -1) {
+                val pages = book.oldChapters[book.oldChapters.size - 1].oldPages
+                //val pages = book.value.chapters[book.value.chapters.size - 1].pages
+                Log.d("PagesScreen", "chapters size = ${book.oldChapters.size}")
+                val spannedPages = convertPagesToSpannedPagesLazy(
+                    pages,
+                    metadata,
+                    context,
+                    book,
+                    listState,
+                    viewModel,
+                    uiStateViewModel
+                )
+                //itemPages.clear()
+                if (spannedPages.isNotEmpty()) {
+                    itemPages.value += spannedPages
+                    Log.d("PagesScreen", "item pages size = ${itemPages.value.size}")
+                } else Log.d("PagesScreen", "spanned pages is empty")
+            } else {
+                val pages = newBook.value.chapters[newBook.value.chapters.size - 1].pages
+                val spannedPages = convertPagesToSpannedPagesLazy(
+                    pages,
+                    newMetadata.value!!,
+                    context,
+                    newBook.value,
+                    listState,
+                    viewModel,
+                    uiStateViewModel
+                )
+                //itemPages.clear()
+                if (spannedPages.isNotEmpty()) {
+                    itemPages.value += spannedPages
+                } else Log.d("PagesScreen", "spanned pages is empty")
+            }
+        }
     }
+//    LaunchedEffect (key1 = viewModel.newBook) {
+//        val pages = book.tokens[0].content
+//    }
 
 //    if (isLoading) {
 //      Display loading indicator
@@ -116,27 +140,27 @@ fun PagesScreen(
     ) {
         itemsIndexed(itemPages.value,
             key = { index, page ->
-            "${page.pageNumber}-${showHighlights}-$index"
-         })
+                "${page.pageNumber}-${showHighlights}-$index"
+            })
         { index, page ->
-                val chapterIndex = viewModel.getCurrentChapterIndex(page.pageNumber)
-                XMLViewLazyItem(
-                    page = page,
-                    viewModel = viewModel,
-                    modifier = Modifier,
-                    chapterIndex = chapterIndex,
-                    uiStateViewModel = uiStateViewModel,
-                    itemIndex = index
-                )
-                Spacer( //indicates the pages divider
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.outline)
-                        .height(3.dp)
-                )
-            }
+            val chapterIndex = viewModel.getCurrentChapterIndex(page.pageNumber)
+            XMLViewLazyItem(
+                page = page,
+                viewModel = viewModel,
+                modifier = Modifier,
+                chapterIndex = chapterIndex,
+                uiStateViewModel = uiStateViewModel,
+                itemIndex = index
+            )
+            Spacer( //indicates the pages divider
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.outline)
+                    .height(3.dp)
+            )
         }
     }
+}
 
 //    } else {
 //        LazyRow(

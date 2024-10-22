@@ -7,6 +7,6 @@
    },
    "pagesNumber":30,
    "bookSize":5,
-   "id":"328478",
+   "id":-1,
    "chaptersNumber":5
 }

@@ -1,80 +1,89 @@
 package alexschool.bookreader.data
 
 import alexSchool.network.NetworkModule
-import alexschool.bookreader.data.domain.Author
-import alexschool.bookreader.data.domain.BookInfo
-import alexschool.bookreader.data.domain.Category
-import alexschool.bookreader.data.domain.DetailedBookInfo
-import alexschool.bookreader.data.domain.GeneralBookInfo
-import alexschool.bookreader.data.domain.ReadingProgress
-import alexschool.bookreader.data.domain.SavedBook
-import alexschool.bookreader.data.domain.Set
-import alexschool.bookreader.data.domain.SetContent
-import alexschool.bookreader.data.domain.Subscription
-import alexschool.bookreader.data.domain.Tag
-import alexschool.bookreader.data.domain.Translator
-import alexschool.bookreader.data.local.AlexSchoolDatabase
-import alexschool.bookreader.data.mappers.toAuthor
-import alexschool.bookreader.data.mappers.toAuthorEntity
-import alexschool.bookreader.data.mappers.toBookInfo
-import alexschool.bookreader.data.mappers.toBookInfoEntity
-import alexschool.bookreader.data.mappers.toCategory
-import alexschool.bookreader.data.mappers.toCategoryEntity
-import alexschool.bookreader.data.mappers.toDetailedBookInfo
-import alexschool.bookreader.data.mappers.toGeneralBookInfo
-import alexschool.bookreader.data.mappers.toReadingProgress
-import alexschool.bookreader.data.mappers.toReadingProgressEntity
-import alexschool.bookreader.data.mappers.toSavedBook
-import alexschool.bookreader.data.mappers.toSavedBookEntity
-import alexschool.bookreader.data.mappers.toSet
-import alexschool.bookreader.data.mappers.toSetEntity
-import alexschool.bookreader.data.mappers.toSubscription
-import alexschool.bookreader.data.mappers.toSubscriptionEntity
-import alexschool.bookreader.data.mappers.toTag
-import alexschool.bookreader.data.mappers.toTagEntity
-import alexschool.bookreader.data.mappers.toTranslator
-import alexschool.bookreader.data.mappers.toTranslatorEntity
+import alexSchool.network.data.AlexSchoolDatabase
+import alexSchool.network.domain.Author
+import alexSchool.network.domain.BookInfo
+import alexSchool.network.domain.Category
+import alexSchool.network.domain.DetailedBookInfo
+import alexSchool.network.domain.GeneralBookInfo
+import alexSchool.network.domain.ReadingProgress
+import alexSchool.network.domain.SavedBook
+import alexSchool.network.domain.Set
+import alexSchool.network.domain.SetContent
+import alexSchool.network.domain.Subscription
+import alexSchool.network.domain.Tag
+import alexSchool.network.domain.Translator
+import alexSchool.network.mappers.toAuthor
+import alexSchool.network.mappers.toAuthorEntity
+import alexSchool.network.mappers.toBookInfo
+import alexSchool.network.mappers.toBookInfoEntity
+import alexSchool.network.mappers.toCategory
+import alexSchool.network.mappers.toCategoryEntity
+import alexSchool.network.mappers.toDetailedBookInfo
+import alexSchool.network.mappers.toGeneralBookInfo
+import alexSchool.network.mappers.toReadingProgress
+import alexSchool.network.mappers.toReadingProgressEntity
+import alexSchool.network.mappers.toSavedBook
+import alexSchool.network.mappers.toSavedBookEntity
+import alexSchool.network.mappers.toSet
+import alexSchool.network.mappers.toSetEntity
+import alexSchool.network.mappers.toSubscription
+import alexSchool.network.mappers.toSubscriptionEntity
+import alexSchool.network.mappers.toTag
+import alexSchool.network.mappers.toTagEntity
+import alexSchool.network.mappers.toTranslator
+import alexSchool.network.mappers.toTranslatorEntity
 import android.util.Log
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class AppRepositoryImpl @Inject constructor(
     private val appDatabase: AlexSchoolDatabase,
-    //private val apiService: ApiService,
 ) : AppRepository {
 
     private val defaultDispatcher: CoroutineDispatcher = NetworkModule.provideDispatcher()
     private val apiService = NetworkModule.provideApiService()
-    override suspend fun getCategories(): Flow<List<Category>> = flow {
+
+
+    override suspend fun getCategories(): Flow<List<Category>> = channelFlow {
         val localCategories = appDatabase.categoryDao().getAllCategories()
         // Emit cached categories first
-        emit(localCategories.map { it.toCategory() })
+        send(localCategories.map { it.toCategory() })
         // Fetch categories from API
-        try {
-            val dtoCategories = withContext(defaultDispatcher) {
-                apiService.getCategories()
-            }
-            val updatedCategories = dtoCategories.map { dtoCategory ->
-                val localCategory = appDatabase.categoryDao().getCategoryById(dtoCategory.id)
-                if (dtoCategory.is_deleted == true) {
-                    if (localCategory != null) {
-                        appDatabase.categoryDao().deleteCategoryById(dtoCategory.id)
+        coroutineScope {
+            launch(defaultDispatcher) {
+                try {
+                    val dtoCategories = withContext(defaultDispatcher) {
+                        apiService.getCategories()
                     }
-                } else { // isDeleted either null or false
-                    appDatabase.categoryDao().insertCategory(dtoCategory.toCategoryEntity())
-                }
-                dtoCategory.toCategoryEntity().toCategory()
-            }
-            // Emit updated categories
-            emit(updatedCategories)
+                    val updatedCategories = dtoCategories.map { dtoCategory ->
+                        val localCategory =
+                            appDatabase.categoryDao().getCategoryById(dtoCategory.id)
+                        if (dtoCategory.is_deleted == true) {
+                            if (localCategory != null) {
+                                appDatabase.categoryDao().deleteCategoryById(dtoCategory.id)
+                            }
+                        } else { // isDeleted either null or false
+                            appDatabase.categoryDao().insertCategory(dtoCategory.toCategoryEntity())
+                        }
+                        dtoCategory.toCategoryEntity().toCategory()
+                    }
+                    // Emit updated categories
+                    send(updatedCategories)
 
-        } catch (e: Exception) {
-            // Handle API errors
-            emit(emptyList()) // Or emit an error state
+                } catch (e: Exception) {
+                    // Handle API errors
+                    send(emptyList()) // Or emit an error state
+                }
+            }
         }
     }
 
@@ -130,28 +139,35 @@ class AppRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRemoteBooks(): Flow<List<BookInfo>> = flow {
-        try {
-            val dtoBooks = withContext(defaultDispatcher) {
-                apiService.getBooks()
-            }
-            val remoteBooks = dtoBooks.map { bookDto ->
-                val localBook = appDatabase.bookDao().getBookById(bookDto.book.id)
-                if (bookDto.book.is_deleted == true) {
-                    if (localBook != null) {
-                        appDatabase.bookDao().deleteBookById(bookDto.book.id)
+    override suspend fun getRemoteBooks(): Flow<List<BookInfo>> = channelFlow {
+        val localBooks = appDatabase.bookDao().getAllBooks()
+        send(localBooks.map { it.toBookInfo() })
+        coroutineScope {
+            launch(defaultDispatcher) {
+                try {
+                    val dtoBooks = withContext(defaultDispatcher) {
+                        apiService.getBooks()
                     }
-                } else {
-                    // add bookInfo to its table in db
-                    appDatabase.bookDao().insertBook(bookDto.toBookInfoEntity())
+                    val remoteBooks = dtoBooks.map { bookDto ->
+                        val localBook = appDatabase.bookDao().getBookById(bookDto.book.id)
+                        if (bookDto.book.is_deleted == true) {
+                            if (localBook != null) {
+                                appDatabase.bookDao().deleteBookById(bookDto.book.id)
+                            }
+                        } else {
+                            // add bookInfo to its table in db
+                            appDatabase.bookDao().insertBook(bookDto.toBookInfoEntity())
+                        }
+                        bookDto.toBookInfoEntity().toBookInfo()
+                        //then reload the ui with the new data?
+                    }
+                    send(remoteBooks)
+                } catch (e: Exception) {
+                    Log.d("ApiResponse", "Error: ${e.message}")
                 }
-                bookDto.toBookInfoEntity().toBookInfo()
-                //then reload the ui with the new data?
             }
-            emit(remoteBooks)
-        } catch (e: Exception) {
-            Log.d("ApiResponse", "Error: ${e.message}")
         }
+
     }
 
     override suspend fun getGeneralBooksInfo(): Flow<List<GeneralBookInfo>> {
@@ -314,8 +330,6 @@ class AppRepositoryImpl @Inject constructor(
             emit(emptyList())
         }
     }
-
-
 
 
 }

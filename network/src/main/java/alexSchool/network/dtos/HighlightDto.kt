@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class HighlightDto(
     val id: Long? = 0,
-    val book_id: String,
+    val book_id: Int,
     val chapter_number: Int,
     val page_number: Int,
     val start: Int,

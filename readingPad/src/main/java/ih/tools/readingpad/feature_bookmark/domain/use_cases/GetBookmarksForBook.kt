@@ -18,7 +18,7 @@ class GetBookmarksForBook (
      * @param bookId The ID of the book.
      * @return A Flow emitting a list of bookmarks for the book.
      */
-     suspend operator fun invoke(bookId: String) : Flow<List<Bookmark>>{
+     suspend operator fun invoke(bookId: Int) : Flow<List<Bookmark>>{
         return repository.getBookmarksForBook(bookId)
     }
 }

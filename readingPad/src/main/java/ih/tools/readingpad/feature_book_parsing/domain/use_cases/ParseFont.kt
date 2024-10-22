@@ -1,6 +1,7 @@
 package ih.tools.readingpad.feature_book_parsing.domain.use_cases
 
-import android.content.Context
+import alexSchool.network.domain.BookFont
+import alexSchool.network.domain.Metadata
 import android.graphics.Color
 import android.graphics.Typeface
 import android.text.Layout
@@ -33,7 +34,6 @@ class ParseFont {
         oldMetadata: OldMetadata,
         parsedTag: ParsedElement.Font,
         spannedText: SpannableStringBuilder,
-        context: Context
     ): SpannableStringBuilder {
 
         val start = spannedText.length
@@ -45,8 +45,27 @@ class ParseFont {
             parsedTag.fontTag,
             start,
             end,
-            oldMetadata.oldEncoding.fonts,
-            context
+            fonts = oldMetadata.oldEncoding.fonts,
+        )
+        return spannedText
+    }
+
+    operator fun invoke(
+        metadata: Metadata,
+        parsedTag: ParsedElement.Font,
+        spannedText: SpannableStringBuilder,
+    ): SpannableStringBuilder {
+
+        val start = spannedText.length
+        spannedText.append(parsedTag.content)
+        val end = spannedText.length
+
+        applyFontCustomizations(
+            spannable = spannedText,
+            fontTag = parsedTag.fontTag,
+            start = start,
+            end = end,
+            fonts = metadata.encoding.fonts,
         )
         return spannedText
     }
@@ -87,7 +106,6 @@ fun applyFontCustomizations(
     start: Int,
     end: Int,
     fonts: Map<String, Font>,
-    context: Context
 ) {
 
     val fontStyle = fonts[fontTag] ?: return // Return early if font style is not found
@@ -109,7 +127,7 @@ fun applyFontCustomizations(
     if (fontStyle.underline == "1") {
         //spannable.setSpan(bookerlyNormalTypeface, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         spannable.setSpan(UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-       // spannable.setSpan(customFontTypeface, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        // spannable.setSpan(customFontTypeface, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
     //center alignment
     when (fontStyle.align) {
@@ -155,8 +173,91 @@ fun applyFontCustomizations(
         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
     )
     if (fontStyle.backgroundColor != "0")
+        spannable.setSpan(BackgroundColorSpan(Color.parseColor(fontStyle.backgroundColor)),
+            start,
+            end,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+
+    Log.d("ApplyFont", "Applied font style: $fontStyle from $start to $end")
+}
+
+fun applyFontCustomizations(
+    spannable: SpannableStringBuilder,
+    fontTag: String,
+    start: Int,
+    fonts: Map<String, BookFont>,
+    end: Int,
+) {
+
+    val fontStyle = fonts[fontTag] ?: return // Return early if font style is not found
+    /**
+     * managing different font families using this way requires android v 28 and above
+     */
+//    val bookerlyNormalTypeface = ResourcesCompat.getFont(context, R.font.bookerly_regular)?.let {
+//        TypefaceSpan(it)
+//    }
+//
+//    val customFontTypeface : TypefaceSpan = getTypefaceSpan(context, "bookerly_bold_italic.ttf")
+
+    if (fontStyle.bold == "1") {
+        spannable.setSpan(StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    }
+    if (fontStyle.italic == "1") {
+        spannable.setSpan(StyleSpan(Typeface.ITALIC), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    }
+    if (fontStyle.underline == "1") {
+        //spannable.setSpan(bookerlyNormalTypeface, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spannable.setSpan(UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        // spannable.setSpan(customFontTypeface, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    }
+    //center alignment
+    when (fontStyle.align) {
+        "c" -> {
+            spannable.setSpan(
+                AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER),
+                start,
+                end,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        // end alignment
+        "1" -> {
+            spannable.setSpan(
+                AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE),
+                start,
+                end,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        // start alignment
+        "0" -> {
+            spannable.setSpan(
+                AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL),
+                start,
+                end,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+    }
+    fontStyle.size?.let {
         spannable.setSpan(
-            BackgroundColorSpan(Color.parseColor(fontStyle.backgroundColor)),
+            RelativeSizeSpan(it.toFloat()),
+            start,
+            end,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+    }
+    spannable.setSpan(
+        ForegroundColorSpan(fontStyle.fontColor.toInt()),
+        start,
+        end,
+        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+    )
+    if (fontStyle.backgroundColor != "0")
+        spannable.setSpan(
+            BackgroundColorSpan(fontStyle.backgroundColor.toInt()),
             start,
             end,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE

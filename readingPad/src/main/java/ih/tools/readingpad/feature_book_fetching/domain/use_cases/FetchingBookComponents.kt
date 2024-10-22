@@ -2,9 +2,9 @@ package ih.tools.readingpad.feature_book_fetching.domain.use_cases
 
 import android.content.Context
 import ih.tools.readingpad.R
-import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Book
+import ih.tools.readingpad.feature_book_fetching.domain.book_reader.OldBook
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.OldBookInfo
-import ih.tools.readingpad.feature_book_fetching.domain.book_reader.Chapter
+import ih.tools.readingpad.feature_book_fetching.domain.book_reader.OldChapter
 import ih.tools.readingpad.feature_book_fetching.domain.book_reader.OldMetadata
 
 //Gets a file from raw directory
@@ -14,7 +14,7 @@ fun readFileFromRaw(context: Context, rawResourceId: Int): String {
 }
 
 //called when the user selects a book to open
-fun fetchBook(oldBookInfo: OldBookInfo ): Book {
+fun fetchBook(oldBookInfo: OldBookInfo ): OldBook {
     val newBook = getNewBook(oldBookInfo)
     // returns an empty book! that needs to get chapters
     return newBook
@@ -42,10 +42,10 @@ fun getRawFileByName(context: Context, fileName: String): Int? {
         null
     }
 }
-fun getNewBook(oldBookInfo: OldBookInfo): Book {
-    val bookChapters = mutableListOf<Chapter>()
-    val book = Book(oldBookInfo, bookChapters)
-    return book
+fun getNewBook(oldBookInfo: OldBookInfo): OldBook {
+    val bookOldChapters = mutableListOf<OldChapter>()
+    val oldBook = OldBook(oldBookInfo, bookOldChapters)
+    return oldBook
 }
 
 

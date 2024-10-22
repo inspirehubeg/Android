@@ -1,43 +1,41 @@
 [versions]
 agp = "8.5.2"
 coilCompose = "2.4.0"
-colorpickerview = "2.3.0"
-gradle = "8.0.2"
 gson = "2.10.1"
-kotlin = "2.0.20"
+kotlin = "2.0.21"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-
 kotlinxSerializationJson = "1.7.3"
 ktor = "2.3.12"
 lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.9.2"
-composeBom = "2024.09.02"
+composeBom = "2024.09.03"
 appcompat = "1.7.0"
 material = "1.12.0"
 poiOoxml = "5.2.3"
 recyclerview = "1.3.2"
 daggerHilt = "2.51.1"
 hilt-navigation-compose = "1.2.0"
-roomRuntime = "2.6.1"
+room = "2.7.0-alpha09"
 workRuntime = "2.9.1"
-runtimeAndroid = "1.7.2"
+runtimeAndroid = "1.7.3"
 engageCore = "1.5.5"
 colorpicker = "1.1.2"
-runtimeLivedata = "1.7.2"
-jetbrainsKotlinJvm = "2.0.20"
-roomRuntimeJvm = "2.7.0-alpha09"
+runtimeLivedata = "1.7.3"
+jetbrainsKotlinJvm = "2.0.21"
+ksp = "2.0.21-1.0.25"
 
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
-androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
-androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+#androidx-room-common = { module = "androidx.room:room-common", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-runtime-android = { module = "androidx.room:room-runtime-android", version.ref = "room" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
-
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -74,8 +72,8 @@ androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtim
 poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poiOoxml" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
-kotlinx-serialization-json = {module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson"}
-androidx-room-runtime-jvm = { group = "androidx.room", name = "room-runtime-jvm", version.ref = "roomRuntimeJvm" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+androidx-room-runtime-jvm = { group = "androidx.room", name = "room-runtime-jvm", version.ref = "room" }
 
 
 [plugins]
@@ -86,3 +84,5 @@ hiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }

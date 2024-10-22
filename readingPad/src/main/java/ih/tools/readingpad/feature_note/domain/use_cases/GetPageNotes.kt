@@ -15,7 +15,7 @@ class GetPageNotes (private val repository: NoteRepository
      * @return A Flow emitting a list of notes for the specified page.
      */
     suspend operator fun invoke(
-        bookId: String,
+        bookId: Int,
         chapterNumber: Int,
         pageNumber: Int
     ): Flow<List<NoteEntity>> {

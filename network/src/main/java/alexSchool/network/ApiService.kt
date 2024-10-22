@@ -50,25 +50,25 @@ interface ApiService {
     //this is called when there is changes in saved_book table
     suspend fun getSavedBooksByUserId(userId: Int) : List<SavedBookDto>
 
-    suspend fun getTokens(bookId: Int, tokenNum: Int) : List<TokenDto>
-    suspend fun getMetadata(bookId: Int): MetadataDto
+    suspend fun getTokens(bookId: Int, tokenNum: Int) : TokenDto?
+    suspend fun getMetadata(bookId: Int): MetadataDto?
 
     suspend fun getSubscriptions() : List<SubscriptionDto>
 
 
 
 
-    suspend fun getHighlights(bookId: String): List<HighlightDto>
+    suspend fun getHighlights(bookId: Int): List<HighlightDto>
     suspend fun addHighlight(highlightDto: HighlightDto)
     suspend fun deleteHighlight(highlightDto: HighlightDto)
 
 
-    suspend fun getBookmarks(bookId: String): List<BookmarkDto>
+    suspend fun getBookmarks(bookId: Int): List<BookmarkDto>
     suspend fun addBookmark(bookmarkDto: BookmarkDto)
     suspend fun deleteBookmark(bookmarkDto: BookmarkDto)
 
 
-    suspend fun getNotes(bookId: String): List<NoteDto>
+    suspend fun getNotes(bookId: Int): List<NoteDto>
     suspend fun addNote(noteDto: NoteDto)
     suspend fun deleteNote(noteDto: NoteDto)
 

@@ -33,7 +33,7 @@ interface BookmarkDao {
      * @return A Flow emitting a list of bookmarks for the book.
      */
     @Query("SELECT * FROM bookmarks WHERE bookId = :bookId AND isDeleted = 0")
-    fun getBookmarksForBook(bookId: String): List<BookmarkEntity>
+    fun getBookmarksForBook(bookId: Int): List<BookmarkEntity>
 
     /**
      * Updates the title of a bookmark.

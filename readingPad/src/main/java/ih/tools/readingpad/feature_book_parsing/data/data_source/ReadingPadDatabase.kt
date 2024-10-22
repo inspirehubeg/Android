@@ -1,8 +1,5 @@
 package ih.tools.readingpad.feature_book_parsing.data.data_source
 
-import alexSchool.network.entities.BookInfoEntity
-import alexSchool.network.entities.MetadataEntity
-import alexSchool.network.entities.TokenEntity
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import ih.tools.readingpad.feature_bookmark.data.data_source.BookmarkDao
@@ -13,7 +10,6 @@ import ih.tools.readingpad.feature_note.data.data_source.NoteDao
 import ih.tools.readingpad.feature_note.data.data_source.NoteEntity
 import ih.tools.readingpad.feature_theme_color.data.data_source.ThemeColorDao
 import ih.tools.readingpad.feature_theme_color.domain.model.ThemeColor
-import ih.tools.readingpad.remote.BookContentDao
 
 /**
  * Room database class for the ReadingPad library.
@@ -25,9 +21,6 @@ import ih.tools.readingpad.remote.BookContentDao
         HighlightEntity::class,
         ThemeColor::class,
         NoteEntity::class,
-        MetadataEntity::class,
-        BookInfoEntity::class,
-        TokenEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -50,5 +43,4 @@ abstract class ReadingPadDatabase : RoomDatabase() {
 
     abstract val noteDao: NoteDao
 
-    abstract val bookContentDao: BookContentDao
 }

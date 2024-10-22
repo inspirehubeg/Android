@@ -12,7 +12,7 @@ class GetBookHighlights (  private val repository: HighlightRepository
      * @param bookId The ID of the book.
      * @return A Flow emitting a list of highlights for the book.
      */
-    suspend operator fun invoke(bookId: String) : Flow<List<Highlight>> {
+    suspend operator fun invoke(bookId: Int) : Flow<List<Highlight>> {
         return repository.getHighlightsForBook(bookId)
     }
 }

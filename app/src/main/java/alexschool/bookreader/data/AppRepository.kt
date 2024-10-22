@@ -1,17 +1,18 @@
 package alexschool.bookreader.data
 
-import alexschool.bookreader.data.domain.Author
-import alexschool.bookreader.data.domain.BookInfo
-import alexschool.bookreader.data.domain.Category
-import alexschool.bookreader.data.domain.DetailedBookInfo
-import alexschool.bookreader.data.domain.GeneralBookInfo
-import alexschool.bookreader.data.domain.ReadingProgress
-import alexschool.bookreader.data.domain.SavedBook
-import alexschool.bookreader.data.domain.Set
-import alexschool.bookreader.data.domain.SetContent
-import alexschool.bookreader.data.domain.Subscription
-import alexschool.bookreader.data.domain.Tag
-import alexschool.bookreader.data.domain.Translator
+import alexSchool.network.domain.Author
+import alexSchool.network.domain.BookInfo
+import alexSchool.network.domain.Category
+import alexSchool.network.domain.DetailedBookInfo
+import alexSchool.network.domain.GeneralBookInfo
+import alexSchool.network.domain.ReadingProgress
+import alexSchool.network.domain.SavedBook
+import alexSchool.network.domain.Set
+import alexSchool.network.domain.SetContent
+import alexSchool.network.domain.Subscription
+import alexSchool.network.domain.Tag
+import alexSchool.network.domain.Translator
+
 import kotlinx.coroutines.flow.Flow
 
 interface AppRepository {

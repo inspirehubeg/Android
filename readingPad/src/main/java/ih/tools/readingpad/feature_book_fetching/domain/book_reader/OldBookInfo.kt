@@ -23,7 +23,7 @@ class OldBookInfo : Id {
      * this fun will be used when create new bookInfo obj
      */
     constructor(
-        id: String,
+        id: Int,
         name: String,
         cover: String,
         description: String,

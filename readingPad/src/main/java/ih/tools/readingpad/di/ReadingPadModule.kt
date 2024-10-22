@@ -1,5 +1,7 @@
 package ih.tools.readingpad.di
 
+import alexSchool.network.data.AlexSchoolDatabase
+import alexSchool.network.entities.Converters
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
@@ -78,12 +80,21 @@ object ReadingPadModule {
      */
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): ReadingPadDatabase {
+    fun provideReadingPadDatabase(@ApplicationContext context: Context): ReadingPadDatabase {
         return Room.databaseBuilder(
             context,
             ReadingPadDatabase::class.java, "reading_pad_database"
         ).build()
     }
+
+//    @Provides
+//    @Singleton
+//    fun provideAlexSchoolDatabase(@ApplicationContext context: Context): AlexSchoolDatabase {
+//        return Room.databaseBuilder(
+//            context,
+//            AlexSchoolDatabase::class.java, "alex_school_database"
+//        ).build()
+//    }
 
     /**
      * Provides an instance of HighlightDao.
@@ -210,10 +221,8 @@ object ReadingPadModule {
         return BookParserUseCases(
             parseImage = ParseImage(),
             parseFont = ParseFont(),
-
             parseWebLink = ParseWebLink(),
             parseRegularText = ParseRegularText(),
-
             parsePageLazy = ParsePageLazy(),
             parseInternalLinkLazy = ParseInternalLinkLazy(),
         )
@@ -274,15 +283,17 @@ object ReadingPadModule {
     @Singleton
     fun provideBookContentRepository(
         readingPadDatabase: ReadingPadDatabase,
+        alexSchoolDatabase: AlexSchoolDatabase,
+        converters: Converters
     ): BookContentRepository {
-        return BookContentRepoImpl(readingPadDatabase)
+        return BookContentRepoImpl(readingPadDatabase, alexSchoolDatabase, converters)
 
     }
 
-//    @Singleton
-//    @Provides
-//    fun provideBookInputApi(httpClient: HttpClient): BookInputApi = BookInputApiImpl(httpClient)
-//
-
+    @Provides
+    @Singleton
+    fun provideConverters(): Converters {
+        return Converters()
+    }
 
 }

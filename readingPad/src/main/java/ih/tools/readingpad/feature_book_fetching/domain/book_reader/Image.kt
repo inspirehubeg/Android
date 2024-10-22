@@ -12,6 +12,7 @@ class Image(private val imageName: String, var encodingImage: String?) {
 
     companion object {
         const val IMAGE_SPLITTER = "!@D%#^$@@#BFSA#$"
+        const val IMAGE_NAME_SPLITTER = "!@D%#^$#BFSA#$"
     }
 
 }

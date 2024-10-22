@@ -41,7 +41,7 @@ interface BookmarkRepository {
      * @param bookId The ID of the book.
      * @return A Flow emitting a list of bookmarks for the book.
      */
-    suspend fun getBookmarksForBook(bookId: String): Flow<List<Bookmark>>
+    suspend fun getBookmarksForBook(bookId: Int): Flow<List<Bookmark>>
 
     /**
      * Checks if a bookmark with the given ID exists.

@@ -4,7 +4,8 @@ plugins {
     alias(libs.plugins.hiltAndroid)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.compose.compiler)
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -40,9 +41,11 @@ android {
 //        kotlinCompilerExtensionVersion = "1.5.1"
 //    }
 }
+room{
+    schemaDirectory("$projectDir/schemas")
+}
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -75,14 +78,12 @@ dependencies {
 
     //Room
     implementation(libs.androidx.room.runtime)
-    ksp("androidx.room:room-compiler:2.6.1")
-//    kapt (libs.androidx.room.compiler){
-//        exclude(group = "com.intellij", module = "annotations") // Add this line
-//    }
+    ksp(libs.androidx.room.compiler)
+
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation (libs.androidx.room.ktx)
-    //Coil for image handling
-    implementation(libs.coil.compose)
+//    //Coil for image handling
+//    implementation(libs.coil.compose)
 
     //colorPicker
     implementation(libs.compose.colorpicker)
@@ -97,5 +98,4 @@ dependencies {
     implementation(libs.ktor.client.logging)
     implementation(libs.ktor.client.serialization)
     implementation (libs.ktor.client.content.negotiation)
-
 }

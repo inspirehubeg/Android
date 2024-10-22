@@ -1,6 +1,9 @@
 package ih.tools.readingpad.feature_book_parsing.presentation
 
-import alexSchool.network.data.Token
+import alexSchool.network.domain.Book
+import alexSchool.network.domain.DetailedBookInfo
+import alexSchool.network.domain.Metadata
+import alexSchool.network.domain.Token
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.gestures.scrollBy
@@ -10,6 +13,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -61,11 +65,12 @@ class BookContentViewModel @Inject constructor(
     private val themeColorUseCases: ThemeColorUseCases,
     private val noteUseCases: NoteUseCases,
     private val bookContentRepository: BookContentRepository,
+    private val savedStateHandle: SavedStateHandle,
     private val context: Context
 ) : ViewModel() {
 
-    private val _bookTokens = MutableStateFlow<List<Token>>(emptyList())
-    val bookTokens = _bookTokens.asStateFlow()
+//    private val _bookTokens = MutableStateFlow<List<Token>>(emptyList())
+//    val bookTokens = _bookTokens.asStateFlow()
     private val _savedFontColors = MutableLiveData<List<ThemeColor>>()
     val savedFontColors = _savedFontColors
 
@@ -94,6 +99,11 @@ class BookContentViewModel @Inject constructor(
         _textView.value = textView
     }
 
+    private var _newMetadata = MutableStateFlow<Metadata?>(null)
+    val newMetadata: StateFlow<Metadata?> = _newMetadata
+
+    private var _savedBookInfo = MutableStateFlow<DetailedBookInfo?>(null)
+    val savedBookInfo: StateFlow<DetailedBookInfo?> = _savedBookInfo
 
     private val _pageNumber = mutableIntStateOf(1)
     val pageNumber: State<Int> = _pageNumber
@@ -102,24 +112,120 @@ class BookContentViewModel @Inject constructor(
         getCurrentChapterIndex(number)
     }
 
-    fun loadBookData(bookId: Int) {
-        //fetchMetadata(bookId)
-        //fetchTokens(bookId, 0)
-    }
+    private val _bookId = mutableIntStateOf(-1)
+    val bookId: State<Int> = _bookId
 
-    private fun fetchMetadata(bookId: Int) {
-        viewModelScope.launch {
-            bookContentRepository.getMetadata(bookId)
+
+    private val _newBook = MutableStateFlow<Book>(
+        Book(
+            id = -1,
+            name = "",
+            pagesNumber = 0,
+            chaptersNumber = 0,
+            index = "",
+            encoding = "",
+            bookSize = 0.0f,
+            targetLinks = "",
+            readingProgress = 0,
+            cover = null,
+            authorName = "",
+            description = ""
+        )
+    )
+    val newBook: StateFlow<Book> = _newBook
+
+    private fun loadBookData(bookId: Int) {
+        Log.d("PagesScreen", "loadBookData is called book id = $bookId")
+        if (bookId != -1) {
+            // Update the ViewModel's state with the saved book details
+            viewModelScope.launch {
+                fetchBookInfo(bookId)
+                fetchMetadata(bookId)
+                newFetchFirstChapter(bookId)
+                _state.value = state.value.copy(
+                    bookId = newBook.value.id,
+                    bookTitle = newBook.value.name,
+                    bookAuthor = newBook.value.authorName,
+                    numberOfChapters = newBook.value.chaptersNumber,
+                    numberOfPages = newBook.value.pagesNumber,
+                    bookDescription = newBook.value.description,
+                    imageUrl = newBook.value.cover.toString(),
+                )
+                getBookBookmarks(bookId)
+                getBookHighlights(bookId)
+                getBookNotes(bookId)
+
+            }
+        } else {
+            // this part is temporary, it fetches the book from Raw but it should be replaced by fetching the book by id in the init{}
+            fetchNextChapter()
+            viewModelScope.launch {
+                _state.value = state.value.copy(
+                    bookId = book.oldBookInfo.id,
+                    bookTitle = book.oldBookInfo.name,
+                    bookAuthor = book.oldBookInfo.oldAuthor.name,
+                    // bookCategory = book.category,
+                    numberOfChapters = book.oldBookInfo.chaptersNumber,
+                    numberOfPages = book.oldBookInfo.pagesNumber,
+                    bookDescription = book.oldBookInfo.description,
+                    // imageUrl = book.bookInfo.cover,
+                )
+                getBookBookmarks(bookId)
+                getBookHighlights(bookId)
+                getBookNotes(bookId)
+            }
         }
     }
 
+    private suspend fun fetchBookInfo(bookId: Int) {
+
+        bookContentRepository.getBookInfo(bookId)
+            .onEach { Log.d("PagesScreen", "BookInfo emitted: $it") } // Log emitted values
+            .catch { e ->
+                Log.e("BookContentViewModel", "Error fetching book info: ${e.message}")
+            }
+            .collect { NbookInfo ->
+                Log.d("PagesScreen", "bookInfo = ${NbookInfo}")
+                _savedBookInfo.value = NbookInfo
+
+                _newBook.value = Book(
+                    id = savedBookInfo.value?.id ?: -1,
+                    name = savedBookInfo.value?.name ?: "",
+                    pagesNumber = savedBookInfo.value?.pagesNumber ?: 0,
+                    chaptersNumber = savedBookInfo.value?.chaptersNumber ?: 0,
+                    index = "",
+                    encoding = "",
+                    bookSize = savedBookInfo.value?.bookSize,
+                    targetLinks = "",
+                    readingProgress = savedBookInfo.value?.readingProgress,
+                    cover = savedBookInfo.value?.cover,
+                    authorName = savedBookInfo.value?.authorsName!!.joinToString(", "),
+                    description = savedBookInfo.value?.description!!
+                )
+            }
+
+    }
+
+    private suspend fun fetchMetadata(bookId: Int) {
+        bookContentRepository.getMetadata(bookId)
+            .onEach { Log.d("PagesScreen", "Metadata emitted: $it") } // Log emitted values
+            .catch { e ->
+                Log.e("BookContentViewModel", "Error fetching metadata: ${e.message}")
+            }
+            .collect { Nmetadata ->
+                Log.d("PagesScreen", "metadata = ${Nmetadata}")
+                _newMetadata.value = Nmetadata
+            }
+    }
+
+
     fun getCurrentChapterIndex(pageNumber: Int): Int {
-        if (book.chapters.isEmpty()) {
-            Log.d("PagesScreen", "book chapters are empty")
+        if (book.oldChapters.isEmpty()) {
+            //Log.d("PagesScreen", "book chapters are empty")
             return -1
         } // Handle empty case
-        for (i in 0 until book.chapters.size) {
-            book.chapters[i].pages.forEach { page ->
+        for (i in 0 until book.oldChapters.size) {
+            book.oldChapters[i].oldPages.forEach { page ->
                 Log.d("PagesScreen", "check page number = ${page.pageNumber}")
                 if (page.pageNumber == pageNumber) {
                     Log.d(
@@ -167,6 +273,9 @@ class BookContentViewModel @Inject constructor(
     private var tokenIndex = 0
     private val _chapterCount = mutableIntStateOf(0)
     val chapterCount: State<Int> = _chapterCount
+    private val _count = mutableIntStateOf(0)
+    val count: State<Int> = _count
+
 
     private fun fetchNextChapter() {
         // size of the lazy list
@@ -177,52 +286,72 @@ class BookContentViewModel @Inject constructor(
             Log.d("PagesScreen", " tokenName = $tokenName")
             val chapterId = getRawFileByName(context, tokenName)
             val chapter = chapterId?.let { readFileFromRaw(context, it) }
-            //val chapter = bookTokens.value.firstOrNull { it.id == 1 }?.content
             if (chapter != null) {
+                Log.d("PagesScreen", " chapter is not null ${chapter.length}")
                 val decodedText = Decryption.decryption(chapter)
                 book.addChapter(decodedText, metadata.oldEncoding)
-                _chapterCount.intValue = book.chapters.size // Update chapter count
+                //newMetadata.value?.encoding?.let { book.addChapter(decodedText, it) }
+                _count.intValue = book.oldChapters.size
+                _chapterCount.intValue = book.oldChapters.size // Update chapter count
             } else {
                 Log.d("PagesScreen", "chapter is null")
             }
         }
     }
 
-    init {
-        // this part is temporary, it fetches the book from Raw but it should be replaced by fetching the book by id in the init{}
-          fetchNextChapter()
-
-        viewModelScope.launch {
-            _state.value = state.value.copy(
-                bookId = book.oldBookInfo.id,
-                bookTitle = book.oldBookInfo.name,
-                bookAuthor = book.oldBookInfo.oldAuthor.name,
-                // bookCategory = book.category,
-                numberOfChapters = book.oldBookInfo.chaptersNumber,
-                numberOfPages = book.oldBookInfo.pagesNumber,
-                bookDescription = book.oldBookInfo.description,
-
-                // imageUrl = book.bookInfo.cover,
-            )
-            getBookBookmarks(bookInfo.id)
-            getBookHighlights(bookInfo.id)
-            getBookNotes(bookInfo.id)
-
+    private suspend fun newFetchFirstChapter(bookId: Int) {
+        if (newMetadata.value == null) {
+            Log.d("PagesScreen", "metadata is null")
+            return
         }
-        getSavedColors()
+        Log.d("PagesScreen", "chapters number = ${newMetadata.value?.index?.size}")
+        if (tokenIndex + 1 <= (newMetadata.value?.index?.size ?: -1)) {
+            //token id starts with 0 so we need to fetch the first one here with id 0
+            fetchToken(
+                bookId = bookId,
+                tokenNum = tokenIndex + 1,
+                onCollect = { token ->
+                    Log.d("PagesScreen", "token = $token")
+                    if (token != null) {
+                        Log.d("PagesScreen", "chapter is not null")
+                        val decodedText = Decryption.decryption(token.content, bookId)
+                        Log.d("PagesScreen", "decodedText = $decodedText")
+                        newMetadata.value?.let {
+                            Log.d("PagesScreen", "metadata is not null")
+                            newBook.value.addChapter(
+                                tokenBody = decodedText,
+                                encoding = it.encoding,
+                                chapterNumber = tokenIndex + 1,
+                                bookIndex = it.index
+                            )
+                        }
+                        _chapterCount.intValue = newBook.value.chapters.size
+                        _count.intValue = newBook.value.chapters.size
+                    } else {
+                        Log.d("PagesScreen", "chapter is null")
+                    }
+                })
+
+        } else {
+            Log.d("PagesScreen", "token is null")
+        }
     }
 
-    private fun fetchTokens(bookId: Int, tokenNum: Int) {
+    init {
+        _bookId.intValue = savedStateHandle.get<Int>("bookId") ?: error("Book ID not found")
+        getSavedColors()
+        Log.d("PagesScreen", "BookContentViewModel init is called newBookId = ${bookId}")
+        loadBookData(bookId.value)
+    }
+
+    private suspend fun fetchToken(bookId: Int, tokenNum: Int, onCollect: (token: Token) -> Unit) {
         Log.d("PagesScreen", "fetchTokens is called")
-        viewModelScope.launch {
-            bookContentRepository.getTokens(bookId, tokenNum).catch { e ->
-                // Handle errors, e.g., log the error or update an error state
-                Log.e("PagesScreen", "Error fetching tokens: ${e.message}")
-            }.collect { tokens ->
-                _bookTokens.value = tokens
-            }
-            fetchNextChapter()
+        bookContentRepository.getTokens(bookId = bookId, tokenNum = tokenNum).catch { e ->
+            Log.e("PagesScreen", "Error fetching tokens: ${e.message}")
+        }.collect { token ->
+            onCollect(token)
         }
+        Log.d("PagesScreen", "fetching token BEFORE RETURN")
     }
 
     fun addHighlight(
@@ -422,7 +551,7 @@ class BookContentViewModel @Inject constructor(
     }
 
 
-    private fun getBookBookmarks(bookId: String) {
+    private fun getBookBookmarks(bookId: Int) {
         viewModelScope.launch {
             bookmarkUseCases.getBookmarksForBook(
                 bookId,
@@ -436,7 +565,7 @@ class BookContentViewModel @Inject constructor(
         }
     }
 
-    private fun getBookHighlights(bookId: String) {
+    private fun getBookHighlights(bookId: Int) {
         viewModelScope.launch {
             highlightUseCases.getBookHighlights(
                 bookId,
@@ -450,7 +579,7 @@ class BookContentViewModel @Inject constructor(
         }
     }
 
-    private fun getBookNotes(bookId: String) {
+    private fun getBookNotes(bookId: Int) {
         viewModelScope.launch {
             noteUseCases.getBookNotes(
                 bookId,

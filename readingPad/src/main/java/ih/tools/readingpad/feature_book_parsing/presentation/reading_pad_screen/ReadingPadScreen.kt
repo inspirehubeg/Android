@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ReadingPadScreen(
     bookId: Int,
+    //bookInfo: BookInfo?,
     navController: NavController
 ) {
     val viewModel: BookContentViewModel = hiltViewModel()
@@ -58,10 +59,9 @@ fun ReadingPadScreen(
     val currentDialog by uiStateViewModel.currentDialog.collectAsState()
     val currentScreen by uiStateViewModel.currentScreen.collectAsState()
 
-
-    LaunchedEffect(key1 = bookId) {
-        viewModel.loadBookData(bookId)
-    }
+//    LaunchedEffect(key1 = bookId) {
+//        viewModel.loadBookData(bookId)
+//    }
 
     ReadingPadTheme(isDarkTheme) {
         val showTopBar by uiStateViewModel.showTopBar.collectAsState()

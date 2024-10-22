@@ -1,6 +1,6 @@
 package alexschool.bookreader.ui
 
-import alexschool.bookreader.data.domain.Category
+import alexSchool.network.domain.Category
 import alexschool.bookreader.network.NetworkViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

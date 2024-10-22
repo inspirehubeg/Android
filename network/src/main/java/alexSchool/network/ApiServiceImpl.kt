@@ -15,7 +15,6 @@ import alexSchool.network.dtos.SubscriptionDto
 import alexSchool.network.dtos.TagDto
 import alexSchool.network.dtos.TokenDto
 import alexSchool.network.dtos.TranslatorDto
-import alexSchool.network.entities.Util
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
@@ -136,48 +135,58 @@ class ApiServiceImpl(private val httpClient: HttpClient) : ApiService {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getTokens(bookId: Int, tokenNum: Int): List<TokenDto> {
+    override suspend fun getTokens(bookId: Int, tokenNum: Int): TokenDto? {
         return try {
-            println("ApiResponse: Tokens Api called: ${Util.TOKEN_URL}")
-            httpClient.get(Util.TOKEN_URL).body()
-//            httpClient.get("${Util.BOOK_INFO_ENDPOINT}${bookId}${Util.TOKEN_ENDPOINT}${tokenNum}")
-//                .body()
+             httpClient.get("${Util.BASE_URL}${Util.BOOK_INFO_ENDPOINT}${bookId}${Util.TOKEN_ENDPOINT}${tokenNum}").body()
+            //httpClient.get("http://192.168.1.47:8080/api/v1/books/25/tokens/1").body()
         } catch (e: RedirectResponseException) {
             //3xx - responses
             println("ApiResponse: 3xx Error: ${e.response.status.description}")
-            emptyList()
+            // emptyList()
+            null
         } catch (e: ClientRequestException) {
             //4xx - responses
             println("ApiResponse, 4xx Error: ${e.response.status.description}")
-            emptyList()
+            //emptyList()
+            null
         } catch (e: ServerResponseException) {
             //5xx - responses
             println("ApiResponse: 5xx Error: ${e.response.status.description}")
-            emptyList()
+            //emptyList()
+            null
         } catch (e: Exception) {
             println("ApiResponse:Token Error: ${e.message}")
-            emptyList()
+            // emptyList()
+            null
         }
     }
 
-    override suspend fun getMetadata(bookId: Int): MetadataDto {
+    override suspend fun getMetadata(bookId: Int): MetadataDto? {
         return try {
-            httpClient.get(Util.TOKEN_URL).body()
+            httpClient.get(
+                "http://192.168.1.47:8080/api/v1/books/$bookId/metadata"
+                //"${Util.BASE_URL}${Util.BOOK_INFO_ENDPOINT}${bookId}${Util.METADATA_FOR_BOOK_ENDPOINT}"
+            )
+                .body()
         } catch (e: RedirectResponseException) {
             //3xx - responses
-            println("ApiResponse: 3xx Error: ${e.response.status.description}")
-            MetadataDto(bookId, "", "", "")
+            println("ApiResponse: Metadata 3xx Error: ${e.response.status.description}")
+            //MetadataDto(bookId, "", "", "")
+            null
         } catch (e: ClientRequestException) {
             //4xx - responses
-            println("ApiResponse, 4xx Error: ${e.response.status.description}")
-            MetadataDto(bookId, "", "", "")
+            println("ApiResponse: Metadata 4xx Error: ${e.response.status.description}")
+            null
+            //MetadataDto(bookId, "", "", "")
         } catch (e: ServerResponseException) {
             //5xx - responses
-            println("ApiResponse: 5xx Error: ${e.response.status.description}")
-            MetadataDto(bookId, "", "", "")
+            println("ApiResponse: Metadata 5xx Error: ${e.response.status.description}")
+            null
+            //MetadataDto(bookId, "", "", "")
         } catch (e: Exception) {
-            println("ApiResponse:Token Error: ${e.message}")
-            MetadataDto(bookId, "", "", "")
+            println("ApiResponse: Metadata Error: ${e.message}")
+            null
+            // MetadataDto(bookId, "", "", "")
         }
     }
 
@@ -187,7 +196,7 @@ class ApiServiceImpl(private val httpClient: HttpClient) : ApiService {
     }
 
 
-    override suspend fun getHighlights(bookId: String): List<HighlightDto> {
+    override suspend fun getHighlights(bookId: Int): List<HighlightDto> {
         return httpClient.get("/books/$bookId/highlights").body()
     }
 
@@ -199,7 +208,7 @@ class ApiServiceImpl(private val httpClient: HttpClient) : ApiService {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getBookmarks(bookId: String): List<BookmarkDto> {
+    override suspend fun getBookmarks(bookId: Int): List<BookmarkDto> {
         return httpClient.get("/books/$bookId/bookmarks").body()
     }
 
@@ -211,7 +220,7 @@ class ApiServiceImpl(private val httpClient: HttpClient) : ApiService {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getNotes(bookId: String): List<NoteDto> {
+    override suspend fun getNotes(bookId: Int): List<NoteDto> {
         return httpClient.get("/books/$bookId/notes").body()
     }
 

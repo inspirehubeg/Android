@@ -61,7 +61,7 @@ class BookmarkRepositoryImpl(
      * @param bookId The ID of the book.
      * @return A Flow emitting a list of bookmarks for the book.
      */
-    override suspend fun getBookmarksForBook(bookId: String): Flow<List<Bookmark>> = flow {
+    override suspend fun getBookmarksForBook(bookId: Int): Flow<List<Bookmark>> = flow {
         val localBookmarksForBook = withContext(defaultDispatcher)
         {
             dao.getBookmarksForBook(bookId)

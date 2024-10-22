@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BookmarkDto(
     val id: Long? = 0,
-    val bookId: String,
+    val bookId: Int,
     val chapter_number: Int,
     val page_number: Int,
     val bookmark_title: String,

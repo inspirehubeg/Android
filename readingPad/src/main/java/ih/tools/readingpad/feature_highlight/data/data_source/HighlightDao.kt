@@ -49,7 +49,7 @@ interface HighlightDao {
     @Query("SELECT * FROM highlights WHERE bookId = :bookId AND chapterNumber = :chapterNumber " +
             "AND pageNumber = :pageNumber AND isDeleted = 0")
     fun getPageHighlights(
-        bookId: String,
+        bookId: Int,
         chapterNumber: Int,
         pageNumber: Int
     ): Flow<List<HighlightEntity>>
@@ -62,7 +62,7 @@ interface HighlightDao {
      * @return A Flow emitting a list of highlights for the book.
      */
     @Query("SELECT * FROM highlights WHERE bookId = :bookId AND isDeleted = 0")
-     fun getHighlightsForBook(bookId: String): List<HighlightEntity>
+     fun getHighlightsForBook(bookId: Int): List<HighlightEntity>
 
 
      @Query("SELECT * FROM highlights WHERE id = :id")

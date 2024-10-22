@@ -13,6 +13,7 @@ import android.text.style.AlignmentSpan
 import android.text.style.ClickableSpan
 import android.text.style.ImageSpan
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.View
 import ih.tools.readingpad.feature_book_parsing.domain.model.ParsedElement
 import ih.tools.readingpad.ui.UIStateViewModel
@@ -39,6 +40,7 @@ class ParseImage {
         val start = spannedText.length
         val spannedImage =
             addPhoto(parsedTag.alignment, parsedTag.content, parsedTag.ratio, context, uiStateViewModel )
+        //spannedText.append("\n")
         spannedText.append(spannedImage)
         return spannedText
     }
@@ -62,18 +64,28 @@ fun addPhoto(
     context: Context,
     uiStateViewModel: UIStateViewModel
 ): SpannableString {
-
+    //Log.d("parseImage", "addPhoto: byteArray= ${byteArray}")
     val spannableString = SpannableString("0") //Use a placeholder character
+    Log.d("imageParser", "addPhoto: align= ${align}")
     val span =
         when (align) {
-            "c" -> {
+            "C" -> {
                 AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER)
             }
-
+            "c" ->{
+                AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER)
+            }
             "n" -> {
                 AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL)
             }
 
+            "S" -> {
+                AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL)
+            }
+
+            "E" -> {
+                AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE)
+            }
             "o" -> {
                 AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE)
             }

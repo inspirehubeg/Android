@@ -31,10 +31,10 @@ interface HighlightRepository {
      * @return A Flow emitting a list of highlights for the specified page.
      */
     suspend fun getPageHighlights(
-        bookId: String,
+        bookId: Int,
         chapterNumber: Int,
         pageNumber: Int
     ): Flow<List<HighlightEntity>>
 
-   suspend fun getHighlightsForBook(bookId: String): Flow<List<Highlight>>
+   suspend fun getHighlightsForBook(bookId: Int): Flow<List<Highlight>>
 }
